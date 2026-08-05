@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+
+# Never commit the mounted GitHub token used by the devcontainer
+.devcontainer/.secrets/
