@@ -1,0 +1,13 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    // Needed for `node:url` in vite.config.ts; @vue/tsconfig sets "types": [] to keep
+    // Node globals out of app code, so we opt back in explicitly here.
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue", "vite.config.ts"]
+}

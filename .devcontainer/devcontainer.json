@@ -11,7 +11,7 @@
   "runArgs": ["--cap-add=NET_ADMIN", "--cap-add=NET_RAW"],
   "customizations": {
     "vscode": {
-      "extensions": ["dbaeumer.vscode-eslint"],
+      "extensions": ["dbaeumer.vscode-eslint", "Vue.volar"],
       "settings": {
         "terminal.integrated.defaultProfile.linux": "zsh",
         "terminal.integrated.profiles.linux": { "zsh": { "path": "/bin/zsh" } }
@@ -32,7 +32,7 @@
     "CLAUDE_CONFIG_DIR": "/home/node/.claude",
     "POWERLEVEL9K_DISABLE_GITSTATUS": "true"
   },
-  // Common dev-server ports; add/remove once the project's actual stack is known.
-  "forwardPorts": [3000, 4200, 5173, 8080],
+  // Vite dev server (see vite.config.ts).
+  "forwardPorts": [5173],
   "postCreateCommand": "bash /workspace/.devcontainer/postCreate.sh"
 }

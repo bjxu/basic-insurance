@@ -42,13 +42,13 @@ It's bind-mounted **read-only**, is `.gitignore`d, and never gets baked into the
 
 ## Adjusting the firewall allowlist
 
-The stack for this project isn't set up yet, so only GitHub/npm/Anthropic are
-allowlisted. If the site ends up fetching data from somewhere else (e.g. a Swiss
-open-data API for insurance premiums), add its domain to the `for domain in ...` loop
-in `init-firewall.sh` and rebuild the container.
+The site is a Vue 3 + Vite SPA (see [../README.md](../README.md)) with a fully local,
+placeholder premium estimator — it makes no outbound API calls, so only
+GitHub/npm/Anthropic are allowlisted. If it later fetches real pricing data from
+somewhere else (e.g. a Swiss open-data API for insurance premiums), add that domain to
+the `for domain in ...` loop in `init-firewall.sh` and rebuild the container.
 
 ## Ports
 
-`3000, 4200, 5173, 8080` are forwarded by default (common dev-server ports for
-Next/CRA, Angular, Vite, and generic servers). Edit `forwardPorts` in
-`devcontainer.json` once the project's actual dev server is in place.
+`5173` (the Vite dev server) is forwarded by default. Run `npm run dev` inside the
+container and open the forwarded port.
