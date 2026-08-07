@@ -27,6 +27,13 @@ Because it's a GitHub Pages *project* site (not a custom domain or `<user>.githu
 root site), `vite.config.ts` sets `base: '/basic-insurance/'` — if this repo is ever
 renamed or moved to a custom domain, update that (and the URL above) together.
 
+GitHub Pages serves static files only, with no server-side rewrites — so a direct
+load/refresh/bookmark of a route like `/compare` would 404 (client-side navigation
+*within* the app is unaffected; only a fresh request to that path is a problem). The
+`postbuild` script copies `dist/index.html` to `dist/404.html` as a workaround: GitHub
+Pages serves that for any unmatched path, which boots the app and lets Vue Router take
+over from wherever the user landed.
+
 ## Running
 
 Recommended: use the sandboxed dev container (see
