@@ -17,7 +17,10 @@ import { RouterLink, RouterView } from 'vue-router'
     </main>
 
     <footer class="site-footer">
-      <p>Estimates only &mdash; not a real quote. &copy; {{ new Date().getFullYear() }} Basic Insurance.</p>
+      <p>
+        Health premiums: real BAG data. Car/home: illustrative placeholder only, not a
+        real quote. &copy; {{ new Date().getFullYear() }} Basic Insurance.
+      </p>
     </footer>
   </div>
 </template>

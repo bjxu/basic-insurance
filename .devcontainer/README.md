@@ -42,11 +42,11 @@ It's bind-mounted **read-only**, is `.gitignore`d, and never gets baked into the
 
 ## Adjusting the firewall allowlist
 
-The site is a Vue 3 + Vite SPA (see [../README.md](../README.md)) with a fully local,
-placeholder premium estimator — it makes no outbound API calls, so only
-GitHub/npm/Anthropic are allowlisted. If it later fetches real pricing data from
-somewhere else (e.g. a Swiss open-data API for insurance premiums), add that domain to
-the `for domain in ...` loop in `init-firewall.sh` and rebuild the container.
+The site is a Vue 3 + Vite SPA (see [../README.md](../README.md)). The deployed app
+itself makes no outbound API calls — real health-insurance premiums ship as a static
+JSON file regenerated offline. `opendata.bagnet.ch` (BAG's official premium dataset,
+see `npm run build:data`) is allowlisted only so that regeneration script can run from
+inside the container; the app's own `npm run dev`/`build`/`preview` never touch it.
 
 ## Ports
 

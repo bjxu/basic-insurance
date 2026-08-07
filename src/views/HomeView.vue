@@ -6,13 +6,14 @@ import { RouterLink } from 'vue-router'
   <section class="hero">
     <h1>Know roughly what you'd pay &mdash; before you talk to anyone.</h1>
     <p class="lede">
-      Basic Insurance is a small tool for comparing rough monthly premium estimates across
-      health, car, and home cover, based on your age, coverage amount, and deductible.
+      Basic Insurance compares monthly premiums for health, car, and home cover, based on
+      your age, coverage amount, and deductible.
     </p>
     <RouterLink to="/compare" class="cta">Get an estimate</RouterLink>
     <p class="disclaimer">
-      Figures are illustrative only, computed locally in your browser from a simplified
-      formula &mdash; they are not quotes from any insurer.
+      Health premiums are real, official figures published by Switzerland's Federal
+      Office of Public Health (BAG). Car and home figures are a simplified local
+      placeholder, not real quotes &mdash; support for those is still on the way.
     </p>
   </section>
 </template>

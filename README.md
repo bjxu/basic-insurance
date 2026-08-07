@@ -1,12 +1,19 @@
 # Basic Insurance
 
-A small Vue 3 + Vite + TypeScript site with a premium comparison tool: enter age,
-insurance type, coverage amount, and deductible, and get a rough monthly/annual
-estimate.
+A small Vue 3 + Vite + TypeScript site with a premium comparison tool: pick an
+insurance type and enter your details to compare monthly premiums.
 
-The estimator ([src/lib/estimate.ts](src/lib/estimate.ts)) is a simplified, local
-formula for demo purposes — it is **not** a real quote and isn't pulled from any
-insurer's rate table. Swap it out once a real pricing source is wired up.
+- **Health**: real, official 2026 mandatory health insurance (KVG/OKP) premiums from
+  Switzerland's Federal Office of Public Health (BAG) open data — see
+  [src/lib/health-premiums.ts](src/lib/health-premiums.ts) and
+  [scripts/build-premium-data.mjs](scripts/build-premium-data.mjs) for how the raw
+  ~217k-row dataset gets turned into the compact [public/data/premiums.json](public/data/premiums.json)
+  the app fetches. Regenerate it with `npm run build:data` (needs network access to
+  `opendata.bagnet.ch`; not run automatically — the deployed site only ever reads the
+  committed static JSON).
+- **Car / home**: still a simplified, local placeholder formula
+  ([src/lib/estimate.ts](src/lib/estimate.ts)) — **not** a real quote from any insurer.
+  No open data source for these is wired up yet.
 
 ## Running
 
@@ -25,5 +32,7 @@ npm run preview   # preview the production build
 
 - [src/views/HomeView.vue](src/views/HomeView.vue) — landing page
 - [src/views/CompareView.vue](src/views/CompareView.vue) — the comparison tool
-- [src/lib/estimate.ts](src/lib/estimate.ts) — the (placeholder) pricing formula
+- [src/lib/health-premiums.ts](src/lib/health-premiums.ts) — real BAG health premium lookups
+- [src/lib/estimate.ts](src/lib/estimate.ts) — the (placeholder) car/home pricing formula
+- [scripts/build-premium-data.mjs](scripts/build-premium-data.mjs) — regenerates `public/data/premiums.json` from BAG's open data
 - [src/router/index.ts](src/router/index.ts) — routes

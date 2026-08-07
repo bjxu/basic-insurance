@@ -45,13 +45,16 @@ while read -r cidr; do
   ipset add allowed-domains "$cidr"
 done < <(echo "$gh_ranges" | jq -r '(.web + .api + .git)[]' | aggregate -q)
 
-# Other allowed domains: npm registry + Anthropic API/telemetry
+# Other allowed domains: npm registry + Anthropic API/telemetry + BAG open data
+# (opendata.bagnet.ch serves the official Swiss health insurance premium dataset used
+# by scripts/build-premium-data.mjs; see .devcontainer/README.md).
 for domain in \
   "registry.npmjs.org" \
   "api.anthropic.com" \
   "statsig.anthropic.com" \
   "statsig.com" \
-  "sentry.io"; do
+  "sentry.io" \
+  "opendata.bagnet.ch"; do
   echo "Resolving $domain..."
   ips=$(dig +short A "$domain" || true)
   if [ -z "$ips" ]; then
