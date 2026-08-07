@@ -15,6 +15,18 @@ insurance type and enter your details to compare monthly premiums.
   ([src/lib/estimate.ts](src/lib/estimate.ts)) — **not** a real quote from any insurer.
   No open data source for these is wired up yet.
 
+## Deployment
+
+Deployed to GitHub Pages at <https://bjxu.github.io/basic-insurance/> via
+[.github/workflows/deploy.yml](.github/workflows/deploy.yml), which builds and
+publishes on every push to `main` (or manually via workflow_dispatch). The build
+needs no network access — `public/data/premiums.json` is a committed snapshot, not
+fetched at build/deploy time (see `npm run build:data` above).
+
+Because it's a GitHub Pages *project* site (not a custom domain or `<user>.github.io`
+root site), `vite.config.ts` sets `base: '/basic-insurance/'` — if this repo is ever
+renamed or moved to a custom domain, update that (and the URL above) together.
+
 ## Running
 
 Recommended: use the sandboxed dev container (see

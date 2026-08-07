@@ -47,7 +47,9 @@ export interface HealthQuoteResult {
 let dataPromise: Promise<PremiumsData> | null = null
 
 export function loadPremiumsData(): Promise<PremiumsData> {
-  dataPromise ??= fetch('/data/premiums.json').then((res) => {
+  // BASE_URL already carries a trailing slash (e.g. "/basic-insurance/", or "/" in
+  // dev) — see the `base` comment in vite.config.ts for why this can't be hardcoded.
+  dataPromise ??= fetch(`${import.meta.env.BASE_URL}data/premiums.json`).then((res) => {
     if (!res.ok) throw new Error(`Failed to load premium data: HTTP ${res.status}`)
     return res.json() as Promise<PremiumsData>
   })
