@@ -26,7 +26,7 @@ option and see what switching would save them.
 - Comparing current-year (and next-year, once published) premiums for one person.
 - A "switch & save" comparison against the user's current plan.
 
-**Out of scope (v1):** see §11 for the full list and rationale (household comparison,
+**Out of scope (v1):** see §12 for the full list and rationale (household comparison,
 non-German languages, subsidy calculations, peer/percentile and trend-flag features, and
 any accounts, forms, or switching workflow).
 
@@ -186,6 +186,9 @@ municipality is always visible on screen (§5.1).
 | REQ-15 | If no plans match the current required inputs and active filters (e.g. an insurer doesn't operate in that region), a clear empty-state message is shown instead of a blank list. |
 | REQ-16 | Next-year lookups (list and headline) use the age band and deductible tier applicable to next year, not the current year, for users whose age band changes between the two (e.g. turning 19 or 26). |
 | REQ-17 | The page is usable at viewport widths from ~360px up (mobile) through desktop, and meets WCAG 2.1 AA. |
+| REQ-18 | Page `<title>` and meta description reflect the active comparison when loaded from a stateful URL, with a generic keyword-appropriate default otherwise. |
+| REQ-19 | Open Graph / Twitter Card metadata mirrors the title/description, so shared comparison links (REQ-11) preview correctly. |
+| REQ-20 | Parameterized comparison URLs are `noindex` with a canonical tag to the base URL; only the base URL is indexed, and is the sitemap's sole entry. |
 
 ## 8. Edge Cases & Error Handling
 
@@ -215,7 +218,36 @@ municipality is always visible on screen (§5.1).
   (§4) — this is a UX expectation, not a technical performance target, which stays out of
   scope per this document's boundaries.
 
-## 10. Open Questions / Assumptions for Review
+## 10. SEO & Discoverability
+
+Scope: general findability and clean sharing hygiene only — v1 does not include a
+dedicated landing-page/content strategy (e.g. per-canton pages built to rank for specific
+searches); that's deferred, see §12.
+
+Because comparison state lives entirely in URL query parameters (§5.3, REQ-11), the space
+of possible URLs is effectively unbounded (every combination of location × birth year ×
+deductible × optional current-plan fields is its own URL). That's good for shareability
+but would be harmful for SEO if left unmanaged — search engines would see it as
+near-infinite thin/duplicate content. v1 handles this by keeping exactly one URL
+indexable (the base app URL, with no query parameters) while still allowing every
+parameterized URL to be crawled, shared, and correctly previewed.
+
+- The page's `<title>` and meta description reflect the active comparison when the page
+  is loaded from a URL with state in it (e.g. *"Krankenkassenvergleich Zürich – ab CHF
+  245/Monat"*), and fall back to a generic, keyword-appropriate default (mentioning
+  Grundversicherung/Krankenkassenvergleich) when no comparison has been entered yet.
+- Open Graph and Twitter Card metadata mirror that title/description, so a shared
+  comparison link (REQ-11) renders a correct, specific preview on social/messaging
+  platforms rather than a generic one.
+- Every parameterized comparison URL carries a canonical tag pointing to the base app URL
+  and is marked `noindex`; only the base URL is intended to be indexed by search engines.
+  This does not affect crawling for link-preview purposes (Open Graph scraping is
+  independent of search-index `noindex` directives).
+- The sitemap contains only the base URL; robots.txt allows it.
+- Semantic HTML (proper heading hierarchy, landmark regions) is used throughout — this
+  serves SEO and is also required for the accessibility bar already in place (REQ-17).
+
+## 11. Open Questions / Assumptions for Review
 
 1. Age-band reference date (§8) — believed to be "age reached during the calendar year"
    per known BAG methodology; flagged for a quick confirmation against the official data
@@ -232,7 +264,7 @@ municipality is always visible on screen (§5.1).
    be driven by BAG's actual Tarifart classification during implementation rather than
    hardcoded to these three named models, in case the official classification is broader.
 
-## 11. Future Considerations (explicitly not v1)
+## 12. Future Considerations (explicitly not v1)
 
 - Household/multi-person comparison view.
 - French/Italian language support.
@@ -240,5 +272,8 @@ municipality is always visible on screen (§5.1).
 - Year-over-year "mover" flag for insurers with fast-rising rank/price — deferred because
   two data points (current + next year) is a thin trend signal.
 - Premium subsidy (*Prämienverbilligung*) eligibility/estimation.
+- Dedicated SEO landing pages / content strategy (e.g. static per-canton or per-region
+  pages built to rank for specific searches) — v1 covers only general findability and
+  sharing hygiene (§10).
 - Any user accounts, saved profiles, switching workflow, or insurer referral links —
   deliberately excluded from this tool's purpose (§4), not merely deferred for later.
