@@ -1,19 +1,32 @@
 # Basic Insurance
 
-A small Vue 3 + Vite + TypeScript site with a premium comparison tool: pick an
-insurance type and enter your details to compare monthly premiums.
+A small Vue 3 + Vite + TypeScript site comparing real, official Swiss mandatory
+health insurance (KVG/OKP) premiums — enter your age, deductible, accident-coverage
+choice, and postcode/municipality, and see actual premiums per insurer.
 
-- **Health**: real, official 2026 mandatory health insurance (KVG/OKP) premiums from
-  Switzerland's Federal Office of Public Health (BAG) open data — see
-  [src/lib/health-premiums.ts](src/lib/health-premiums.ts) and
-  [scripts/build-premium-data.mjs](scripts/build-premium-data.mjs) for how the raw
-  ~217k-row dataset gets turned into the compact [public/data/premiums.json](public/data/premiums.json)
-  the app fetches. Regenerate it with `npm run build:data` (needs network access to
-  `opendata.bagnet.ch`; not run automatically — the deployed site only ever reads the
-  committed static JSON).
-- **Car / home**: still a simplified, local placeholder formula
-  ([src/lib/estimate.ts](src/lib/estimate.ts)) — **not** a real quote from any insurer.
-  No open data source for these is wired up yet.
+All numbers come from Switzerland's Federal Office of Public Health (BAG) and
+priminfo.admin.ch open data — nothing is estimated or fabricated:
+
+- [scripts/build-premium-data.mjs](scripts/build-premium-data.mjs) downloads BAG's
+  ~217k-row premium dataset (`Prämien_CH.csv`) *and* the official municipality/
+  postcode → premium-region lookup (`praemienregionen.xlsx`), cross-checks that the
+  two agree on how many premium regions each canton has, and compacts both into
+  [public/data/premiums.json](public/data/premiums.json). Regenerate with
+  `npm run build:data` (needs network access to `opendata.bagnet.ch` and
+  `www.priminfo.admin.ch`; not run automatically — the deployed site only ever reads
+  the committed static JSON).
+- [src/lib/health-premiums.ts](src/lib/health-premiums.ts) is the client-side lookup:
+  resolves a postcode/municipality search to its exact premium region (not just
+  canton — e.g. Zürich the city and rural ZH municipalities are priced differently),
+  then filters premiums by that region, age class, deductible, and accident coverage.
+
+**No gender field, on purpose**: Art. 61 KVG requires Swiss insurers to charge the
+same OKP premium regardless of sex — BAG's dataset has no such column, so there's
+nothing to show. Age only has three real buckets in the data (child 0–18, young adult
+19–25, adult 26+), not per-year pricing.
+
+This app covers mandatory health insurance only — no car, home, or other insurance
+types; no open data source for those has been wired up.
 
 ## Deployment
 
@@ -50,8 +63,7 @@ npm run preview   # preview the production build
 ## Structure
 
 - [src/views/HomeView.vue](src/views/HomeView.vue) — landing page
-- [src/views/CompareView.vue](src/views/CompareView.vue) — the comparison tool
-- [src/lib/health-premiums.ts](src/lib/health-premiums.ts) — real BAG health premium lookups
-- [src/lib/estimate.ts](src/lib/estimate.ts) — the (placeholder) car/home pricing formula
-- [scripts/build-premium-data.mjs](scripts/build-premium-data.mjs) — regenerates `public/data/premiums.json` from BAG's open data
+- [src/views/CompareView.vue](src/views/CompareView.vue) — the comparison tool (postcode/municipality search, age, deductible, accident coverage)
+- [src/lib/health-premiums.ts](src/lib/health-premiums.ts) — client-side premium/municipality lookups
+- [scripts/build-premium-data.mjs](scripts/build-premium-data.mjs) + [scripts/lib/xlsx-lite.mjs](scripts/lib/xlsx-lite.mjs) — regenerate `public/data/premiums.json` from BAG/priminfo open data
 - [src/router/index.ts](src/router/index.ts) — routes

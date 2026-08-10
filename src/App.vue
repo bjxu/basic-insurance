@@ -18,8 +18,8 @@ import { RouterLink, RouterView } from 'vue-router'
 
     <footer class="site-footer">
       <p>
-        Health premiums: real BAG data. Car/home: illustrative placeholder only, not a
-        real quote. &copy; {{ new Date().getFullYear() }} Basic Insurance.
+        Real premium data from Switzerland's Federal Office of Public Health (BAG).
+        &copy; {{ new Date().getFullYear() }} Basic Insurance.
       </p>
     </footer>
   </div>

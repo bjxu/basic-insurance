@@ -4,16 +4,16 @@ import { RouterLink } from 'vue-router'
 
 <template>
   <section class="hero">
-    <h1>Know roughly what you'd pay &mdash; before you talk to anyone.</h1>
+    <h1>Know what you'd actually pay &mdash; before you talk to anyone.</h1>
     <p class="lede">
-      Basic Insurance compares monthly premiums for health, car, and home cover, based on
-      your age, coverage amount, and deductible.
+      Basic Insurance compares real, official monthly premiums for Swiss mandatory
+      health insurance (KVG/OKP), based on your age, deductible, accident coverage, and
+      exact municipality.
     </p>
-    <RouterLink to="/compare" class="cta">Get an estimate</RouterLink>
+    <RouterLink to="/compare" class="cta">Compare premiums</RouterLink>
     <p class="disclaimer">
-      Health premiums are real, official figures published by Switzerland's Federal
-      Office of Public Health (BAG). Car and home figures are a simplified local
-      placeholder, not real quotes &mdash; support for those is still on the way.
+      Figures are published by Switzerland's Federal Office of Public Health (BAG) and
+      priminfo.admin.ch &mdash; not estimates.
     </p>
   </section>
 </template>

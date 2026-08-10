@@ -44,9 +44,10 @@ It's bind-mounted **read-only**, is `.gitignore`d, and never gets baked into the
 
 The site is a Vue 3 + Vite SPA (see [../README.md](../README.md)). The deployed app
 itself makes no outbound API calls — real health-insurance premiums ship as a static
-JSON file regenerated offline. `opendata.bagnet.ch` (BAG's official premium dataset,
-see `npm run build:data`) is allowlisted only so that regeneration script can run from
-inside the container; the app's own `npm run dev`/`build`/`preview` never touch it.
+JSON file regenerated offline. `opendata.bagnet.ch` (BAG's official premium dataset)
+and `www.priminfo.admin.ch` (the official municipality/postcode premium-region lookup)
+are allowlisted only so `npm run build:data` can run from inside the container; the
+app's own `npm run dev`/`build`/`preview` never touch either.
 
 ## Ports
 

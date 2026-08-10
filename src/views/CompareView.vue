@@ -1,24 +1,19 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { estimatePremium, type InsuranceType } from '../lib/estimate'
 import {
   ageToAgeClass,
   getHealthPremiums,
   loadPremiumsData,
+  searchGemeinden,
+  type Gemeinde,
   type HealthQuoteResult,
   type PremiumsData,
 } from '../lib/health-premiums'
 
 const form = reactive({
-  type: 'health' as InsuranceType,
   age: 35,
-  // health only
-  canton: 'ZH',
   franchise: 300,
   accidentIncluded: true,
-  // car/home only
-  coverageAmount: 50_000,
-  deductible: 500,
 })
 
 const currency = new Intl.NumberFormat(undefined, {
@@ -27,26 +22,30 @@ const currency = new Intl.NumberFormat(undefined, {
   maximumFractionDigits: 2,
 })
 
-const insuranceTypes: { value: InsuranceType; label: string }[] = [
-  { value: 'health', label: 'Health' },
-  { value: 'car', label: 'Car' },
-  { value: 'home', label: 'Home' },
-]
-
-// --- Car/home: placeholder local formula (see src/lib/estimate.ts) -----------------
-const placeholderResult = computed(() => estimatePremium({ ...form }))
-
-// --- Health: real BAG premium data --------------------------------------------------
 const premiums = ref<PremiumsData | null>(null)
 const premiumsError = ref<string | null>(null)
 const healthResult = ref<HealthQuoteResult | null>(null)
 
+// --- Location search (postcode or municipality name -> exact premium region) -------
+const locationQuery = ref('')
+const selectedLocation = ref<Gemeinde | null>(null)
+const locationResults = computed(() =>
+  premiums.value && !selectedLocation.value ? searchGemeinden(premiums.value, locationQuery.value) : [],
+)
+
+function selectLocation(g: Gemeinde) {
+  selectedLocation.value = g
+  locationQuery.value = `${g.plz} ${g.ort}`
+}
+
+function clearLocation() {
+  selectedLocation.value = null
+  locationQuery.value = ''
+}
+
 const ageClass = computed(() => ageToAgeClass(form.age))
 const franchiseOptions = computed(
   () => premiums.value?.ageClasses[ageClass.value]?.franchises ?? [],
-)
-const cantonOptions = computed(() =>
-  premiums.value ? Object.entries(premiums.value.cantons).sort((a, b) => a[1].localeCompare(b[1])) : [],
 )
 
 // Keep the selected franchise valid when age crosses an age-class boundary (children,
@@ -60,12 +59,16 @@ watch(
 )
 
 watch(
-  [() => form.type, () => form.age, () => form.canton, () => form.franchise, () => form.accidentIncluded],
+  [() => form.age, () => form.franchise, () => form.accidentIncluded, selectedLocation],
   async () => {
-    if (form.type !== 'health') return
+    if (!selectedLocation.value) {
+      healthResult.value = null
+      return
+    }
     try {
       healthResult.value = await getHealthPremiums({
-        canton: form.canton,
+        canton: selectedLocation.value.canton,
+        region: selectedLocation.value.region,
         age: form.age,
         franchise: form.franchise,
         accidentIncluded: form.accidentIncluded,
@@ -89,72 +92,71 @@ onMounted(async () => {
 
 <template>
   <section class="compare">
-    <h1>Compare premiums</h1>
+    <h1>Compare health insurance premiums</h1>
 
     <form class="form" @submit.prevent>
-      <fieldset class="field">
-        <legend>Insurance type</legend>
-        <label v-for="option in insuranceTypes" :key="option.value" class="radio">
-          <input v-model="form.type" type="radio" name="type" :value="option.value" />
-          {{ option.label }}
-        </label>
-      </fieldset>
-
       <label class="field">
         Age
         <input v-model.number="form.age" type="number" min="0" max="100" required />
       </label>
 
-      <template v-if="form.type === 'health'">
-        <label class="field">
-          Canton
-          <select v-model="form.canton" required>
-            <option v-for="[code, name] in cantonOptions" :key="code" :value="code">
-              {{ name }} ({{ code }})
-            </option>
-          </select>
-        </label>
-
-        <label class="field">
-          Deductible / Franchise (CHF)
-          <select v-model.number="form.franchise" required>
-            <option v-for="amount in franchiseOptions" :key="amount" :value="amount">
-              {{ currency.format(amount) }}
-            </option>
-          </select>
-        </label>
-
-        <label class="field checkbox-field">
-          <input v-model="form.accidentIncluded" type="checkbox" />
-          Include accident coverage
-        </label>
-        <p class="field-hint">
-          Leave this off if accidents are already covered through an employer (common
-          for anyone working &ge;8h/week in Switzerland).
-        </p>
-      </template>
-
-      <template v-else>
-        <label class="field">
-          Coverage amount (CHF)
+      <div class="field location-field">
+        <label for="location-input">Postcode or municipality</label>
+        <div v-if="selectedLocation" class="location-selected">
+          <span>
+            {{ selectedLocation.plz }} {{ selectedLocation.ort }},
+            {{ selectedLocation.gemeinde }} ({{ selectedLocation.canton }}) &mdash;
+            {{
+              selectedLocation.region === 0
+                ? 'single premium region (canton not split)'
+                : `premium region ${selectedLocation.region}`
+            }}
+          </span>
+          <button type="button" class="link-button" @click="clearLocation">Change</button>
+        </div>
+        <template v-else>
           <input
-            v-model.number="form.coverageAmount"
-            type="number"
-            min="0"
-            step="1000"
-            required
+            id="location-input"
+            v-model="locationQuery"
+            type="text"
+            placeholder="e.g. 8001 or Zürich"
+            autocomplete="off"
           />
-        </label>
+          <ul v-if="locationResults.length > 0" class="location-results">
+            <li v-for="g in locationResults" :key="`${g.bfsNr}-${g.plz}`">
+              <button type="button" @click="selectLocation(g)">
+                {{ g.plz }} {{ g.ort }}, {{ g.gemeinde }} ({{ g.canton }})
+              </button>
+            </li>
+          </ul>
+          <p v-else-if="locationQuery.trim()" class="field-hint">No matching municipality found.</p>
+        </template>
+      </div>
 
-        <label class="field">
-          Deductible (CHF)
-          <input v-model.number="form.deductible" type="number" min="0" step="100" required />
-        </label>
-      </template>
+      <label class="field">
+        Deductible / Franchise (CHF)
+        <select v-model.number="form.franchise" required>
+          <option v-for="amount in franchiseOptions" :key="amount" :value="amount">
+            {{ currency.format(amount) }}
+          </option>
+        </select>
+      </label>
+
+      <label class="field checkbox-field">
+        <input v-model="form.accidentIncluded" type="checkbox" />
+        Include accident coverage
+      </label>
+      <p class="field-hint">
+        Leave this off if accidents are already covered through an employer (common
+        for anyone working &ge;8h/week in Switzerland).
+      </p>
     </form>
 
-    <div v-if="form.type === 'health'" class="result-block">
+    <div class="result-block">
       <p v-if="premiumsError" class="error">Couldn't load premium data: {{ premiumsError }}</p>
+      <p v-else-if="!selectedLocation" class="result-empty">
+        Search for your postcode or municipality above to see premiums.
+      </p>
       <template v-else-if="healthResult">
         <div v-if="healthResult.cheapest" class="result" role="status">
           <p class="result-label">Cheapest available</p>
@@ -187,26 +189,13 @@ onMounted(async () => {
           {{ premiums?.premiumYear }} mandatory health insurance (KVG/OKP) premiums,
           published by the
           <a :href="premiums?.sourceDataset" target="_blank" rel="noopener">Federal Office of
-          Public Health (BAG)</a>. Cheapest premium found per insurer in your canton,
-          across premium regions and insurance models (standard, HMO, family-doctor,
-          etc.) &mdash; not specific to your municipality, and excludes supplementary
-          insurance.
+          Public Health (BAG)</a>, resolved to your exact
+          <a :href="premiums?.sourceRegions" target="_blank" rel="noopener">premium region</a>
+          via your municipality &mdash; not just your canton. Excludes supplementary
+          insurance. Not shown: gender &mdash; Swiss law requires OKP premiums to be
+          gender-neutral, so BAG's data has no such dimension.
         </p>
       </template>
-      <p v-else class="result-empty">Loading premium data&hellip;</p>
-    </div>
-
-    <div v-else class="result-block">
-      <div class="result" role="status">
-        <p class="result-label">Estimated premium</p>
-        <p class="result-value">{{ currency.format(placeholderResult.monthlyPremium) }} / month</p>
-        <p class="result-sub">{{ currency.format(placeholderResult.annualPremium) }} / year</p>
-      </div>
-      <p class="disclaimer">
-        This is a simplified, local placeholder estimate for demo purposes &mdash; not a
-        real quote from any insurer. (Only health insurance uses real published data so
-        far &mdash; see the Health option.)
-      </p>
     </div>
   </section>
 </template>
@@ -250,27 +239,68 @@ onMounted(async () => {
   color: var(--color-text-muted);
 }
 
-fieldset.field {
+.location-field {
+  position: relative;
+}
+
+.location-selected {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 1rem;
-}
-
-fieldset.field legend {
-  font-weight: 600;
-  font-size: 0.9rem;
-  padding: 0;
-}
-
-.radio {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background-color: var(--color-bg);
   font-weight: 400;
+  font-size: 0.9rem;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.location-results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background-color: var(--color-bg);
+  max-height: 12rem;
+  overflow-y: auto;
+}
+
+.location-results li + li {
+  border-top: 1px solid var(--color-border);
+}
+
+.location-results button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.6rem;
+  background: none;
+  border: none;
+  font: inherit;
+  font-weight: 400;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.location-results button:hover {
+  background-color: var(--color-surface);
 }
 
 input[type='number'],
+input[type='text'],
 select {
   padding: 0.5rem 0.6rem;
   border: 1px solid var(--color-border);
@@ -279,6 +309,7 @@ select {
   color: var(--color-text);
   font-size: 1rem;
   font-family: inherit;
+  font-weight: 400;
 }
 
 .result-block {
