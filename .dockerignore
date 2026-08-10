@@ -1,0 +1,25 @@
+# No Dockerfile exists yet (devcontainer.json uses a prebuilt `image`), but
+# this file guards ahead of time: if a Dockerfile with `COPY . .` is ever
+# added, these must never be baked into an image layer.
+
+# Secrets — never bake into an image layer
+.devcontainer/.secrets/
+*.env
+.env.*
+
+# Git
+.git/
+.gitignore
+
+# Node
+node_modules/
+dist/
+build/
+coverage/
+npm-debug.log*
+*.tsbuildinfo
+.eslintcache
+
+# Editor/OS
+.DS_Store
+Thumbs.db
