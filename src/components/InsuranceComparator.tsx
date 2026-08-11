@@ -47,6 +47,7 @@ export function InsuranceComparator() {
 
   const gemeinden = plz.length === 4 ? resolveGemeinden(plz) : [];
   const ambiguous = needsDisambiguation(gemeinden);
+  const plzNotFound = plz.length === 4 && gemeinden.length === 0;
   const resolvedGemeinde = bfsNr ? gemeinden.find((g) => g.bfsNr === bfsNr) : gemeinden[0];
   const praemienregionId = resolvedGemeinde?.praemienregionId ?? null;
 
@@ -119,7 +120,7 @@ export function InsuranceComparator() {
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <PlzInput value={plz} onChange={setPlz} />
+          <PlzInput value={plz} onChange={setPlz} notFound={plzNotFound} />
           <BirthYearInput value={birthYear} onChange={setBirthYear} calendarYear={year} />
           <DeductibleSelect altersklasse={altersklasse} value={franchise} onChange={setFranchise} />
         </div>

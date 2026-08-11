@@ -5,10 +5,16 @@ import { validatePlz } from "@/lib/validate";
 type Props = {
   value: string;
   onChange: (value: string) => void;
+  /** True when the PLZ has valid format but doesn't resolve to any known Gemeinde (REQ-13). */
+  notFound?: boolean;
 };
 
-export function PlzInput({ value, onChange }: Props) {
-  const result = value ? validatePlz(value) : { valid: true as const };
+export function PlzInput({ value, onChange, notFound }: Props) {
+  const formatResult = value ? validatePlz(value) : { valid: true as const };
+  const result =
+    formatResult.valid && notFound
+      ? { valid: false as const, message: "PLZ nicht gefunden — bitte überprüfen." }
+      : formatResult;
 
   return (
     <div>
