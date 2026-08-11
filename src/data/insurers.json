@@ -1,10 +1,138 @@
 [
-  { "insurerCode": "ASSURA", "insurerName": "Assura" },
-  { "insurerCode": "KPT", "insurerName": "KPT" },
-  { "insurerCode": "EGK", "insurerName": "EGK-Gesundheitskasse" },
-  { "insurerCode": "CONCORDIA", "insurerName": "Concordia" },
-  { "insurerCode": "VISANA", "insurerName": "Visana" },
-  { "insurerCode": "HELSANA", "insurerName": "Helsana" },
-  { "insurerCode": "SANITAS", "insurerName": "Sanitas" },
-  { "insurerCode": "CSS", "insurerName": "CSS" }
+  {
+    "insurerCode": "1560",
+    "insurerName": "Agrisano"
+  },
+  {
+    "insurerCode": "1507",
+    "insurerName": "AMB Assurances (Groupe Mutuel)"
+  },
+  {
+    "insurerCode": "32",
+    "insurerName": "Aquilana"
+  },
+  {
+    "insurerCode": "1542",
+    "insurerName": "Assura"
+  },
+  {
+    "insurerCode": "312",
+    "insurerName": "Atupri"
+  },
+  {
+    "insurerCode": "343",
+    "insurerName": "Avenir Assurance (Groupe Mutuel)"
+  },
+  {
+    "insurerCode": "1113",
+    "insurerName": "Caisse-maladie de la vallée d'Entremont"
+  },
+  {
+    "insurerCode": "290",
+    "insurerName": "Concordia"
+  },
+  {
+    "insurerCode": "8",
+    "insurerName": "CSS"
+  },
+  {
+    "insurerCode": "820",
+    "insurerName": "curaulta"
+  },
+  {
+    "insurerCode": "881",
+    "insurerName": "EGK"
+  },
+  {
+    "insurerCode": "134",
+    "insurerName": "Einsiedler Krankenkasse"
+  },
+  {
+    "insurerCode": "1386",
+    "insurerName": "Galenos"
+  },
+  {
+    "insurerCode": "780",
+    "insurerName": "Glarner Krankenversicherung"
+  },
+  {
+    "insurerCode": "1562",
+    "insurerName": "Helsana"
+  },
+  {
+    "insurerCode": "376",
+    "insurerName": "KPT"
+  },
+  {
+    "insurerCode": "1322",
+    "insurerName": "Krankenkasse Birchmeier"
+  },
+  {
+    "insurerCode": "360",
+    "insurerName": "Krankenkasse Luzerner Hinterland"
+  },
+  {
+    "insurerCode": "246",
+    "insurerName": "Krankenkasse Steffisburg"
+  },
+  {
+    "insurerCode": "1040",
+    "insurerName": "Krankenkasse Visperterminen"
+  },
+  {
+    "insurerCode": "1318",
+    "insurerName": "Krankenkasse Wädenswil"
+  },
+  {
+    "insurerCode": "1479",
+    "insurerName": "Mutuel Assurance (Groupe Mutuel)"
+  },
+  {
+    "insurerCode": "455",
+    "insurerName": "ÖKK"
+  },
+  {
+    "insurerCode": "1535",
+    "insurerName": "Philos Assurance (Groupe Mutuel)"
+  },
+  {
+    "insurerCode": "1401",
+    "insurerName": "rhenusana"
+  },
+  {
+    "insurerCode": "1568",
+    "insurerName": "sana24"
+  },
+  {
+    "insurerCode": "1509",
+    "insurerName": "Sanitas"
+  },
+  {
+    "insurerCode": "923",
+    "insurerName": "SLKK"
+  },
+  {
+    "insurerCode": "941",
+    "insurerName": "sodalis"
+  },
+  {
+    "insurerCode": "194",
+    "insurerName": "Sumiswalder Krankenkasse"
+  },
+  {
+    "insurerCode": "1384",
+    "insurerName": "Swica"
+  },
+  {
+    "insurerCode": "509",
+    "insurerName": "Sympany"
+  },
+  {
+    "insurerCode": "1555",
+    "insurerName": "Visana"
+  },
+  {
+    "insurerCode": "966",
+    "insurerName": "vita surselva"
+  }
 ]
