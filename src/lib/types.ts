@@ -1,0 +1,47 @@
+// Core domain types shared across lookup, ETL, and UI layers (architecture.md §3.3).
+
+export type Altersklasse = "kind" | "jung" | "erwachsen"; // 0–18, 19–25, 26+
+
+export type Tarifart =
+  | "standard"
+  | "hmo"
+  | "hausarzt"
+  | "telmed"
+  | "andere"; // driven by BAG classification, not hardcoded labels
+
+export type PremiumRow = {
+  year: number;
+  insurerCode: string; // BAG insurer code
+  insurerName: string;
+  praemienregionId: string;
+  altersklasse: Altersklasse;
+  franchise: number; // CHF
+  unfalldeckung: boolean; // true = accident coverage included
+  tarifart: Tarifart;
+  monthlyPremium: number; // CHF, two decimal places
+};
+
+export type Gemeinde = {
+  bfsNr: number;
+  name: string;
+  kanton: string;
+  praemienregionId: string;
+};
+
+export type Metadata = {
+  publicationDate: string; // ISO date, e.g. "2025-10-15"
+  availableYears: number[];
+};
+
+export type CurrentPlan = {
+  insurerCode: string;
+  franchise: number;
+  tarifart: Tarifart;
+  unfalldeckung: boolean;
+};
+
+export type HeadlineState =
+  | { kind: "savings"; current: PremiumRow; cheapest: PremiumRow; savingsPerYear: number }
+  | { kind: "already-cheapest"; current: PremiumRow }
+  | { kind: "no-current-plan"; cheapest: PremiumRow | null }
+  | { kind: "current-plan-not-found"; cheapest: PremiumRow | null };

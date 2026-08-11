@@ -1,0 +1,10 @@
+[
+  { "insurerCode": "ASSURA", "insurerName": "Assura" },
+  { "insurerCode": "KPT", "insurerName": "KPT" },
+  { "insurerCode": "EGK", "insurerName": "EGK-Gesundheitskasse" },
+  { "insurerCode": "CONCORDIA", "insurerName": "Concordia" },
+  { "insurerCode": "VISANA", "insurerName": "Visana" },
+  { "insurerCode": "HELSANA", "insurerName": "Helsana" },
+  { "insurerCode": "SANITAS", "insurerName": "Sanitas" },
+  { "insurerCode": "CSS", "insurerName": "CSS" }
+]
