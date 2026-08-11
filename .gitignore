@@ -1,0 +1,17 @@
+# Secrets — never commit
+.devcontainer/.secrets/
+*.env
+.env.*
+
+# Node
+node_modules/
+dist/
+build/
+coverage/
+npm-debug.log*
+*.tsbuildinfo
+.eslintcache
+
+# Editor/OS
+.DS_Store
+Thumbs.db
