@@ -112,14 +112,9 @@ time.
 
 ### 5.3 Filters & List
 
-Below the headline, all matching plans are listed, sorted by price ascending, with ties
-broken alphabetically by insurer name. Defaults:
-- Insurance model: **Standard only**. Alternative models (HMO, Hausarztmodell, Telmed, and
-  other BAG-classified alternative variants) are opt-in via a filter toggle. Each shown
-  alternative model carries a one-line, plain-language description of its restriction (not
-  just a name/badge) — e.g. "Telmed: must call a hotline before seeing a doctor."
-- Accident coverage: **included** by default (the safer assumption when we don't know the
-  user's employment status); toggle to exclude it.
+Below the headline, one row per insurer is listed, showing that insurer's **cheapest available plan** at the selected franchise and active filters, sorted by price ascending with ties broken alphabetically by insurer name. Defaults:
+- Insurance model: **Standard only**. When alternative models are toggled on, the row for each insurer shows whichever model (Standard or alternative) is cheapest for that insurer at the selected franchise — so a single Helsana row might switch from showing Standard to Telmed if Telmed is cheaper. Each row's model badge carries a one-line, plain-language description of its restriction (not just a name/badge) — e.g. "Telmed: must call a hotline before seeing a doctor."
+- Accident coverage: **included** by default (the safer assumption when we don't know the user's employment status); toggle to exclude it.
 - Year: current year by default; toggle to next year once published. This toggle also
   drives the headline's year, per §5.2.
 
@@ -171,8 +166,8 @@ municipality is always visible on screen (§5.1).
 |---|---|
 | REQ-1 | User can locate their premium region via postal code, disambiguating by municipality when a postal code spans multiple regions; the resolved municipality is always displayed. |
 | REQ-2 | User can specify birth year and deductible; deductible options are scoped to the applicable tier (children 0–18 vs. everyone 19+, per §3). |
-| REQ-3 | System returns all matching plans (Standard model, accident coverage included, current year) sorted by price ascending (ties broken alphabetically by insurer), recomputed live as soon as all required inputs are valid — no explicit submit action. |
-| REQ-4 | User can toggle in alternative insurance models, each shown with a one-line plain-language description of its restriction. |
+| REQ-3 | System returns one row per insurer showing that insurer’s cheapest plan at the selected franchise and active filters (Standard model only by default, accident coverage included, current year), sorted by price ascending (ties broken alphabetically by insurer), recomputed live as soon as all required inputs are valid — no explicit submit action. |
+| REQ-4 | User can toggle in alternative insurance models; when active, each insurer’s row shows whichever model (Standard or alternative) is cheapest for that insurer at the selected franchise, with a one-line plain-language description of its restriction. |
 | REQ-5 | User can toggle accident coverage off. |
 | REQ-6 | User can toggle between current-year and next-year results when next-year data is published; this toggle also determines the year shown in the headline (§5.2). |
 | REQ-7 | User can optionally enter their current insurer, deductible, model, and accident-coverage status (all four fields) to enable the savings comparison. |
@@ -189,6 +184,8 @@ municipality is always visible on screen (§5.1).
 | REQ-18 | Page `<title>` and meta description reflect the active comparison when loaded from a stateful URL, with a generic keyword-appropriate default otherwise. |
 | REQ-19 | Open Graph / Twitter Card metadata mirrors the title/description, so shared comparison links (REQ-11) preview correctly. |
 | REQ-20 | Parameterized comparison URLs are `noindex` with a canonical tag to the base URL; only the base URL is indexed, and is the sitemap's sole entry. |
+| REQ-21 | Every price inquiry (defined as: all required inputs valid and results rendered) is logged server-side for activity monitoring. Each log entry records timestamp, resolved Prämienregion, Altersklasse, Franchise, active year, and active filters (model set, accident coverage). It does **not** record IP address, the optional current-plan fields, or any other data not needed for aggregate usage analysis. Logged data is used solely for understanding usage patterns (popular regions, peak times, filter usage) and is never sold or shared. |
+| REQ-22 | A password-protected admin dashboard at `/admin` visualises aggregate inquiry activity. It is not publicly linked or indexed. Access is restricted by a secret token stored in an environment variable (no user account system required). The dashboard has a time-range selector (presets: Today, Last 7 days, Last 30 days, This month, Last 3 months, This year, and any custom from/to date; defaults to Last 30 days) that drives every panel on the page simultaneously. Panels: total inquiries in the selected range; a time-series trend chart (granularity auto-adapts: hourly for ≤2 days, daily for ≤90 days, monthly for >90 days); top 10 Prämienregionen by count; breakdown by Altersklasse; breakdown by Franchise tier; breakdown by active insurance model set; breakdown by accident-coverage toggle. The selected range is reflected in the page URL so it is bookmarkable. All figures are aggregate counts — no raw log rows are exposed through the UI. |
 
 ## 8. Edge Cases & Error Handling
 
