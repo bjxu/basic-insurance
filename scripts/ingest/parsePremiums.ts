@@ -3,6 +3,10 @@
 // Column mapping and edge cases verified against the live file during planning
 // (2026-08-11) — see docs/superpowers/plans/2026-08-11-real-bag-data-ingestion.md
 // Global Constraints for how each was confirmed.
+//
+// After mapping, rows are deduped to one per (insurerCode, praemienregionId,
+// altersklasse, franchise, unfalldeckung, tarifart, year) key, keeping the
+// lowest monthlyPremium — see dedupeByLowestPremium below (requirement.md §11.2).
 
 import { parse } from "csv-parse/sync";
 import type { Altersklasse, PremiumRow, Tarifart } from "../../src/lib/types";
@@ -93,7 +97,38 @@ export function parsePremiumRows(
     });
   }
 
-  return { rows, skippedCantons, unknownTariftypes };
+  return { rows: dedupeByLowestPremium(rows), skippedCantons, unknownTariftypes };
+}
+
+// requirement.md §11.2 — BAG publishes multiple named products (distinct
+// Tarif/Tarifbezeichnung values, which we don't otherwise retain) under the
+// same (insurerCode, praemienregionId, altersklasse, franchise, unfalldeckung,
+// tarifart, year) key for some insurers, with genuinely different prices.
+// Without this, findCurrentPlan's `rows.find(...)` would pick an arbitrary
+// (file-order) row for that key, making it non-deterministic and able to
+// overstate the user's current premium. Keeping the lowest-priced row per key
+// resolves this conservatively: it can never overstate savings, and it's a
+// no-op for the results list, whose cheapestPerInsurer already takes a min
+// over the same field set. Ties (identical price) keep whichever row was
+// encountered first — no meaningful tiebreak signal is available.
+function dedupeByLowestPremium(rows: PremiumRow[]): PremiumRow[] {
+  const byKey = new Map<string, PremiumRow>();
+  for (const row of rows) {
+    const key = [
+      row.insurerCode,
+      row.praemienregionId,
+      row.altersklasse,
+      row.franchise,
+      row.unfalldeckung,
+      row.tarifart,
+      row.year,
+    ].join("|");
+    const existing = byKey.get(key);
+    if (!existing || row.monthlyPremium < existing.monthlyPremium) {
+      byKey.set(key, row);
+    }
+  }
+  return [...byKey.values()];
 }
 
 function parseFranchise(code: string): number {

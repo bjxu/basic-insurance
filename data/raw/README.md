@@ -1,6 +1,7 @@
 # Raw BAG data
 
-Committed here so the exact source is auditable and `npm run ingest --local data/raw`
+Committed here so the exact source is auditable and
+`npm run ingest -- --local data/raw --publication-date <YYYY-MM-DD>`
 works offline (architecture.md §3.1).
 
 | File | Source | Refresh |

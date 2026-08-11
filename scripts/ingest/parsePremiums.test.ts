@@ -90,6 +90,18 @@ describe("parsePremiumRows", () => {
     ).toThrow(/Altersklasse/);
   });
 
+  it("dedupes rows sharing the same key, keeping the lowest monthlyPremium", () => {
+    const { rows } = parsePremiumRows(
+      csv(
+        "8,ZH,CH,2026,2025,PR-REG CH1,AKL-ERW,MIT-UNF,BASE,TAR-BASE,,FRAST1,FRA-300,301.1,1,1,Grundversicherung Classic",
+        "8,ZH,CH,2026,2025,PR-REG CH1,AKL-ERW,MIT-UNF,PREMIUM,TAR-BASE,,FRAST1,FRA-300,350.0,1,1,Grundversicherung Premium",
+      ),
+      NAMES,
+    );
+    expect(rows).toHaveLength(1);
+    expect(rows[0].monthlyPremium).toBe(301.1);
+  });
+
   it("throws on an unknown insurer code", () => {
     expect(() =>
       parsePremiumRows(
