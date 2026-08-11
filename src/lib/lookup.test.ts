@@ -116,4 +116,11 @@ describe("computeHeadline", () => {
     const result = computeHeadline(cheapest, cheapest, true);
     expect(result.kind).toBe("already-cheapest");
   });
+
+  it("returns already-cheapest (not savings) when current is strictly cheaper than the filtered cheapest", () => {
+    // findCurrentPlan runs unfiltered, so this can legitimately happen (REQ-10).
+    const cheaperThanCheapest: PremiumRow = { ...cheapest, monthlyPremium: cheapest.monthlyPremium - 10 };
+    const result = computeHeadline(cheaperThanCheapest, cheapest, true);
+    expect(result.kind).toBe("already-cheapest");
+  });
 });
