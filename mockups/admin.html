@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin – Krankenkassenvergleich</title>
+  <meta name="robots" content="noindex, nofollow">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:       #2563eb;
+      --blue-mid:   #3b82f6;
+      --blue-light: #eff6ff;
+      --gray-50:    #f9fafb;
+      --gray-100:   #f3f4f6;
+      --gray-200:   #e5e7eb;
+      --gray-300:   #d1d5db;
+      --gray-400:   #9ca3af;
+      --gray-500:   #6b7280;
+      --gray-600:   #4b5563;
+      --gray-700:   #374151;
+      --gray-900:   #111827;
+      --radius:     8px;
+      --shadow-sm:  0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.04);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ── Nav ── */
+    nav {
+      background: var(--gray-900);
+      color: #fff;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    nav .brand { font-weight: 700; font-size: 15px; }
+    nav .badge {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: #374151;
+      color: var(--gray-400);
+      letter-spacing: .4px;
+    }
+    nav .spacer { flex: 1; }
+    nav .logout {
+      font-size: 13px;
+      color: var(--gray-400);
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 5px;
+      border: 1px solid #374151;
+      background: none;
+    }
+    /* Logout clears the token cookie — no server-side session (REQ-22) */
+    nav .logout:hover { background: #374151; color: #fff; }
+
+    /* ── Page ── */
+    .page {
+      max-width: 1100px;
+      margin: 28px auto;
+      padding: 0 20px;
+    }
+
+    /* ── Range picker ── */
+    .range-picker {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .range-picker .rp-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-right: 4px;
+    }
+    .preset-btn {
+      padding: 5px 12px;
+      border-radius: 5px;
+      border: 1px solid var(--gray-200);
+      background: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--gray-600);
+    }
+    .preset-btn:hover { border-color: var(--blue); color: var(--blue); }
+    .preset-btn.active {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+      font-weight: 600;
+    }
+    .rp-sep {
+      width: 1px; height: 22px;
+      background: var(--gray-200);
+      margin: 0 4px;
+    }
+    .date-inputs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .date-inputs span { font-size: 12px; color: var(--gray-400); }
+    .date-inputs input[type="date"] {
+      height: 32px;
+      padding: 0 8px;
+      border: 1px solid var(--gray-200);
+      border-radius: 5px;
+      font-size: 13px;
+      color: var(--gray-700);
+      background: var(--gray-50);
+    }
+    .rp-range-label {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--gray-400);
+    }
+
+    /* ── Stat card ── */
+    .stat-card {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      display: inline-block;
+      min-width: 220px;
+    }
+    .stat-card .sc-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--gray-400);
+    }
+    .stat-card .sc-value {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--gray-900);
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin: 4px 0 2px;
+    }
+    .stat-card .sc-range {
+      font-size: 12px;
+      color: var(--gray-400);
+    }
+
+    /* ── Card wrapper ── */
+    .card {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 20px 20px 16px;
+    }
+    .card h2 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-600);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: 16px;
+    }
+
+    /* ── Grid layouts ── */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .grid-2-1 {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* ── SVG line chart ── */
+    .chart-area {
+      width: 100%;
+      height: 130px;
+    }
+    .chart-area svg { width: 100%; height: 100%; overflow: visible; }
+
+    .axis-label {
+      font-size: 11px;
+      fill: var(--gray-400);
+    }
+
+    /* ── Horizontal bar chart ── */
+    .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+
+    .bar-row { display: flex; align-items: center; gap: 8px; }
+    .bar-row-label {
+      width: 130px;
+      flex-shrink: 0;
+      font-size: 13px;
+      color: var(--gray-700);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .bar-row-label.short { width: 90px; }
+    .bar-track {
+      flex: 1;
+      height: 18px;
+      background: var(--gray-100);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      background: var(--blue);
+      border-radius: 3px;
+      transition: width .4s;
+    }
+    .bar-value {
+      width: 64px;
+      flex-shrink: 0;
+      font-size: 12px;
+      color: var(--gray-500);
+      text-align: right;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">Krankenkassenvergleich</span>
+  <span class="badge">ADMIN</span>
+  <div class="spacer"></div>
+  <button class="logout">Abmelden</button>
+</nav>
+
+<main class="page">
+  <h1 class="sr-only">Admin-Dashboard — Anfrage-Aktivität</h1>
+
+  <!-- ── Range picker ── -->
+  <div class="range-picker">
+    <span class="rp-label" id="range-label">Zeitraum</span>
+    <button class="preset-btn">Heute</button>
+    <button class="preset-btn">7 Tage</button>
+    <button class="preset-btn active" aria-pressed="true">30 Tage</button>
+    <button class="preset-btn">Dieser Monat</button>
+    <button class="preset-btn">3 Monate</button>
+    <button class="preset-btn">Dieses Jahr</button>
+    <div class="rp-sep"></div>
+    <div class="date-inputs">
+      <label for="date-from" class="sr-only">Von</label>
+      <input id="date-from" type="date" value="2026-07-12">
+      <span>→</span>
+      <label for="date-to" class="sr-only">Bis</label>
+      <input id="date-to" type="date" value="2026-08-11">
+    </div>
+    <span class="rp-range-label">30 Tage · 12. Jul – 11. Aug 2026</span>
+  </div>
+
+  <!-- ── Stat card ── -->
+  <div class="stat-card">
+    <div class="sc-label">Anfragen im Zeitraum</div>
+    <div class="sc-value">34'210</div>
+    <div class="sc-range">12. Jul – 11. Aug 2026</div>
+  </div>
+
+  <!-- ── Trend chart (full width) ── -->
+  <div class="card" style="margin-bottom:16px;">
+    <h2>Anfragen über Zeit &nbsp;<span style="font-weight:400;color:var(--gray-400);font-size:11px;text-transform:none;letter-spacing:0">täglich</span></h2>
+    <div class="chart-area">
+      <svg viewBox="0 0 760 110" preserveAspectRatio="none" role="img" aria-label="Anfragen pro Tag, 12. Juli bis 11. August 2026, steigender Trend von 300 auf 1500 pro Tag">
+        <!-- grid lines -->
+        <line x1="0" y1="0"  x2="760" y2="0"  stroke="#f3f4f6" stroke-width="1"/>
+        <line x1="0" y1="36" x2="760" y2="36" stroke="#f3f4f6" stroke-width="1"/>
+        <line x1="0" y1="72" x2="760" y2="72" stroke="#f3f4f6" stroke-width="1"/>
+
+        <!-- area fill -->
+        <path d="M0,90 L25,82 L50,78 L75,74 L100,68 L125,72 L150,60 L175,55
+                 L200,58 L225,50 L250,44 L275,48 L300,38 L325,32 L350,36
+                 L375,28 L400,22 L425,26 L450,18 L475,20 L500,14 L525,16
+                 L550,10 L575,12 L600,8  L625,14 L650,10 L675,6  L700,8
+                 L725,4  L760,6 L760,110 L0,110 Z"
+              fill="rgba(37,99,235,.08)"/>
+
+        <!-- line -->
+        <path d="M0,90 L25,82 L50,78 L75,74 L100,68 L125,72 L150,60 L175,55
+                 L200,58 L225,50 L250,44 L275,48 L300,38 L325,32 L350,36
+                 L375,28 L400,22 L425,26 L450,18 L475,20 L500,14 L525,16
+                 L550,10 L575,12 L600,8  L625,14 L650,10 L675,6  L700,8
+                 L725,4  L760,6"
+              fill="none" stroke="#2563eb" stroke-width="2" stroke-linejoin="round"/>
+
+        <!-- x-axis labels -->
+        <text x="0"   y="108" class="axis-label">12 Jul</text>
+        <text x="125" y="108" class="axis-label">17 Jul</text>
+        <text x="253" y="108" class="axis-label">22 Jul</text>
+        <text x="380" y="108" class="axis-label">27 Jul</text>
+        <text x="505" y="108" class="axis-label">1 Aug</text>
+        <text x="630" y="108" class="axis-label">6 Aug</text>
+        <text x="725" y="108" class="axis-label">11 Aug</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ── Top regions + Age band ── -->
+  <div class="grid-2">
+
+    <div class="card">
+      <h2>Top 10 Prämienregionen</h2>
+      <div class="bar-chart">
+        <div class="bar-row"><span class="bar-row-label">Zürich (ZH-1)</span>    <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="bar-value">4'210 · 12%</span></div>
+        <div class="bar-row"><span class="bar-row-label">Bern (BE-1)</span>      <div class="bar-track"><div class="bar-fill" style="width:68%"></div></div> <span class="bar-value">2'840 · 8%</span></div>
+        <div class="bar-row"><span class="bar-row-label">Basel (BS-1)</span>     <div class="bar-track"><div class="bar-fill" style="width:46%"></div></div> <span class="bar-value">1'920 · 6%</span></div>
+        <div class="bar-row"><span class="bar-row-label">Genf (GE-1)</span>      <div class="bar-track"><div class="bar-fill" style="width:39%"></div></div> <span class="bar-value">1'640 · 5%</span></div>
+        <div class="bar-row"><span class="bar-row-label">Lausanne (VD-2)</span>  <div class="bar-track"><div class="bar-fill" style="width:33%"></div></div> <span class="bar-value">1'380 · 4%</span></div>
+        <div class="bar-row"><span class="bar-row-label">St. Gallen (SG-1)</span><div class="bar-track"><div class="bar-fill" style="width:27%"></div></div> <span class="bar-value">1'140 · 3%</span></div>
+        <div class="bar-row"><span class="bar-row-label">Luzern (LU-1)</span>    <div class="bar-track"><div class="bar-fill" style="width:23%"></div></div> <span class="bar-value">  970 · 3%</span></div>
+        <div class="bar-row"><span class="bar-row-label">Winterthur (ZH-2)</span><div class="bar-track"><div class="bar-fill" style="width:19%"></div></div> <span class="bar-value">  800 · 2%</span></div>
+        <div class="bar-row"><span class="bar-row-label">Zug (ZG-1)</span>       <div class="bar-track"><div class="bar-fill" style="width:16%"></div></div> <span class="bar-value">  670 · 2%</span></div>
+        <div class="bar-row"><span class="bar-row-label">Thun (BE-2)</span>      <div class="bar-track"><div class="bar-fill" style="width:13%"></div></div> <span class="bar-value">  560 · 2%</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Altersklasse</h2>
+      <div class="bar-chart">
+        <div class="bar-row"><span class="bar-row-label">Erwachsen (26+)</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="bar-value">24'350 · 71%</span></div>
+        <div class="bar-row"><span class="bar-row-label">Jung (19–25)</span>  <div class="bar-track"><div class="bar-fill" style="width:25%"></div></div><span class="bar-value"> 6'160 · 18%</span></div>
+        <div class="bar-row"><span class="bar-row-label">Kind (0–18)</span>   <div class="bar-track"><div class="bar-fill" style="width:16%"></div></div><span class="bar-value"> 3'700 · 11%</span></div>
+      </div>
+
+      <h2 style="margin-top:24px;">Unfalldeckung</h2>
+      <div class="bar-chart">
+        <div class="bar-row"><span class="bar-row-label">Eingeschlossen</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="bar-value">29'760 · 87%</span></div>
+        <div class="bar-row"><span class="bar-row-label">Ausgeschlossen</span><div class="bar-track"><div class="bar-fill" style="width:15%"></div></div><span class="bar-value"> 4'450 · 13%</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Franchise + Model ── -->
+  <div class="grid-2">
+
+    <div class="card">
+      <h2>Franchise-Verteilung</h2>
+      <div class="bar-chart">
+        <div class="bar-row"><span class="bar-row-label short">CHF 300</span> <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="bar-value">13'010 · 38%</span></div>
+        <div class="bar-row"><span class="bar-row-label short">CHF 500</span> <div class="bar-track"><div class="bar-fill" style="width:50%"></div></div> <span class="bar-value"> 6'500 · 19%</span></div>
+        <div class="bar-row"><span class="bar-row-label short">CHF 1000</span><div class="bar-track"><div class="bar-fill" style="width:37%"></div></div> <span class="bar-value"> 4'790 · 14%</span></div>
+        <div class="bar-row"><span class="bar-row-label short">CHF 1500</span><div class="bar-track"><div class="bar-fill" style="width:31%"></div></div> <span class="bar-value"> 4'110 · 12%</span></div>
+        <div class="bar-row"><span class="bar-row-label short">CHF 2000</span><div class="bar-track"><div class="bar-fill" style="width:26%"></div></div> <span class="bar-value"> 3'420 · 10%</span></div>
+        <div class="bar-row"><span class="bar-row-label short">CHF 2500</span><div class="bar-track"><div class="bar-fill" style="width:19%"></div></div> <span class="bar-value"> 2'380 · 7%</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Versicherungsmodell</h2>
+      <div class="bar-chart">
+        <div class="bar-row"><span class="bar-row-label short">Standard</span> <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="bar-value">28'050 · 82%</span></div>
+        <div class="bar-row"><span class="bar-row-label short">Hausarzt</span> <div class="bar-track"><div class="bar-fill" style="width:12%"></div></div> <span class="bar-value"> 3'420 · 10%</span></div>
+        <div class="bar-row"><span class="bar-row-label short">Telmed</span>   <div class="bar-track"><div class="bar-fill" style="width:6.5%"></div></div><span class="bar-value"> 1'710 · 5%</span></div>
+        <div class="bar-row"><span class="bar-row-label short">HMO</span>      <div class="bar-track"><div class="bar-fill" style="width:4%"></div></div>  <span class="bar-value"> 1'030 · 3%</span></div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+</body>
+</html>

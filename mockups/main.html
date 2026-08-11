@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Static default title; dynamically replaced from URL state e.g. "Krankenkassenvergleich Zürich – ab CHF 301/Monat" -->
+  <title>Krankenkassenvergleich – Grundversicherung Schweiz</title>
+  <meta name="description" content="Vergleiche Krankenkassenprämien für die Grundversicherung – alle Kassen, alle Modelle, offizielle BAG-Daten.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Krankenkassenvergleich – Grundversicherung Schweiz">
+  <meta property="og:description" content="Vergleiche Krankenkassenprämien für die Grundversicherung – alle Kassen, alle Modelle, offizielle BAG-Daten.">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Krankenkassenvergleich – Grundversicherung Schweiz">
+  <meta name="twitter:description" content="Vergleiche Krankenkassenprämien für die Grundversicherung – offizielle BAG-Daten.">
+  <!-- On parameterised URLs only (added server-side): -->
+  <!-- <link rel="canonical" href="https://example.com/"> -->
+  <!-- <meta name="robots" content="noindex"> -->
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:       #2563eb;
+      --blue-light: #eff6ff;
+      --blue-dark:  #1d4ed8;
+      --gray-50:    #f9fafb;
+      --gray-100:   #f3f4f6;
+      --gray-200:   #e5e7eb;
+      --gray-400:   #9ca3af;
+      --gray-500:   #6b7280;
+      --gray-600:   #4b5563;
+      --gray-700:   #374151;
+      --gray-900:   #111827;
+      --green:      #16a34a;
+      --green-light:#f0fdf4;
+      --red:        #dc2626;
+      --red-light:  #fef2f2;
+      --radius:     8px;
+      --shadow-sm:  0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
+      --shadow:     0 4px 12px rgba(0,0,0,.08);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    /* ── Header ── */
+    header {
+      background: #fff;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    header .logo {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--blue);
+      letter-spacing: -.3px;
+    }
+    header .sub {
+      font-size: 13px;
+      color: var(--gray-500);
+    }
+
+    /* ── Page wrapper ── */
+    main {
+      max-width: 860px;
+      margin: 32px auto;
+      padding: 0 16px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ── Input section ── */
+    .input-section {
+      padding: 24px;
+    }
+    .input-section h1 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .input-section .tagline {
+      font-size: 14px;
+      color: var(--gray-500);
+      margin-bottom: 20px;
+    }
+
+    .fields-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 600px) {
+      .fields-row { grid-template-columns: 1fr; }
+    }
+
+    .field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-600);
+      margin-bottom: 6px;
+    }
+    .field input, .field select {
+      width: 100%;
+      height: 40px;
+      padding: 0 12px;
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      font-size: 15px;
+      color: var(--gray-900);
+      background: #fff;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .field input:focus, .field select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+    }
+    .field .hint {
+      font-size: 12px;
+      color: var(--gray-400);
+      margin-top: 4px;
+    }
+    .field .hint.error { color: var(--red); }
+    .field input.error-field {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(220,38,38,.10);
+    }
+    .field .resolved {
+      font-size: 12px;
+      color: var(--blue);
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ── Gemeinde picker ── */
+    .gemeinde-picker {
+      margin-top: 12px;
+      background: var(--blue-light);
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      padding: 12px 14px;
+    }
+    .gemeinde-picker p {
+      font-size: 13px;
+      color: var(--gray-700);
+      margin-bottom: 8px;
+    }
+    .gemeinde-options {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .gemeinde-options button {
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid #93c5fd;
+      background: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--gray-700);
+    }
+    .gemeinde-options button.selected {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* ── Not-found notice (REQ-14) ── */
+    .plan-not-found {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #92400e;
+      margin-bottom: 8px;
+    }
+    .plan-not-found strong { font-weight: 600; }
+    /* ── Empty state (REQ-15) ── */
+    .empty-state {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 40px 24px;
+      text-align: center;
+      color: var(--gray-500);
+    }
+    .empty-state .empty-title { font-size: 15px; margin-bottom: 4px; }
+    .empty-state .empty-sub   { font-size: 13px; color: var(--gray-400); }
+    /* ── Section label (mockup annotation) ── */
+    .mockup-label {
+      font-size: 11px; font-weight: 600; color: var(--gray-400);
+      text-transform: uppercase; letter-spacing: .5px;
+      margin: 24px 0 8px;
+    }
+    /* ── Current plan (collapsible) ── */
+    .current-plan-divider {
+      margin-top: 20px;
+      border-top: 1px solid var(--gray-100);
+      padding-top: 16px;
+    }
+    /* summary is a direct child of details per HTML spec (REQ-17 / WCAG) */
+    details > summary {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      list-style: none;
+      font-size: 14px;
+      color: var(--blue);
+      font-weight: 600;
+      user-select: none;
+    }
+    details > summary::-webkit-details-marker { display: none; }
+    details > summary::before { content: "▸"; font-size: 12px; }
+    details[open] > summary::before { content: "▾"; }
+    details > summary .label-sub {
+      font-weight: 400;
+      color: var(--gray-500);
+    }
+
+    .current-plan-fields {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 640px) {
+      .current-plan-fields { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ── Headline ── */
+    .headline {
+      margin-top: 24px;
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .headline.savings {
+      background: var(--green-light);
+      border: 1px solid #bbf7d0;
+    }
+    .headline.cheapest {
+      background: var(--blue-light);
+      border: 1px solid #bfdbfe;
+    }
+    .headline.already-cheapest {
+      background: var(--green-light);
+      border: 1px solid #bbf7d0;
+    }
+    .headline-icon {
+      font-size: 22px;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .headline-text strong {
+      display: block;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .headline-text span {
+      font-size: 13px;
+      color: var(--gray-600);
+    }
+    .headline-text .saving-amount {
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    /* ── Filter bar ── */
+    .filter-bar {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .filter-label {
+      font-size: 13px;
+      color: var(--gray-500);
+      margin-right: 4px;
+    }
+
+    .toggle-group {
+      display: flex;
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .toggle-group button {
+      padding: 6px 14px;
+      font-size: 13px;
+      border: none;
+      background: #fff;
+      cursor: pointer;
+      color: var(--gray-600);
+      border-right: 1px solid var(--gray-200);
+    }
+    .toggle-group button:last-child { border-right: none; }
+    .toggle-group button.active {
+      background: var(--blue);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .chip-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border: 1px solid var(--gray-200);
+      border-radius: 20px;
+      background: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--gray-600);
+      user-select: none;
+    }
+    .chip-toggle.active {
+      background: var(--blue-light);
+      border-color: #93c5fd;
+      color: var(--blue);
+      font-weight: 600;
+    }
+    .chip-toggle .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--gray-300);
+    }
+    .chip-toggle.active .dot { background: var(--blue); }
+
+    .filter-sep {
+      width: 1px;
+      height: 24px;
+      background: var(--gray-200);
+      margin: 0 4px;
+    }
+
+    /* ── Results ── */
+    .results-count {
+      font-size: 13px;
+      color: var(--gray-500);
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
+
+    .plan-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .plan-row {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow .15s;
+    }
+    .plan-row:hover { box-shadow: var(--shadow); }
+
+    .plan-rank {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gray-400);
+      width: 20px;
+      flex-shrink: 0;
+      text-align: center;
+    }
+    .plan-rank.first { color: var(--blue); }
+
+    .plan-insurer {
+      flex: 1;
+      min-width: 0;
+    }
+    .plan-insurer .name {
+      font-weight: 600;
+      font-size: 15px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .plan-insurer .model-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--gray-500);
+      margin-top: 2px;
+    }
+    .model-tag {
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--gray-100);
+      color: var(--gray-600);
+    }
+    .model-tag.hmo    { background: #fef3c7; color: #92400e; }
+    .model-tag.telmed { background: #ede9fe; color: #5b21b6; }
+    .model-tag.haus   { background: #d1fae5; color: #065f46; }
+
+    .plan-yoy {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .plan-yoy.up   { background: var(--red-light);  color: var(--red); }
+    .plan-yoy.down { background: var(--green-light); color: var(--green); }
+    .plan-yoy.flat { color: var(--gray-400); font-weight: 400; }
+
+    .plan-price {
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .plan-price .amount {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--gray-900);
+    }
+    .plan-price .per {
+      font-size: 12px;
+      color: var(--gray-400);
+    }
+    .plan-price.cheapest .amount { color: var(--blue); }
+
+    .plan-row.current-plan {
+      border-color: #fca5a5;
+      background: #fff8f8;
+    }
+    .current-plan-tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #fee2e2;
+      color: var(--red);
+      flex-shrink: 0;
+    }
+
+    /* ── Data notice ── */
+    .data-notice {
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--gray-400);
+      text-align: center;
+      padding-bottom: 40px;
+    }
+    .data-notice a { color: var(--blue); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="logo">Krankenkassenvergleich</span>
+  <span class="sub">Grundversicherung Schweiz</span>
+</header>
+
+<main>
+
+  <!-- ── Input card ── -->
+  <div class="card input-section">
+    <h1>Prämienvergleich</h1>
+    <p class="tagline">Gib deine Angaben ein — die günstigsten Kassen erscheinen sofort.</p>
+
+    <div class="fields-row">
+      <div class="field">
+        <label for="plz">Postleitzahl (PLZ)</label>
+        <input id="plz" type="text" value="8044" maxlength="4" placeholder="z.B. 3001">
+        <div class="resolved">&#10003; Zürich &amp; Dübendorf — bitte Gemeinde wählen</div>
+      </div>
+      <div class="field">
+        <label for="by">Jahrgang</label>
+        <input id="by" type="number" value="1988" min="1900" max="2026" placeholder="z.B. 1985">
+        <div class="hint">→ Erwachsen (26+), Franchise CHF 300–2500</div>
+      </div>
+      <div class="field">
+        <label for="fran">Franchise</label>
+        <select id="fran">
+          <option>CHF 300</option>
+          <option selected>CHF 500</option>
+          <option>CHF 1000</option>
+          <option>CHF 1500</option>
+          <option>CHF 2000</option>
+          <option>CHF 2500</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Gemeinde disambiguator (pre-selection) -->
+    <div class="gemeinde-picker">
+      <p>PLZ 8044 liegt in zwei Prämienregionen. Bitte wähle deine Gemeinde:</p>
+      <div class="gemeinde-options">
+        <button class="selected">Zürich (ZH Region 1)</button>
+        <button>Dübendorf (ZH Region 2)</button>
+      </div>
+    </div>
+    <!-- Post-selection: picker collapses; municipality always visible (REQ-1) -->
+    <!-- <div class="resolved" style="margin-top:8px;">&#10003; Zürich (ZH Region 1) · <a href="#" style="color:var(--blue)">ändern</a></div> -->
+
+    <!-- Current plan — summary is a DIRECT child of details (REQ-17 fix) -->
+    <div class="current-plan-divider">
+    <details>
+      <summary>Was zahlst du heute? <span class="label-sub">&nbsp;(optional — zeigt deine Ersparnis)</span></summary>
+      <div class="current-plan-fields">
+        <div class="field">
+          <label>Aktuelle Kasse</label>
+          <select><option>Helsana</option><option>CSS</option><option>Swica</option></select>
+        </div>
+        <div class="field">
+          <label>Aktuelle Franchise</label>
+          <select><option>CHF 300</option><option selected>CHF 500</option></select>
+        </div>
+        <div class="field">
+          <label>Aktuelles Modell</label>
+          <select><option selected>Standard</option><option>Hausarzt</option><option>HMO</option></select>
+        </div>
+        <div class="field">
+          <label>Unfalldeckung</label>
+          <select><option selected>Eingeschlossen</option><option>Ausgeschlossen</option></select>
+        </div>
+      </div>
+    </details>
+    </div>
+
+    <!-- Validation error states (REQ-13) -->
+    <hr style="margin:24px 0 0;border:none;border-top:1px solid var(--gray-100);">
+    <p class="mockup-label" style="margin-top:16px;">Fehler-Zustände (REQ-13)</p>
+    <div class="fields-row">
+      <div class="field">
+        <label>PLZ — nicht gefunden</label>
+        <input type="text" value="99999" class="error-field">
+        <div class="hint error">Ungültige PLZ — bitte eine vierstellige Schweizer PLZ eingeben.</div>
+      </div>
+      <div class="field">
+        <label>Jahrgang — in der Zukunft</label>
+        <input type="number" value="2030" class="error-field">
+        <div class="hint error">Jahrgang liegt in der Zukunft.</div>
+      </div>
+      <div class="field">
+        <label>Jahrgang — unrealistisch alt</label>
+        <input type="number" value="1890" class="error-field">
+        <div class="hint error">Bitte einen realistischen Jahrgang eingeben (max. ~120 Jahre).</div>
+      </div>
+    </div>
+  </div><!-- /input card -->
+
+  <!-- ══ HEADLINE A: savings (REQ-8) ══ -->
+  <p class="mockup-label">Headline A — aktuelle Kasse angegeben, günstiger verfügbar (REQ-8)</p>
+  <div class="headline savings">
+    <div class="headline-icon">💡</div>
+    <div class="headline-text">
+      <strong>Wenn du nichts tust: CHF 412.40/Monat 2026 bei Helsana.</strong>
+      <span>Günstigstes Angebot für dein Profil: CHF 301.10/Monat bei Assura —
+        <span class="saving-amount">spare CHF 1'335.60/Jahr durch einen Wechsel.</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- ══ HEADLINE B: no current plan (REQ-9) ══ -->
+  <p class="mockup-label">Headline B — keine aktuelle Kasse angegeben (REQ-9)</p>
+  <div class="headline cheapest">
+    <div class="headline-icon">🔍</div>
+    <div class="headline-text">
+      <strong>Günstigstes Angebot 2026: CHF 301.10/Monat bei Assura.</strong>
+      <span>Gib deine aktuelle Kasse an, um zu sehen, wie viel du sparen könntest. ↓</span>
+    </div>
+  </div>
+
+  <!-- ══ HEADLINE C: already cheapest (REQ-10) ══ -->
+  <p class="mockup-label">Headline C — bereits günstigstes Angebot (REQ-10)</p>
+  <div class="headline already-cheapest">
+    <div class="headline-icon">✅</div>
+    <div class="headline-text">
+      <strong>Du hast bereits das günstigste Angebot für dein Profil.</strong>
+      <span>Assura · Standard · CHF 500 Franchise · CHF 301.10/Monat 2026. Kein günstigeres Angebot gefunden.</span>
+    </div>
+  </div>
+
+  <!-- ══ HEADLINE D: current plan not found (REQ-14) ══ -->
+  <p class="mockup-label">Headline D — aktuelle Kasse nicht in BAG-Daten gefunden (REQ-14)</p>
+  <div class="plan-not-found">
+    <strong>Aktuelle Kasse nicht gefunden.</strong> Helsana bietet in deiner Region kein Standard-Modell mit CHF 500 Franchise und Unfalldeckung an (oder der Eintrag existiert nicht in den BAG-Daten). Das günstigste verfügbare Angebot wird angezeigt.
+  </div>
+  <div class="headline cheapest">
+    <div class="headline-icon">🔍</div>
+    <div class="headline-text">
+      <strong>Günstigstes Angebot 2026: CHF 301.10/Monat bei Assura.</strong>
+      <span>Gib deine aktuelle Kasse an, um zu sehen, wie viel du sparen könntest. ↓</span>
+    </div>
+  </div>
+
+  <!-- ══ Filter bar + results (Headline A context) ══ -->
+  <p class="mockup-label">Ergebnisliste — Standard: günstigstes Standard-Angebot je Kasse (REQ-3)</p>
+  <!-- ── Filter bar ── -->
+  <div class="filter-bar">
+    <span class="filter-label">Jahr:</span>
+    <div class="toggle-group">
+      <button class="active">2026</button>
+      <button>2027</button>
+    </div>
+    <div class="filter-sep"></div>
+    <div class="chip-toggle" role="button" tabindex="0" aria-pressed="false">
+      <span class="dot"></span> Alternative Modelle: aus
+    </div>
+    <!-- Chip label reflects CURRENT VALUE, not the action, to avoid ambiguity (REQ-5) -->
+    <div class="chip-toggle active" role="button" tabindex="0" aria-pressed="true">
+      <span class="dot"></span> Unfall: eingeschlossen
+    </div>
+    <!-- Inactive state: <div class="chip-toggle"><span class="dot"></span> Unfall: ausgeschlossen</div> -->
+  </div>
+
+  <p class="results-count">18 Kassen · jeweils günstigstes Standard-Angebot · Unfalldeckung eingeschlossen · 2026</p>
+
+  <div class="plan-list" role="list">
+    <div class="plan-row" role="listitem">
+      <div class="plan-rank first">1</div>
+      <div class="plan-insurer">
+        <div class="name">Assura</div>
+        <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
+      </div>
+      <div class="plan-yoy up">+4.2%</div>
+      <div class="plan-price cheapest">
+        <div class="amount">CHF 301.10</div>
+        <div class="per">/Monat</div>
+      </div>
+    </div>
+
+    <div class="plan-row">
+      <div class="plan-rank">2</div>
+      <div class="plan-insurer">
+        <div class="name">KPT</div>
+        <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
+      </div>
+      <div class="plan-yoy down">−1.1%</div>
+      <div class="plan-price">
+        <div class="amount">CHF 318.50</div>
+        <div class="per">/Monat</div>
+      </div>
+    </div>
+
+    <div class="plan-row">
+      <div class="plan-rank">3</div>
+      <div class="plan-insurer">
+        <div class="name">EGK-Gesundheitskasse</div>
+        <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
+      </div>
+      <div class="plan-yoy flat">±0%</div>
+      <div class="plan-price">
+        <div class="amount">CHF 334.80</div>
+        <div class="per">/Monat</div>
+      </div>
+    </div>
+
+    <div class="plan-row">
+      <div class="plan-rank">4</div>
+      <div class="plan-insurer">
+        <div class="name">Concordia</div>
+        <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
+      </div>
+      <div class="plan-yoy up">+2.8%</div>
+      <div class="plan-price">
+        <div class="amount">CHF 347.20</div>
+        <div class="per">/Monat</div>
+      </div>
+    </div>
+
+    <div class="plan-row">
+      <div class="plan-rank">5</div>
+      <div class="plan-insurer">
+        <div class="name">Visana</div>
+        <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
+      </div>
+      <div class="plan-yoy up">+3.5%</div>
+      <div class="plan-price">
+        <div class="amount">CHF 358.90</div>
+        <div class="per">/Monat</div>
+      </div>
+    </div>
+
+    <!-- Current plan row -->
+    <div class="plan-row current-plan">
+      <div class="plan-rank">11</div>
+      <div class="plan-insurer">
+        <div class="name">Helsana</div>
+        <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
+      </div>
+      <span class="current-plan-tag">Deine Kasse</span>
+      <div class="plan-yoy up">+5.1%</div>
+      <div class="plan-price">
+        <div class="amount">CHF 412.40</div>
+        <div class="per">/Monat</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ Alternative models toggled ON: each insurer shows its single cheapest model (REQ-4) ══ -->
+  <p class="mockup-label">Ergebnisliste — Alternative Modelle an: günstiges Modell je Kasse (REQ-4)</p>
+  <div class="filter-bar">
+    <span class="filter-label">Jahr:</span>
+    <div class="toggle-group">
+      <button class="active">2026</button>
+      <button>2027</button>
+    </div>
+    <div class="filter-sep"></div>
+    <div class="chip-toggle active" role="button" tabindex="0" aria-pressed="true">
+      <span class="dot"></span> Alternative Modelle: ein
+    </div>
+    <div class="chip-toggle active" role="button" tabindex="0" aria-pressed="true">
+      <span class="dot"></span> Unfall: eingeschlossen
+    </div>
+  </div>
+
+  <p class="results-count">18 Kassen · günstiges Modell je Kasse · Unfalldeckung eingeschlossen · 2026</p>
+
+  <div class="plan-list" role="list">
+    <div class="plan-row" role="listitem">
+      <div class="plan-rank first">1</div>
+      <div class="plan-insurer">
+        <div class="name">Sanitas</div>
+        <div class="model-badge"><span class="model-tag telmed">Telmed</span> · Anruf bei Hotline erforderlich vor jedem Arztbesuch</div>
+      </div>
+      <div class="plan-yoy up">+2.1%</div>
+      <div class="plan-price cheapest">
+        <div class="amount">CHF 221.80</div>
+        <div class="per">/Monat</div>
+      </div>
+    </div>
+
+    <div class="plan-row">
+      <div class="plan-rank">2</div>
+      <div class="plan-insurer">
+        <div class="name">CSS</div>
+        <div class="model-badge"><span class="model-tag haus">Hausarzt</span> · Erstbehandlung immer beim gewählten Hausarzt</div>
+      </div>
+      <div class="plan-yoy down">−0.8%</div>
+      <div class="plan-price">
+        <div class="amount">CHF 238.50</div>
+        <div class="per">/Monat</div>
+      </div>
+    </div>
+
+    <div class="plan-row">
+      <div class="plan-rank">3</div>
+      <div class="plan-insurer">
+        <div class="name">Assura</div>
+        <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
+      </div>
+      <div class="plan-yoy up">+4.2%</div>
+      <div class="plan-price">
+        <div class="amount">CHF 301.10</div>
+        <div class="per">/Monat</div>
+      </div>
+    </div>
+
+    <div class="plan-row">
+      <div class="plan-rank">4</div>
+      <div class="plan-insurer">
+        <div class="name">KPT</div>
+        <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
+      </div>
+      <div class="plan-yoy down">−1.1%</div>
+      <div class="plan-price">
+        <div class="amount">CHF 318.50</div>
+        <div class="per">/Monat</div>
+      </div>
+    </div>
+
+    <!-- Helsana: cheapest is HMO; current plan is Standard — row shows cheapest available, footnote clarifies -->
+    <div class="plan-row current-plan">
+      <div class="plan-rank">9</div>
+      <div class="plan-insurer">
+        <div class="name">Helsana</div>
+        <div class="model-badge"><span class="model-tag hmo">HMO</span> · Erstanlaufstelle immer beim HMO-Zentrum</div>
+      </div>
+      <span class="current-plan-tag">Deine Kasse*</span>
+      <div class="plan-yoy up">+3.4%</div>
+      <div class="plan-price">
+        <div class="amount">CHF 362.10</div>
+        <div class="per">/Monat</div>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:12px;color:var(--gray-400);margin-top:6px;">* Deine aktuelle Kasse ist Helsana Standard (CHF 412.40/Monat). Helsanas günstigstes Angebot bei CHF 500 Franchise ist das HMO-Modell (CHF 362.10/Monat).</p>
+
+  <!-- ══ Empty state (REQ-15) ══ -->
+  <p class="mockup-label">Leere Ergebnisliste (REQ-15)</p>
+  <div class="empty-state">
+    <p class="empty-title">Keine Angebote gefunden</p>
+    <p class="empty-sub">Für PLZ 9999, Jahrgang 1988, CHF 500 Franchise mit den aktuellen Filtern sind keine Prämien in den BAG-Daten vorhanden. Bitte überprüfe deine Eingaben oder passe die Filter an.</p>
+  </div>
+
+  <p class="data-notice">
+    Daten: <a href="#">BAG Opendata</a> · Publikation 15. Oktober 2025 ·
+    Nur Pflichtleistungen (OKP) · Kein Sponsoring, keine Vermittlungslinks
+  </p>
+
+</main>
+</body>
+</html>
