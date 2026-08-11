@@ -1,0 +1,11 @@
+[
+  { "year": 2026, "insurerCode": "SANITAS", "insurerName": "Sanitas", "praemienregionId": "ZH-1", "altersklasse": "erwachsen", "franchise": 500, "unfalldeckung": true, "tarifart": "telmed", "monthlyPremium": 221.80 },
+  { "year": 2026, "insurerCode": "CSS", "insurerName": "CSS", "praemienregionId": "ZH-1", "altersklasse": "erwachsen", "franchise": 500, "unfalldeckung": true, "tarifart": "hausarzt", "monthlyPremium": 238.50 },
+  { "year": 2026, "insurerCode": "ASSURA", "insurerName": "Assura", "praemienregionId": "ZH-1", "altersklasse": "erwachsen", "franchise": 500, "unfalldeckung": true, "tarifart": "standard", "monthlyPremium": 301.10 },
+  { "year": 2026, "insurerCode": "KPT", "insurerName": "KPT", "praemienregionId": "ZH-1", "altersklasse": "erwachsen", "franchise": 500, "unfalldeckung": true, "tarifart": "standard", "monthlyPremium": 318.50 },
+  { "year": 2026, "insurerCode": "EGK", "insurerName": "EGK-Gesundheitskasse", "praemienregionId": "ZH-1", "altersklasse": "erwachsen", "franchise": 500, "unfalldeckung": true, "tarifart": "standard", "monthlyPremium": 334.80 },
+  { "year": 2026, "insurerCode": "CONCORDIA", "insurerName": "Concordia", "praemienregionId": "ZH-1", "altersklasse": "erwachsen", "franchise": 500, "unfalldeckung": true, "tarifart": "standard", "monthlyPremium": 347.20 },
+  { "year": 2026, "insurerCode": "VISANA", "insurerName": "Visana", "praemienregionId": "ZH-1", "altersklasse": "erwachsen", "franchise": 500, "unfalldeckung": true, "tarifart": "standard", "monthlyPremium": 358.90 },
+  { "year": 2026, "insurerCode": "HELSANA", "insurerName": "Helsana", "praemienregionId": "ZH-1", "altersklasse": "erwachsen", "franchise": 500, "unfalldeckung": true, "tarifart": "hmo", "monthlyPremium": 362.10 },
+  { "year": 2026, "insurerCode": "HELSANA", "insurerName": "Helsana", "praemienregionId": "ZH-1", "altersklasse": "erwachsen", "franchise": 500, "unfalldeckung": true, "tarifart": "standard", "monthlyPremium": 412.40 }
+]

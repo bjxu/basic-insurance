@@ -1,0 +1,53 @@
+// /admin/login — single password field compared against ADMIN_SECRET (REQ-22).
+// No user table, no JWT — one env variable, one HttpOnly cookie.
+
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+
+async function login(formData: FormData) {
+  "use server";
+  const password = formData.get("password");
+  const secret = process.env.ADMIN_SECRET;
+
+  if (typeof password === "string" && secret && password === secret) {
+    const cookieStore = await cookies();
+    cookieStore.set("admin_token", secret, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      path: "/",
+    });
+    redirect("/admin");
+  }
+  redirect("/admin/login?error=1");
+}
+
+export default async function AdminLoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
+
+  return (
+    <main className="min-h-screen flex items-center justify-center bg-gray-50">
+      <form action={login} className="bg-white border border-gray-200 rounded-lg shadow-sm p-8 w-full max-w-sm">
+        <h1 className="text-lg font-bold mb-4">Admin-Login</h1>
+        <label htmlFor="password" className="block text-sm font-semibold text-gray-600 mb-1.5">
+          Passwort
+        </label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          required
+          className="w-full h-10 px-3 rounded-md border border-gray-200 text-[15px] outline-none focus:border-blue-600 mb-3"
+        />
+        {error && <p className="text-sm text-red-600 mb-3">Falsches Passwort.</p>}
+        <button type="submit" className="w-full h-10 rounded-md bg-blue-600 text-white font-semibold">
+          Anmelden
+        </button>
+      </form>
+    </main>
+  );
+}

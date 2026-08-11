@@ -1,0 +1,12 @@
+{
+  "8044": [
+    { "bfsNr": 261, "name": "Zürich", "kanton": "ZH", "praemienregionId": "ZH-1" },
+    { "bfsNr": 191, "name": "Dübendorf", "kanton": "ZH", "praemienregionId": "ZH-2" }
+  ],
+  "3001": [
+    { "bfsNr": 351, "name": "Bern", "kanton": "BE", "praemienregionId": "BE-1" }
+  ],
+  "4001": [
+    { "bfsNr": 2701, "name": "Basel", "kanton": "BS", "praemienregionId": "BS-1" }
+  ]
+}
