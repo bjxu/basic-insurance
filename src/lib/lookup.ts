@@ -92,6 +92,10 @@ export function computeHeadline(
   if (!current) {
     return { kind: "current-plan-not-found", cheapest };
   }
+  // REQ-10 defines this for the exact-equal case; <= also covers current being
+  // strictly cheaper than the filtered "cheapest" (possible because findCurrentPlan
+  // runs unfiltered, e.g. current uses a model excluded by the active filter) —
+  // without this, that case would fall into "savings" with a negative amount.
   if (!cheapest || current.monthlyPremium <= cheapest.monthlyPremium) {
     return { kind: "already-cheapest", current };
   }

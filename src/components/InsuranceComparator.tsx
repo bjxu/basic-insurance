@@ -55,6 +55,22 @@ export function InsuranceComparator() {
   const altersklasse = parsedBirthYear ? getAltersklasse(parsedBirthYear, year) : null;
   const franchiseTiers = altersklasse ? getFranchiseTiers(altersklasse) : [];
 
+  // A PLZ edit invalidates any previously-picked Gemeinde from a different PLZ (bug fix:
+  // without this, bfsNr could point at a Gemeinde not in the new PLZ's list, silently
+  // breaking location resolution with no visible way to recover).
+  const handlePlzChange = useCallback((newPlz: string) => {
+    setPlz(newPlz);
+    setBfsNr(null);
+  }, []);
+
+  // A franchise tier only valid for the previous age band must not silently persist
+  // (bug fix: previously the <select> could show a stale value not in the new tier list).
+  useEffect(() => {
+    if (franchise != null && altersklasse && !getFranchiseTiers(altersklasse).includes(franchise)) {
+      setFranchise(null);
+    }
+  }, [altersklasse, franchise]);
+
   // Sync state to URL (REQ-11) — replace, not push, to avoid history spam.
   useEffect(() => {
     const params = encodeState({
@@ -120,7 +136,7 @@ export function InsuranceComparator() {
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <PlzInput value={plz} onChange={setPlz} notFound={plzNotFound} />
+          <PlzInput value={plz} onChange={handlePlzChange} notFound={plzNotFound} />
           <BirthYearInput value={birthYear} onChange={setBirthYear} calendarYear={year} />
           <DeductibleSelect altersklasse={altersklasse} value={franchise} onChange={setFranchise} />
         </div>

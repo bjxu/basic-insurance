@@ -3,13 +3,21 @@
 
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import { timingSafeEqual } from "node:crypto";
+
+function safeEqual(a: string, b: string): boolean {
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) return false;
+  return timingSafeEqual(bufA, bufB);
+}
 
 async function login(formData: FormData) {
   "use server";
   const password = formData.get("password");
   const secret = process.env.ADMIN_SECRET;
 
-  if (typeof password === "string" && secret && password === secret) {
+  if (typeof password === "string" && secret && safeEqual(password, secret)) {
     const cookieStore = await cookies();
     cookieStore.set("admin_token", secret, {
       httpOnly: true,
