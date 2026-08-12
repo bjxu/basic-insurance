@@ -74,7 +74,7 @@ describe("validateIngestOutput", () => {
     );
     const result = validateIngestOutput(csvText, [row({ monthlyPremium: 999 })]);
     expect(result.ok).toBe(false);
-    expect(result.errors).toEqual([expect.stringContaining("value:")]);
+    expect(result.errors).toEqual([expect.stringContaining("expected monthlyPremium")]);
   });
 
   it("fails when an output row has no matching source row at all", () => {
@@ -86,7 +86,29 @@ describe("validateIngestOutput", () => {
       [row({ insurerCode: "1542", insurerName: "Assura" })],
     );
     expect(result.ok).toBe(false);
-    expect(result.errors).toEqual([expect.stringContaining("value:")]);
+    expect(result.errors).toEqual([expect.stringContaining("no source row found")]);
+  });
+
+  it("caps duplicate-key examples at MAX_EXAMPLES and summarizes the rest", () => {
+    const sourceRow =
+      "8,ZH,CH,2026,2025,PR-REG CH1,AKL-ERW,MIT-UNF,BASE,TAR-BASE,,FRAST1,FRA-300,301.1,1,1,Grundversicherung";
+    const csvText = csv(...Array(12).fill(sourceRow));
+    const rows = Array.from({ length: 12 }, () => row());
+
+    const result = validateIngestOutput(csvText, rows);
+
+    expect(result.ok).toBe(false);
+    // 12 output rows sharing one key: 1st is unique, 2nd-12th (11) are duplicates.
+    // Only the first 10 duplicates get an individual message; the 11th is summarized.
+    const duplicateMessages = result.errors.filter((e) =>
+      e.startsWith("uniqueness: duplicate output row"),
+    );
+    expect(duplicateMessages).toHaveLength(10);
+    expect(result.errors).toEqual([
+      ...duplicateMessages,
+      "uniqueness: …and 1 more duplicate key(s) not shown",
+    ]);
+    expect(result.errors).toHaveLength(11);
   });
 });
 

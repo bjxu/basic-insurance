@@ -48,6 +48,13 @@ function naturalKey(fields: {
   ].join("|");
 }
 
+// Assumes `csvText` has already been successfully parsed by `parsePremiumRows` (i.e.
+// it's the exact CSV that produced `rows`). Malformed rows that would make
+// `ALTERSKLASSE_MAP`/`parseFranchise`/`parseRegionNumber`/`parseUnfalldeckung` throw
+// here cannot occur in practice, because `parsePremiumRows` would have already thrown
+// on the same input via the same predicates in the same order. A truly standalone
+// caller passing a CSV that skipped `parsePremiumRows` could see an uncaught
+// exception instead of a `{ ok: false }` result.
 export function validateIngestOutput(csvText: string, rows: PremiumRow[]): ValidationResult {
   const errors: string[] = [];
   const records: Record<string, string>[] = parse(csvText, {
@@ -133,6 +140,22 @@ export function validateIngestOutput(csvText: string, rows: PremiumRow[]): Valid
         );
       }
     }
+  }
+
+  if (duplicateCount > MAX_EXAMPLES) {
+    errors.push(
+      `uniqueness: …and ${duplicateCount - MAX_EXAMPLES} more duplicate key(s) not shown`,
+    );
+  }
+  if (missingSourceCount > MAX_EXAMPLES) {
+    errors.push(
+      `value: …and ${missingSourceCount - MAX_EXAMPLES} more row(s) with no matching source, not shown`,
+    );
+  }
+  if (valueMismatchCount > MAX_EXAMPLES) {
+    errors.push(
+      `value: …and ${valueMismatchCount - MAX_EXAMPLES} more value mismatch(es) not shown`,
+    );
   }
 
   return { ok: errors.length === 0, errors };

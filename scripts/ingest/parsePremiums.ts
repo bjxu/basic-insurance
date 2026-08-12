@@ -103,18 +103,18 @@ export function parsePremiumRows(
 
 export function parseFranchise(code: string): number {
   const match = /^FRA-(\d+)$/.exec(code);
-  if (!match) throw new Error(`parsePremiumRows: unrecognized Franchise code "${code}"`);
+  if (!match) throw new Error(`parseFranchise: unrecognized Franchise code "${code}"`);
   return Number(match[1]);
 }
 
 export function parseRegionNumber(code: string): string {
   const match = /^PR-REG CH(\d+)$/.exec(code);
-  if (!match) throw new Error(`parsePremiumRows: unrecognized Region code "${code}"`);
+  if (!match) throw new Error(`parseRegionNumber: unrecognized Region code "${code}"`);
   return match[1];
 }
 
 export function parseUnfalldeckung(code: string): boolean {
   if (code === "MIT-UNF") return true;
   if (code === "OHN-UNF") return false;
-  throw new Error(`parsePremiumRows: unrecognized Unfalleinschluss "${code}"`);
+  throw new Error(`parseUnfalldeckung: unrecognized Unfalleinschluss "${code}"`);
 }

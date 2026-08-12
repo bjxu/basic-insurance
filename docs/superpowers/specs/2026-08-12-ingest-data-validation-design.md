@@ -48,8 +48,10 @@ against the exact raw CSV bytes that produced `rows`:
    Catches mapping bugs (e.g. a value attached to the wrong row) that row-count
    checks alone can't see.
 4. **Read-after-write** — after `public/data/premiums-{year}.json` is written, read
-   it back and deep-compare it against the in-memory `rows`. Closes the loop to what
-   actually ships; catches serialization or write-path bugs.
+   it back and confirm the bytes on disk are identical to the JSON string that was
+   written — this reliably catches write-path bugs (truncation, encoding, concurrent
+   overwrite) but not a `JSON.stringify` serialization bug, since that would be
+   identical on both sides of the comparison.
 
 ### Where it lives
 
@@ -60,6 +62,15 @@ from `parsePremiums.ts` so there is one source of truth for *how* a value maps, 
 independently restates the drop conditions (sibling subgroup, invalid canton) as a
 deliberate cross-check: if that business rule ever drifts between the parser and the
 validator, the conservation check fails loudly instead of silently passing.
+
+Because it shares the CSV parse configuration and the six mapping helpers/tables
+(`VALID_CANTONS`, `ALTERSKLASSE_MAP`, `TARIFART_MAP`, `parseFranchise`,
+`parseRegionNumber`, `parseUnfalldeckung`) with `parsePremiums.ts`, the validator
+independently re-verifies the *loop logic* — which rows are kept vs. dropped, and
+which value lands on which row — but it does not independently re-verify the mapping
+primitives themselves; a bug inside one of those shared helpers would affect both the
+parser and the validator identically and remains covered only by
+`parsePremiums.test.ts`'s fixture tests.
 
 `scripts/ingest.ts` calls it right after parsing
 (`const validation = validateIngestOutput(csvText, rows)`) and again for the
