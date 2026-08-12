@@ -75,11 +75,13 @@ present in the mockup that today's components lack:
 
 `/admin` and `/admin/login`: the live dashboard today is a stub (range-preset
 buttons plus one total-count panel; chart panels are unimplemented pending
-`POSTGRES_URL` / the aggregation queries in `architecture.md` §13.2). This pass
-restyles what exists — the dark `nav` bar, range-picker pill buttons, and the stat
-panel — to match `mockups/admin.html`'s nav/range-picker/panel styling, plus the
-login page's form and button. Chart panels get MD3-aware colors when they're
-actually built, out of scope here since that code doesn't exist yet.
+`POSTGRES_URL` / the aggregation queries in `architecture.md` §13.2), and it has
+no `<nav>` element, unlike `mockups/admin.html`. This pass restyles what exists —
+the range-picker pill buttons and the stat panel — to match
+`mockups/admin.html`'s corresponding styling, plus the login page's form and
+button. Adding the mockup's nav bar (with its logout affordance, which would need
+new session-clearing logic) is new structure/behavior, not a re-skin, so it's out
+of scope here; so are the chart panels, since that code doesn't exist yet.
 
 ### 5.3 Out of scope
 
