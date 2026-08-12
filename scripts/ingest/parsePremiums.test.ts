@@ -28,6 +28,8 @@ describe("parsePremiumRows", () => {
         franchise: 300,
         unfalldeckung: true,
         tarifart: "standard",
+        tarifCode: "BASE",
+        productName: "Grundversicherung",
         monthlyPremium: 301.1,
       },
     ]);
@@ -90,16 +92,19 @@ describe("parsePremiumRows", () => {
     ).toThrow(/Altersklasse/);
   });
 
-  it("dedupes rows sharing the same key, keeping the lowest monthlyPremium", () => {
+  it("keeps distinct BAG products at the same insurer/region/age/franchise/accident/model as separate rows", () => {
     const { rows } = parsePremiumRows(
       csv(
-        "8,ZH,CH,2026,2025,PR-REG CH1,AKL-ERW,MIT-UNF,BASE,TAR-BASE,,FRAST1,FRA-300,301.1,1,1,Grundversicherung Classic",
-        "8,ZH,CH,2026,2025,PR-REG CH1,AKL-ERW,MIT-UNF,PREMIUM,TAR-BASE,,FRAST1,FRA-300,350.0,1,1,Grundversicherung Premium",
+        "8,ZH,CH,2026,2025,PR-REG CH1,AKL-ERW,MIT-UNF,01_016,TAR-HAM,,FRAST1,FRA-300,301.1,0,0,Hausarztversicherung Profit",
+        "8,ZH,CH,2026,2025,PR-REG CH1,AKL-ERW,MIT-UNF,01_046,TAR-HAM,,FRAST1,FRA-300,289.5,0,0,Casa",
       ),
       NAMES,
     );
-    expect(rows).toHaveLength(1);
-    expect(rows[0].monthlyPremium).toBe(301.1);
+    expect(rows).toHaveLength(2);
+    expect(rows.map((r) => ({ tarifCode: r.tarifCode, productName: r.productName, monthlyPremium: r.monthlyPremium }))).toEqual([
+      { tarifCode: "01_016", productName: "Hausarztversicherung Profit", monthlyPremium: 301.1 },
+      { tarifCode: "01_046", productName: "Casa", monthlyPremium: 289.5 },
+    ]);
   });
 
   it("throws on an unknown insurer code", () => {
