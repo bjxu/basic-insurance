@@ -49,8 +49,11 @@ Runs via `npm run ingest`. Steps:
 1. Download (or accept local path via `--local` flag) BAG CSV exports.
 2. Parse, validate column presence and value ranges; abort with a diff on unexpected
    values so schema changes surface immediately.
-3. Emit typed JSON to `src/data/`:
-   - `premiums-{year}.json` — flat array of premium rows, typed as `PremiumRow`.
+3. Emit typed JSON. Most outputs go to `src/data/`; the premium file is large enough
+   (§3.4) that it instead goes to `public/data/` so it can be fetched as a static
+   asset rather than bundled:
+   - `premiums-{year}.json` — flat array of premium rows, typed as `PremiumRow`
+     (`public/data/`).
    - `plz-map.json` — map of `PLZ → { gemeinden: Gemeinde[] }`.
    - `gemeinde-region-map.json` — map of `BfsNr → PraemienregionId`.
    - `insurers.json` — deduplicated insurer list with BAG insurer code + display name.
@@ -90,10 +93,10 @@ type Gemeinde = {
 
 ### 3.4 Data size estimate
 
-~30 000 rows per year × 2 years = ~60 000 rows. At ~150 bytes per row (JSON), the full
-dataset is roughly 9 MB uncompressed / ~1.5 MB gzip. This is served as a static asset
-fetched once on first interaction, cached in the browser, and never requested again
-within the same session.
+~174 876 rows for a single year's premium file, at roughly 244 bytes/row (JSON):
+~42.6 MB uncompressed / ~1.3 MB gzip. This is served as a static asset fetched once
+on first interaction (from `public/data/`, not bundled), cached in the browser, and
+never requested again within the same session.
 
 ---
 
@@ -127,14 +130,16 @@ src/
     format.ts           # Swiss CHF formatting (apostrophe thousands separator)
     validate.ts         # PLZ and birth year validation (REQ-13)
   data/
-    premiums-2026.json
-    premiums-2027.json  # present once BAG publishes it
     plz-map.json
     gemeinde-region-map.json
     insurers.json
     metadata.json
 scripts/
   ingest.ts
+public/
+  data/
+    premiums-2026.json
+    premiums-2027.json  # present once BAG publishes it
 ```
 
 ---

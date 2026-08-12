@@ -45,6 +45,7 @@ export function InsuranceComparator() {
   });
   const [premiumsByYear, setPremiumsByYear] = useState<Record<number, PremiumRow[]>>({});
   const [premiumsLoading, setPremiumsLoading] = useState(false);
+  const [premiumsError, setPremiumsError] = useState(false);
 
   const gemeinden = plz.length === 4 ? resolveGemeinden(plz) : [];
   const ambiguous = needsDisambiguation(gemeinden);
@@ -78,6 +79,7 @@ export function InsuranceComparator() {
     if (premiumsByYear[year]) return;
     let cancelled = false;
     setPremiumsLoading(true);
+    setPremiumsError(false);
     fetch(`/data/premiums-${year}.json`)
       .then((res) => {
         if (!res.ok) throw new Error(`failed to load premium data for ${year}: HTTP ${res.status}`);
@@ -87,10 +89,11 @@ export function InsuranceComparator() {
         if (!cancelled) setPremiumsByYear((prev) => ({ ...prev, [year]: rows }));
       })
       .catch((err) => {
-        // Swallow — results simply stay empty/loading; this matches the app's existing
-        // "logging must never block or degrade the comparison UI" posture (architecture.md §10.2)
-        // extended here to data loading. A real failure is visible as a stuck loading state.
+        // `.finally` below still fires and clears premiumsLoading, so a failure here
+        // would otherwise leave a silent blank page with no loading indicator and no
+        // way to recover. premiumsError drives a visible retry notice instead.
         console.error(err);
+        if (!cancelled) setPremiumsError(true);
       })
       .finally(() => {
         if (!cancelled) setPremiumsLoading(false);
@@ -140,6 +143,24 @@ export function InsuranceComparator() {
       year,
     }).map((r) => ({ tarifCode: r.tarifCode, productName: r.productName }));
   }, [currentPlanCoreProvided, praemienregionId, altersklasse, year, currentPlan.insurerCode, currentPlan.franchise, currentPlan.tarifart, currentPlan.unfalldeckung, ALL_PREMIUMS]);
+
+  // currentPlan.tarifCode is only valid for the exact combination of insurer/
+  // franchise/model/accident-coverage it was picked under (bug fix: without this,
+  // a stale tarifCode from a since-changed combination could either produce a false
+  // "not found" or, worse, silently resolve to a different, wrong product that
+  // happens to share the same code under a different insurer — see
+  // docs/superpowers/plans/2026-08-12-product-disambiguation-and-bundle-size.md's
+  // final-review fix wave).
+  useEffect(() => {
+    if (ALL_PREMIUMS.length === 0) return;
+    if (
+      currentPlan.tarifCode &&
+      currentPlanProductOptions &&
+      !currentPlanProductOptions.some((o) => o.tarifCode === currentPlan.tarifCode)
+    ) {
+      setCurrentPlan((p) => ({ ...p, tarifCode: undefined }));
+    }
+  }, [currentPlanProductOptions, currentPlan.tarifCode, ALL_PREMIUMS]);
 
   const results = useMemo(() => {
     if (!inputsValid || !praemienregionId || !altersklasse || !franchise || ALL_PREMIUMS.length === 0) return null;
@@ -242,6 +263,28 @@ export function InsuranceComparator() {
         <p className="text-sm text-gray-500 mt-4" role="status">
           Prämiendaten werden geladen…
         </p>
+      )}
+
+      {premiumsError && !premiumsLoading && !results && (
+        <div className="mt-4 bg-red-50 border border-red-200 rounded-md p-3.5" role="alert">
+          <p className="text-sm text-gray-700 mb-2">
+            Prämiendaten konnten nicht geladen werden. Bitte versuche es erneut.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setPremiumsError(false);
+              setPremiumsByYear((prev) => {
+                const next = { ...prev };
+                delete next[year];
+                return next;
+              });
+            }}
+            className="px-3 py-1.5 rounded-md border border-red-300 text-sm text-red-700 bg-white hover:bg-red-50"
+          >
+            Erneut versuchen
+          </button>
+        </div>
       )}
 
       {results && (

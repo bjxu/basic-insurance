@@ -1,7 +1,10 @@
 // BAG data ingestion (architecture.md §3.2). Run via `npm run ingest`.
 //
 // Downloads (or reads --local) the BAG premium CSV and premium-region/PLZ
-// spreadsheet, validates and reshapes them, and writes typed JSON to src/data/.
+// spreadsheet, validates and reshapes them, and writes typed JSON to src/data/
+// (plz-map, gemeinde-region-map, insurers, metadata) — except the premium file
+// itself, which is large enough to be fetched as a static asset rather than
+// bundled, so it goes to public/data/ instead (architecture.md §3.4).
 
 import { existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
