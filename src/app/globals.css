@@ -48,7 +48,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans); /* becomes var(--font-roboto) in Task 2 */
+  --font-sans: var(--font-roboto);
   --font-mono: var(--font-geist-mono);
 
   /* MD3 color tokens as Tailwind utilities: bg-primary, text-on-surface-variant, border-outline-variant, ... */
