@@ -213,9 +213,9 @@ export function InsuranceComparator() {
 
   return (
     <main className="max-w-[860px] mx-auto my-8 px-4">
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
-        <h1 className="text-xl font-bold mb-1">Prämienvergleich</h1>
-        <p className="text-sm text-gray-500 mb-5">
+      <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-6">
+        <h1 className="text-title-large text-on-surface mb-1">Prämienvergleich</h1>
+        <p className="text-body-medium text-on-surface-variant mb-5">
           Gib deine Angaben ein — die günstigsten Kassen erscheinen sofort.
         </p>
 
@@ -226,8 +226,8 @@ export function InsuranceComparator() {
         </div>
 
         {ambiguous && (
-          <div className="mt-3 bg-blue-50 border border-blue-200 rounded-md p-3.5">
-            <p className="text-sm text-gray-700 mb-2">
+          <div className="mt-3 bg-primary-container border border-primary-container rounded-md p-3.5">
+            <p className="text-sm text-on-surface-variant mb-2">
               PLZ {plz} liegt in mehreren Prämienregionen. Bitte wähle deine Gemeinde:
             </p>
             <div className="flex gap-2 flex-wrap">
@@ -237,7 +237,9 @@ export function InsuranceComparator() {
                   type="button"
                   onClick={() => handleGemeindeSelect(g.bfsNr)}
                   className={`px-3 py-1 rounded-full border text-sm ${
-                    bfsNr === g.bfsNr ? "bg-blue-600 border-blue-600 text-white font-semibold" : "border-blue-300 text-gray-700 bg-white"
+                    bfsNr === g.bfsNr
+                      ? "bg-primary border-primary text-on-primary font-semibold"
+                      : "border-primary-container text-on-surface-variant bg-surface"
                   }`}
                 >
                   {g.name} ({g.praemienregionId})
@@ -247,7 +249,7 @@ export function InsuranceComparator() {
           </div>
         )}
         {!ambiguous && resolvedGemeinde && (
-          <p className="text-xs text-blue-600 mt-2">&#10003; Gemeinde: {resolvedGemeinde.name}</p>
+          <p className="text-xs text-primary mt-2">&#10003; Gemeinde: {resolvedGemeinde.name}</p>
         )}
 
         <CurrentPlanSection
@@ -260,14 +262,14 @@ export function InsuranceComparator() {
       </div>
 
       {premiumsLoading && !results && (
-        <p className="text-sm text-gray-500 mt-4" role="status">
+        <p className="text-sm text-on-surface-variant mt-4" role="status">
           Prämiendaten werden geladen…
         </p>
       )}
 
       {premiumsError && !premiumsLoading && !results && (
-        <div className="mt-4 bg-red-50 border border-red-200 rounded-md p-3.5" role="alert">
-          <p className="text-sm text-gray-700 mb-2">
+        <div className="mt-4 bg-error-container border border-error-container rounded-md p-3.5" role="alert">
+          <p className="text-sm text-on-error-container mb-2">
             Prämiendaten konnten nicht geladen werden. Bitte versuche es erneut.
           </p>
           <button
@@ -280,7 +282,7 @@ export function InsuranceComparator() {
                 return next;
               });
             }}
-            className="px-3 py-1.5 rounded-md border border-red-300 text-sm text-red-700 bg-white hover:bg-red-50"
+            className="px-3 py-1.5 rounded-md border border-error text-sm text-error bg-surface hover:bg-error-container"
           >
             Erneut versuchen
           </button>
@@ -301,7 +303,7 @@ export function InsuranceComparator() {
             onToggleUnfalldeckung={() => setUnfalldeckung((v) => !v)}
           />
 
-          <p className="text-sm text-gray-500 mt-4 mb-2">
+          <p className="text-sm text-on-surface-variant mt-4 mb-2">
             {results.plans.length} Kassen · {altModelsActive ? "günstiges Modell je Kasse" : "günstigstes Standard-Angebot je Kasse"} ·{" "}
             Unfalldeckung {unfalldeckung ? "eingeschlossen" : "ausgeschlossen"} · {year}
           </p>
@@ -314,7 +316,7 @@ export function InsuranceComparator() {
         </div>
       )}
 
-      <p className="text-xs text-gray-400 text-center mt-6 pb-10">
+      <p className="text-body-small text-outline text-center mt-6 pb-10">
         Daten: BAG Opendata · Publikation{" "}
         {new Date(metadata.publicationDate).toLocaleDateString("de-CH", { day: "numeric", month: "long", year: "numeric" })} ·
         Nur Pflichtleistungen (OKP) · Kein Sponsoring, keine Vermittlungslinks
