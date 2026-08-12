@@ -43,12 +43,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="de">
-      <body
-        className={`${roboto.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+    <html lang="de" className={`${roboto.variable} ${geistMono.variable}`}>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }

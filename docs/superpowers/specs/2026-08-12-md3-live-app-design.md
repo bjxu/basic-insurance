@@ -33,7 +33,8 @@ all-Tailwind authoring style.
   scale as font-size/line-height/tracking vars where Tailwind supports it), so
   components consume them as ordinary Tailwind utilities — `bg-primary`,
   `text-on-surface-variant`, `border-outline-variant` — rather than hand-written
-  CSS classes or `bg-[var(--...)]` arbitrary values.
+  CSS classes or Tailwind's arbitrary-value bracket syntax referencing a raw CSS
+  variable in the class name.
 - Existing ad-hoc Tailwind colors are replaced 1:1 per the guideline's
   consolidation table (`bg-blue-600` → `bg-primary`, `text-gray-500`/`600`/`700` →
   `text-on-surface-variant`, `border-gray-200` → `border-outline-variant`, etc.).
