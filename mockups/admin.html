@@ -5,38 +5,69 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin – Krankenkassenvergleich</title>
   <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --blue:       #2563eb;
-      --blue-mid:   #3b82f6;
-      --blue-light: #eff6ff;
-      --gray-50:    #f9fafb;
-      --gray-100:   #f3f4f6;
-      --gray-200:   #e5e7eb;
-      --gray-300:   #d1d5db;
-      --gray-400:   #9ca3af;
-      --gray-500:   #6b7280;
-      --gray-600:   #4b5563;
-      --gray-700:   #374151;
-      --gray-900:   #111827;
+      --md-sys-color-primary:                  #0053db;
+      --md-sys-color-on-primary:                #ffffff;
+      --md-sys-color-primary-container:         #dbe1ff;
+      --md-sys-color-on-primary-container:      #00174b;
+      --md-sys-color-surface:                   #fefbff;
+      --md-sys-color-on-surface:                #1b1b1f;
+      --md-sys-color-on-surface-variant:        #45464f;
+      --md-sys-color-surface-variant:           #e2e2ec;
+      --md-sys-color-outline:                   #757680;
+      --md-sys-color-outline-variant:           #c5c6d0;
+
+      --md-sys-typescale-title-large-font:         Roboto, sans-serif;
+      --md-sys-typescale-title-large-size:         22px;
+      --md-sys-typescale-title-large-line-height:  28px;
+      --md-sys-typescale-title-large-weight:       400;
+      --md-sys-typescale-title-medium-font:        Roboto, sans-serif;
+      --md-sys-typescale-title-medium-size:        16px;
+      --md-sys-typescale-title-medium-line-height: 24px;
+      --md-sys-typescale-title-medium-weight:      500;
+      --md-sys-typescale-title-medium-tracking:    0.15px;
+      --md-sys-typescale-label-large-font:         Roboto, sans-serif;
+      --md-sys-typescale-label-large-size:         14px;
+      --md-sys-typescale-label-large-line-height:  20px;
+      --md-sys-typescale-label-large-weight:       500;
+      --md-sys-typescale-label-large-tracking:     0.1px;
+      --md-sys-typescale-body-medium-font:         Roboto, sans-serif;
+      --md-sys-typescale-body-medium-size:         14px;
+      --md-sys-typescale-body-medium-line-height:  20px;
+      --md-sys-typescale-body-medium-weight:       400;
+      --md-sys-typescale-body-medium-tracking:     0.25px;
+      --md-sys-typescale-body-small-font:          Roboto, sans-serif;
+      --md-sys-typescale-body-small-size:          12px;
+      --md-sys-typescale-body-small-line-height:   16px;
+      --md-sys-typescale-body-small-weight:        400;
+      --md-sys-typescale-body-small-tracking:      0.4px;
+      --md-sys-typescale-headline-small-font:        Roboto, sans-serif;
+      --md-sys-typescale-headline-small-size:        24px;
+      --md-sys-typescale-headline-small-line-height: 32px;
+      --md-sys-typescale-headline-small-weight:      400;
+
       --radius:     8px;
       --shadow-sm:  0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.04);
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-      background: var(--gray-50);
-      color: var(--gray-900);
+      font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
       font-size: 14px;
       line-height: 1.5;
     }
 
     /* ── Nav ── */
     nav {
-      background: var(--gray-900);
-      color: #fff;
+      background: var(--md-sys-color-on-surface);
+      color: var(--md-sys-color-on-primary);
       height: 52px;
       display: flex;
       align-items: center;
@@ -46,27 +77,27 @@
       top: 0;
       z-index: 10;
     }
-    nav .brand { font-weight: 700; font-size: 15px; }
+    nav .brand { font: var(--md-sys-typescale-title-large-weight) var(--md-sys-typescale-title-large-size)/var(--md-sys-typescale-title-large-line-height) var(--md-sys-typescale-title-large-font); }
     nav .badge {
       font-size: 11px;
       padding: 2px 7px;
       border-radius: 4px;
-      background: #374151;
-      color: var(--gray-400);
+      background: var(--md-sys-color-on-surface-variant);
+      color: var(--md-sys-color-outline);
       letter-spacing: .4px;
     }
     nav .spacer { flex: 1; }
     nav .logout {
       font-size: 13px;
-      color: var(--gray-400);
+      color: var(--md-sys-color-outline);
       cursor: pointer;
       padding: 5px 10px;
       border-radius: 5px;
-      border: 1px solid #374151;
+      border: 1px solid var(--md-sys-color-on-surface-variant);
       background: none;
     }
     /* Logout clears the token cookie — no server-side session (REQ-22) */
-    nav .logout:hover { background: #374151; color: #fff; }
+    nav .logout:hover { background: var(--md-sys-color-on-surface-variant); color: var(--md-sys-color-on-primary); }
 
     /* ── Page ── */
     .page {
@@ -77,8 +108,8 @@
 
     /* ── Range picker ── */
     .range-picker {
-      background: #fff;
-      border: 1px solid var(--gray-200);
+      background: var(--md-sys-color-surface);
+      border: 1px solid var(--md-sys-color-outline-variant);
       border-radius: var(--radius);
       box-shadow: var(--shadow-sm);
       padding: 12px 16px;
@@ -89,9 +120,8 @@
       margin-bottom: 20px;
     }
     .range-picker .rp-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--gray-500);
+      font: var(--md-sys-typescale-label-large-weight) var(--md-sys-typescale-label-large-size)/var(--md-sys-typescale-label-large-line-height) var(--md-sys-typescale-label-large-font);
+      color: var(--md-sys-color-on-surface-variant);
       text-transform: uppercase;
       letter-spacing: .5px;
       margin-right: 4px;
@@ -99,22 +129,22 @@
     .preset-btn {
       padding: 5px 12px;
       border-radius: 5px;
-      border: 1px solid var(--gray-200);
-      background: #fff;
+      border: 1px solid var(--md-sys-color-outline-variant);
+      background: var(--md-sys-color-surface);
       font-size: 13px;
       cursor: pointer;
-      color: var(--gray-600);
+      color: var(--md-sys-color-on-surface-variant);
     }
-    .preset-btn:hover { border-color: var(--blue); color: var(--blue); }
+    .preset-btn:hover { border-color: var(--md-sys-color-primary); color: var(--md-sys-color-primary); }
     .preset-btn.active {
-      background: var(--blue);
-      border-color: var(--blue);
-      color: #fff;
+      background: var(--md-sys-color-primary);
+      border-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
       font-weight: 600;
     }
     .rp-sep {
       width: 1px; height: 22px;
-      background: var(--gray-200);
+      background: var(--md-sys-color-outline-variant);
       margin: 0 4px;
     }
     .date-inputs {
@@ -122,26 +152,27 @@
       align-items: center;
       gap: 6px;
     }
-    .date-inputs span { font-size: 12px; color: var(--gray-400); }
+    .date-inputs span { font: var(--md-sys-typescale-body-small-weight) var(--md-sys-typescale-body-small-size)/var(--md-sys-typescale-body-small-line-height) var(--md-sys-typescale-body-small-font); letter-spacing: var(--md-sys-typescale-body-small-tracking); color: var(--md-sys-color-outline); }
     .date-inputs input[type="date"] {
       height: 32px;
       padding: 0 8px;
-      border: 1px solid var(--gray-200);
+      border: 1px solid var(--md-sys-color-outline-variant);
       border-radius: 5px;
       font-size: 13px;
-      color: var(--gray-700);
-      background: var(--gray-50);
+      color: var(--md-sys-color-on-surface-variant);
+      background: var(--md-sys-color-surface);
     }
     .rp-range-label {
       margin-left: auto;
-      font-size: 12px;
-      color: var(--gray-400);
+      font: var(--md-sys-typescale-body-small-weight) var(--md-sys-typescale-body-small-size)/var(--md-sys-typescale-body-small-line-height) var(--md-sys-typescale-body-small-font);
+      letter-spacing: var(--md-sys-typescale-body-small-tracking);
+      color: var(--md-sys-color-outline);
     }
 
     /* ── Stat card ── */
     .stat-card {
-      background: #fff;
-      border: 1px solid var(--gray-200);
+      background: var(--md-sys-color-surface);
+      border: 1px solid var(--md-sys-color-outline-variant);
       border-radius: var(--radius);
       box-shadow: var(--shadow-sm);
       padding: 20px 24px;
@@ -150,37 +181,33 @@
       min-width: 220px;
     }
     .stat-card .sc-label {
-      font-size: 12px;
-      font-weight: 600;
+      font: var(--md-sys-typescale-label-large-weight) var(--md-sys-typescale-label-large-size)/var(--md-sys-typescale-label-large-line-height) var(--md-sys-typescale-label-large-font);
       text-transform: uppercase;
       letter-spacing: .5px;
-      color: var(--gray-400);
+      color: var(--md-sys-color-outline);
     }
     .stat-card .sc-value {
-      font-size: 36px;
-      font-weight: 700;
-      color: var(--gray-900);
-      letter-spacing: -1px;
-      line-height: 1.1;
+      font: var(--md-sys-typescale-headline-small-weight) var(--md-sys-typescale-headline-small-size)/var(--md-sys-typescale-headline-small-line-height) var(--md-sys-typescale-headline-small-font);
+      color: var(--md-sys-color-on-surface);
       margin: 4px 0 2px;
     }
     .stat-card .sc-range {
-      font-size: 12px;
-      color: var(--gray-400);
+      font: var(--md-sys-typescale-body-small-weight) var(--md-sys-typescale-body-small-size)/var(--md-sys-typescale-body-small-line-height) var(--md-sys-typescale-body-small-font);
+      letter-spacing: var(--md-sys-typescale-body-small-tracking);
+      color: var(--md-sys-color-outline);
     }
 
     /* ── Card wrapper ── */
     .card {
-      background: #fff;
-      border: 1px solid var(--gray-200);
+      background: var(--md-sys-color-surface);
+      border: 1px solid var(--md-sys-color-outline-variant);
       border-radius: var(--radius);
       box-shadow: var(--shadow-sm);
       padding: 20px 20px 16px;
     }
     .card h2 {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--gray-600);
+      font: var(--md-sys-typescale-title-medium-weight) var(--md-sys-typescale-title-medium-size)/var(--md-sys-typescale-title-medium-line-height) var(--md-sys-typescale-title-medium-font);
+      color: var(--md-sys-color-on-surface-variant);
       text-transform: uppercase;
       letter-spacing: .5px;
       margin-bottom: 16px;
@@ -215,7 +242,7 @@
 
     .axis-label {
       font-size: 11px;
-      fill: var(--gray-400);
+      fill: var(--md-sys-color-outline);
     }
 
     /* ── Horizontal bar chart ── */
@@ -226,7 +253,7 @@
       width: 130px;
       flex-shrink: 0;
       font-size: 13px;
-      color: var(--gray-700);
+      color: var(--md-sys-color-on-surface-variant);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -235,13 +262,13 @@
     .bar-track {
       flex: 1;
       height: 18px;
-      background: var(--gray-100);
+      background: var(--md-sys-color-surface-variant);
       border-radius: 3px;
       overflow: hidden;
     }
     .bar-fill {
       height: 100%;
-      background: var(--blue);
+      background: var(--md-sys-color-primary);
       border-radius: 3px;
       transition: width .4s;
     }
@@ -249,7 +276,7 @@
       width: 64px;
       flex-shrink: 0;
       font-size: 12px;
-      color: var(--gray-500);
+      color: var(--md-sys-color-on-surface-variant);
       text-align: right;
     }
 
@@ -305,13 +332,13 @@
 
   <!-- ── Trend chart (full width) ── -->
   <div class="card" style="margin-bottom:16px;">
-    <h2>Anfragen über Zeit &nbsp;<span style="font-weight:400;color:var(--gray-400);font-size:11px;text-transform:none;letter-spacing:0">täglich</span></h2>
+    <h2>Anfragen über Zeit &nbsp;<span style="font-weight:400;color:var(--md-sys-color-outline);font-size:11px;text-transform:none;letter-spacing:0">täglich</span></h2>
     <div class="chart-area">
       <svg viewBox="0 0 760 110" preserveAspectRatio="none" role="img" aria-label="Anfragen pro Tag, 12. Juli bis 11. August 2026, steigender Trend von 300 auf 1500 pro Tag">
         <!-- grid lines -->
-        <line x1="0" y1="0"  x2="760" y2="0"  stroke="#f3f4f6" stroke-width="1"/>
-        <line x1="0" y1="36" x2="760" y2="36" stroke="#f3f4f6" stroke-width="1"/>
-        <line x1="0" y1="72" x2="760" y2="72" stroke="#f3f4f6" stroke-width="1"/>
+        <line x1="0" y1="0"  x2="760" y2="0"  stroke="var(--md-sys-color-surface-variant)" stroke-width="1"/>
+        <line x1="0" y1="36" x2="760" y2="36" stroke="var(--md-sys-color-surface-variant)" stroke-width="1"/>
+        <line x1="0" y1="72" x2="760" y2="72" stroke="var(--md-sys-color-surface-variant)" stroke-width="1"/>
 
         <!-- area fill -->
         <path d="M0,90 L25,82 L50,78 L75,74 L100,68 L125,72 L150,60 L175,55
@@ -319,7 +346,7 @@
                  L375,28 L400,22 L425,26 L450,18 L475,20 L500,14 L525,16
                  L550,10 L575,12 L600,8  L625,14 L650,10 L675,6  L700,8
                  L725,4  L760,6 L760,110 L0,110 Z"
-              fill="rgba(37,99,235,.08)"/>
+              fill="rgba(0,83,219,.08)"/>
 
         <!-- line -->
         <path d="M0,90 L25,82 L50,78 L75,74 L100,68 L125,72 L150,60 L175,55
@@ -327,7 +354,7 @@
                  L375,28 L400,22 L425,26 L450,18 L475,20 L500,14 L525,16
                  L550,10 L575,12 L600,8  L625,14 L650,10 L675,6  L700,8
                  L725,4  L760,6"
-              fill="none" stroke="#2563eb" stroke-width="2" stroke-linejoin="round"/>
+              fill="none" stroke="var(--md-sys-color-primary)" stroke-width="2" stroke-linejoin="round"/>
 
         <!-- x-axis labels -->
         <text x="0"   y="108" class="axis-label">12 Jul</text>
