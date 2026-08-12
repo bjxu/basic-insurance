@@ -19,6 +19,8 @@ export type PremiumRow = {
   unfalldeckung: boolean; // true = accident coverage included
   tarifart: Tarifart;
   monthlyPremium: number; // CHF, two decimal places
+  tarifCode: string; // BAG's raw product code (e.g. "01_016", "BASE") — 1:1 with productName
+  productName: string; // e.g. "Grundversicherung", "Casa" — the specific named product within tarifart
 };
 
 export type Gemeinde = {
@@ -38,6 +40,7 @@ export type CurrentPlan = {
   franchise: number;
   tarifart: Tarifart;
   unfalldeckung: boolean;
+  tarifCode?: string; // set once the user picks a specific product, if disambiguation was needed
 };
 
 export type HeadlineState =
