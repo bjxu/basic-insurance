@@ -1,12 +1,21 @@
+/* Tailwind's automatic content scanner used to walk outside src/ and pick up
+   example utility-class-looking strings from docs/ prose (e.g. class names
+   embedded in Markdown code samples), which either crashed the dev server or
+   leaked unused CSS rules into the production bundle. `source(none)` turns
+   off automatic scanning entirely, and `@source "../"` (i.e. src/, since
+   this file lives at src/app/globals.css) is now the *only* scanned root. If
+   you ever add Tailwind classes outside src/ (a root-level app/, an
+   MDX/content directory, .storybook/, a shared package, etc.), they will
+   silently produce no CSS until you add another @source line for that root. */
 @import "tailwindcss" source(none);
 @source "../";
 
-/* App UI is light-only: every component uses hardcoded light Tailwind
-   classes (bg-white, text-gray-500, ...) with no dark: variants. Without
-   this, an OS/browser dark theme flips just these two body-level vars
-   (leftover Next.js boilerplate) while nested elements stay explicitly
-   light, e.g. an unstyled <h1> inherits the now-light --foreground and
-   renders unreadable on an explicit bg-white card. */
+/* App UI is intentionally light-only: --background, --foreground, and the
+   MD3 color tokens below are defined once with no dark-mode variants and no
+   prefers-color-scheme branch. Without the color-scheme: light pin just
+   below, an OS/browser dark-mode preference would invert these root-level
+   tokens while components authored against their light values wouldn't
+   follow, producing unpredictable, unreadable contrast throughout the UI. */
 :root {
   color-scheme: light;
   --background: #ffffff;
