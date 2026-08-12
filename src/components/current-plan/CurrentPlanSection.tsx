@@ -19,21 +19,21 @@ const MODELS: Tarifart[] = ["standard", "hausarzt", "telmed", "hmo", "andere"];
 
 export function CurrentPlanSection({ insurers, franchiseTiers, value, onChange, productOptions }: Props) {
   return (
-    <details className="mt-5 pt-4 border-t border-gray-100">
-      <summary className="flex items-center gap-2 cursor-pointer select-none text-sm font-semibold text-blue-600 list-none [&::-webkit-details-marker]:hidden before:content-['▸'] before:text-xs [details[open]_&]:before:content-['▾']">
+    <details className="mt-5 pt-4 border-t border-surface-variant">
+      <summary className="flex items-center gap-2 cursor-pointer select-none text-title-medium text-primary list-none [&::-webkit-details-marker]:hidden before:content-['▸'] before:text-xs [details[open]_&]:before:content-['▾']">
         Was zahlst du heute?{" "}
-        <span className="font-normal text-gray-500">&nbsp;(optional — zeigt deine Ersparnis)</span>
+        <span className="font-normal text-on-surface-variant">&nbsp;(optional — zeigt deine Ersparnis)</span>
       </summary>
       <div className="mt-3.5 grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div>
-          <label htmlFor="current-insurer" className="block text-sm font-semibold text-gray-600 mb-1.5">
+          <label htmlFor="current-insurer" className="block text-label-large text-on-surface-variant mb-1.5">
             Aktuelle Kasse
           </label>
           <select
             id="current-insurer"
             value={value.insurerCode ?? ""}
             onChange={(e) => onChange({ ...value, insurerCode: e.target.value, tarifCode: undefined })}
-            className="w-full h-10 px-3 rounded-md border border-gray-200 text-[15px] bg-white outline-none focus:border-blue-600"
+            className="w-full h-10 px-3 rounded-md border border-outline-variant text-[15px] bg-surface outline-none focus:border-primary"
           >
             <option value="">–</option>
             {insurers.map((i) => (
@@ -44,14 +44,14 @@ export function CurrentPlanSection({ insurers, franchiseTiers, value, onChange, 
           </select>
         </div>
         <div>
-          <label htmlFor="current-franchise" className="block text-sm font-semibold text-gray-600 mb-1.5">
+          <label htmlFor="current-franchise" className="block text-label-large text-on-surface-variant mb-1.5">
             Aktuelle Franchise
           </label>
           <select
             id="current-franchise"
             value={value.franchise ?? ""}
             onChange={(e) => onChange({ ...value, franchise: Number(e.target.value), tarifCode: undefined })}
-            className="w-full h-10 px-3 rounded-md border border-gray-200 text-[15px] bg-white outline-none focus:border-blue-600"
+            className="w-full h-10 px-3 rounded-md border border-outline-variant text-[15px] bg-surface outline-none focus:border-primary"
           >
             <option value="">–</option>
             {franchiseTiers.map((t) => (
@@ -62,14 +62,14 @@ export function CurrentPlanSection({ insurers, franchiseTiers, value, onChange, 
           </select>
         </div>
         <div>
-          <label htmlFor="current-model" className="block text-sm font-semibold text-gray-600 mb-1.5">
+          <label htmlFor="current-model" className="block text-label-large text-on-surface-variant mb-1.5">
             Aktuelles Modell
           </label>
           <select
             id="current-model"
             value={value.tarifart ?? ""}
             onChange={(e) => onChange({ ...value, tarifart: e.target.value as Tarifart, tarifCode: undefined })}
-            className="w-full h-10 px-3 rounded-md border border-gray-200 text-[15px] bg-white outline-none focus:border-blue-600"
+            className="w-full h-10 px-3 rounded-md border border-outline-variant text-[15px] bg-surface outline-none focus:border-primary"
           >
             <option value="">–</option>
             {MODELS.map((m) => (
@@ -80,14 +80,14 @@ export function CurrentPlanSection({ insurers, franchiseTiers, value, onChange, 
           </select>
         </div>
         <div>
-          <label htmlFor="current-accident" className="block text-sm font-semibold text-gray-600 mb-1.5">
+          <label htmlFor="current-accident" className="block text-label-large text-on-surface-variant mb-1.5">
             Unfalldeckung
           </label>
           <select
             id="current-accident"
             value={value.unfalldeckung == null ? "" : value.unfalldeckung ? "1" : "0"}
             onChange={(e) => onChange({ ...value, unfalldeckung: e.target.value === "1", tarifCode: undefined })}
-            className="w-full h-10 px-3 rounded-md border border-gray-200 text-[15px] bg-white outline-none focus:border-blue-600"
+            className="w-full h-10 px-3 rounded-md border border-outline-variant text-[15px] bg-surface outline-none focus:border-primary"
           >
             <option value="">–</option>
             <option value="1">Eingeschlossen</option>
@@ -97,14 +97,14 @@ export function CurrentPlanSection({ insurers, franchiseTiers, value, onChange, 
       </div>
       {productOptions && productOptions.length > 1 && (
         <div className="mt-3">
-          <label htmlFor="current-product" className="block text-sm font-semibold text-gray-600 mb-1.5">
+          <label htmlFor="current-product" className="block text-label-large text-on-surface-variant mb-1.5">
             Genaues Produkt
           </label>
           <select
             id="current-product"
             value={value.tarifCode ?? ""}
             onChange={(e) => onChange({ ...value, tarifCode: e.target.value || undefined })}
-            className="w-full h-10 px-3 rounded-md border border-gray-200 text-[15px] bg-white outline-none focus:border-blue-600"
+            className="w-full h-10 px-3 rounded-md border border-outline-variant text-[15px] bg-surface outline-none focus:border-primary"
           >
             <option value="">– bitte wählen –</option>
             {productOptions.map((p) => (
@@ -113,7 +113,7 @@ export function CurrentPlanSection({ insurers, franchiseTiers, value, onChange, 
               </option>
             ))}
           </select>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-body-small text-on-surface-variant mt-1">
             Deine Kasse bietet mehrere Produkte zu diesem Modell/dieser Franchise an — wähle dein genaues Produkt für eine korrekte Ersparnis-Berechnung.
           </p>
         </div>
