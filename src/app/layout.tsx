@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -11,6 +11,12 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+// UI is light-only (no dark: Tailwind variants anywhere) — declare it so an
+// OS/browser dark theme doesn't auto-invert colors and break contrast.
+export const viewport: Viewport = {
+  colorScheme: "light",
+};
 
 // Generic default; overridden per-request in app/page metadata once URL state is read (REQ-18).
 export const metadata: Metadata = {
