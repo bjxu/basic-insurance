@@ -14,7 +14,7 @@ export function DeductibleSelect({ altersklasse, value, onChange }: Props) {
 
   return (
     <div>
-      <label htmlFor="fran" className="block text-sm font-semibold text-gray-600 mb-1.5">
+      <label htmlFor="fran" className="block text-label-large text-on-surface-variant mb-1.5">
         Franchise
       </label>
       <select
@@ -22,7 +22,7 @@ export function DeductibleSelect({ altersklasse, value, onChange }: Props) {
         value={value ?? ""}
         disabled={!altersklasse}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full h-10 px-3 rounded-md border border-gray-200 text-[15px] bg-white outline-none focus:border-blue-600 focus-visible:ring-2 focus-visible:ring-blue-200 disabled:bg-gray-50 disabled:text-gray-400"
+        className="w-full h-10 px-3 rounded-md border border-outline-variant text-[15px] bg-surface outline-none focus:border-primary focus-visible:ring-2 focus-visible:ring-primary-container disabled:bg-surface-variant disabled:text-outline"
       >
         <option value="" disabled>
           {altersklasse ? "Wählen…" : "Erst Jahrgang eingeben"}

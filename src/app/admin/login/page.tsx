@@ -38,10 +38,10 @@ export default async function AdminLoginPage({
   const { error } = await searchParams;
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50">
-      <form action={login} className="bg-white border border-gray-200 rounded-lg shadow-sm p-8 w-full max-w-sm">
-        <h1 className="text-lg font-bold mb-4">Admin-Login</h1>
-        <label htmlFor="password" className="block text-sm font-semibold text-gray-600 mb-1.5">
+    <main className="min-h-screen flex items-center justify-center bg-surface-variant">
+      <form action={login} className="bg-surface border border-outline-variant rounded-lg shadow-sm p-8 w-full max-w-sm">
+        <h1 className="text-title-large text-on-surface mb-4">Admin-Login</h1>
+        <label htmlFor="password" className="block text-label-large text-on-surface-variant mb-1.5">
           Passwort
         </label>
         <input
@@ -49,10 +49,10 @@ export default async function AdminLoginPage({
           name="password"
           type="password"
           required
-          className="w-full h-10 px-3 rounded-md border border-gray-200 text-[15px] outline-none focus:border-blue-600 mb-3"
+          className="w-full h-10 px-3 rounded-md border border-outline-variant text-[15px] outline-none focus:border-primary mb-3"
         />
-        {error && <p className="text-sm text-red-600 mb-3">Falsches Passwort.</p>}
-        <button type="submit" className="w-full h-10 rounded-md bg-blue-600 text-white font-semibold">
+        {error && <p className="text-sm text-error mb-3">Falsches Passwort.</p>}
+        <button type="submit" className="w-full h-10 rounded-md bg-primary text-on-primary font-semibold">
           Anmelden
         </button>
       </form>

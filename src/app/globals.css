@@ -1,26 +1,133 @@
-@import "tailwindcss";
+/* Tailwind's automatic content scanner used to walk outside src/ and pick up
+   example utility-class-looking strings from docs/ prose (e.g. class names
+   embedded in Markdown code samples), which either crashed the dev server or
+   leaked unused CSS rules into the production bundle. `source(none)` turns
+   off automatic scanning entirely, and `@source "../"` (i.e. src/, since
+   this file lives at src/app/globals.css) is now the *only* scanned root. If
+   you ever add Tailwind classes outside src/ (a root-level app/, an
+   MDX/content directory, .storybook/, a shared package, etc.), they will
+   silently produce no CSS until you add another @source line for that root. */
+@import "tailwindcss" source(none);
+@source "../";
 
-/* App UI is light-only: every component uses hardcoded light Tailwind
-   classes (bg-white, text-gray-500, ...) with no dark: variants. Without
-   this, an OS/browser dark theme flips just these two body-level vars
-   (leftover Next.js boilerplate) while nested elements stay explicitly
-   light, e.g. an unstyled <h1> inherits the now-light --foreground and
-   renders unreadable on an explicit bg-white card. */
+/* App UI is intentionally light-only: --background, --foreground, and the
+   MD3 color tokens below are defined once with no dark-mode variants and no
+   prefers-color-scheme branch. Without the color-scheme: light pin just
+   below, an OS/browser dark-mode preference would invert these root-level
+   tokens while components authored against their light values wouldn't
+   follow, producing unpredictable, unreadable contrast throughout the UI. */
 :root {
   color-scheme: light;
   --background: #ffffff;
   --foreground: #171717;
+
+  /* MD3 tokens — copied verbatim from docs/design/material-design-guideline.md
+     (§1.2 color, §2 typography). Do not hand-edit values here; regenerate
+     both this file and the guideline together if the seed color changes. */
+  --md-sys-color-primary: #0053db;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #dbe1ff;
+  --md-sys-color-on-primary-container: #00174b;
+  --md-sys-color-primary-hover: #003ea8;
+  --md-sys-color-secondary: #595e72;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #dde1f9;
+  --md-sys-color-on-secondary-container: #161b2c;
+  --md-sys-color-tertiary: #745470;
+  --md-sys-color-tertiary-container: #ffd6f8;
+  --md-sys-color-on-tertiary-container: #2b122b;
+  --md-sys-color-error: #ba1a1a;
+  --md-sys-color-error-container: #ffdad6;
+  --md-sys-color-on-error-container: #410002;
+  --md-sys-color-success: #006e2d;
+  --md-sys-color-on-success: #ffffff;
+  --md-sys-color-success-container: #7ffc97;
+  --md-sys-color-on-success-container: #002109;
+  --md-sys-color-warning: #855300;
+  --md-sys-color-on-warning: #ffffff;
+  --md-sys-color-warning-container: #ffddb8;
+  --md-sys-color-on-warning-container: #2a1700;
+  --md-sys-color-surface: #fefbff;
+  --md-sys-color-on-surface: #1b1b1f;
+  --md-sys-color-on-surface-variant: #45464f;
+  --md-sys-color-surface-variant: #e2e2ec;
+  --md-sys-color-outline: #757680;
+  --md-sys-color-outline-variant: #c5c6d0;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-roboto);
   --font-mono: var(--font-geist-mono);
+
+  /* MD3 color tokens as Tailwind utilities: bg-primary, text-on-surface-variant, border-outline-variant, ... */
+  --color-primary: var(--md-sys-color-primary);
+  --color-on-primary: var(--md-sys-color-on-primary);
+  --color-primary-container: var(--md-sys-color-primary-container);
+  --color-on-primary-container: var(--md-sys-color-on-primary-container);
+  --color-primary-hover: var(--md-sys-color-primary-hover);
+  --color-secondary: var(--md-sys-color-secondary);
+  --color-on-secondary: var(--md-sys-color-on-secondary);
+  --color-secondary-container: var(--md-sys-color-secondary-container);
+  --color-on-secondary-container: var(--md-sys-color-on-secondary-container);
+  --color-tertiary: var(--md-sys-color-tertiary);
+  --color-tertiary-container: var(--md-sys-color-tertiary-container);
+  --color-on-tertiary-container: var(--md-sys-color-on-tertiary-container);
+  --color-error: var(--md-sys-color-error);
+  --color-error-container: var(--md-sys-color-error-container);
+  --color-on-error-container: var(--md-sys-color-on-error-container);
+  --color-success: var(--md-sys-color-success);
+  --color-on-success: var(--md-sys-color-on-success);
+  --color-success-container: var(--md-sys-color-success-container);
+  --color-on-success-container: var(--md-sys-color-on-success-container);
+  --color-warning: var(--md-sys-color-warning);
+  --color-on-warning: var(--md-sys-color-on-warning);
+  --color-warning-container: var(--md-sys-color-warning-container);
+  --color-on-warning-container: var(--md-sys-color-on-warning-container);
+  --color-surface: var(--md-sys-color-surface);
+  --color-on-surface: var(--md-sys-color-on-surface);
+  --color-on-surface-variant: var(--md-sys-color-on-surface-variant);
+  --color-surface-variant: var(--md-sys-color-surface-variant);
+  --color-outline: var(--md-sys-color-outline);
+  --color-outline-variant: var(--md-sys-color-outline-variant);
+
+  /* MD3 type scale (only the roles actually used in the mockups, per the
+     guideline §2 "Roles used" list) as Tailwind text-size utilities:
+     text-title-large, text-title-medium, text-label-large, text-body-medium,
+     text-body-small, text-headline-small. Each pairs font-size with the
+     matching line-height/weight/tracking automatically. */
+  --text-title-large: 22px;
+  --text-title-large--line-height: 28px;
+  --text-title-large--font-weight: 400;
+
+  --text-title-medium: 16px;
+  --text-title-medium--line-height: 24px;
+  --text-title-medium--font-weight: 500;
+  --text-title-medium--letter-spacing: 0.15px;
+
+  --text-label-large: 14px;
+  --text-label-large--line-height: 20px;
+  --text-label-large--font-weight: 500;
+  --text-label-large--letter-spacing: 0.1px;
+
+  --text-body-medium: 14px;
+  --text-body-medium--line-height: 20px;
+  --text-body-medium--font-weight: 400;
+  --text-body-medium--letter-spacing: 0.25px;
+
+  --text-body-small: 12px;
+  --text-body-small--line-height: 16px;
+  --text-body-small--font-weight: 400;
+  --text-body-small--letter-spacing: 0.4px;
+
+  --text-headline-small: 24px;
+  --text-headline-small--line-height: 32px;
+  --text-headline-small--font-weight: 400;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
 }

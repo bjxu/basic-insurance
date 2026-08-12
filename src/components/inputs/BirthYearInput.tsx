@@ -18,7 +18,7 @@ export function BirthYearInput({ value, onChange, calendarYear }: Props) {
 
   return (
     <div>
-      <label htmlFor="by" className="block text-sm font-semibold text-gray-600 mb-1.5">
+      <label htmlFor="by" className="block text-label-large text-on-surface-variant mb-1.5">
         Jahrgang
       </label>
       <input
@@ -29,11 +29,11 @@ export function BirthYearInput({ value, onChange, calendarYear }: Props) {
         onChange={(e) => onChange(e.target.value)}
         aria-describedby="by-hint"
         aria-invalid={!result.valid}
-        className={`w-full h-10 px-3 rounded-md border text-[15px] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-blue-200 ${
-          result.valid ? "border-gray-200 focus:border-blue-600" : "border-red-600 focus:border-red-600"
+        className={`w-full h-10 px-3 rounded-md border text-[15px] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-primary-container ${
+          result.valid ? "border-outline-variant focus:border-primary" : "border-error focus:border-error"
         }`}
       />
-      <p id="by-hint" className={`text-xs mt-1 ${result.valid ? "text-gray-400" : "text-red-600"}`}>
+      <p id="by-hint" className={`text-body-small mt-1 ${result.valid ? "text-outline" : "text-error"}`}>
         {!result.valid
           ? result.message
           : altersklasse && tiers
