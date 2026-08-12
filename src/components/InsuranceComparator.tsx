@@ -42,6 +42,7 @@ export function InsuranceComparator() {
     insurerCode: initial.currentInsurerCode ?? undefined,
     franchise: initial.currentFranchise ?? undefined,
     tarifart: initial.currentTarifart ?? undefined,
+    tarifCode: initial.currentTarifCode ?? undefined,
     unfalldeckung: initial.currentUnfalldeckung ?? undefined,
   });
 
@@ -84,6 +85,7 @@ export function InsuranceComparator() {
       currentInsurerCode: currentPlan.insurerCode ?? null,
       currentFranchise: currentPlan.franchise ?? null,
       currentTarifart: currentPlan.tarifart ?? null,
+      currentTarifCode: currentPlan.tarifCode ?? null,
       currentUnfalldeckung: currentPlan.unfalldeckung ?? null,
     });
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });

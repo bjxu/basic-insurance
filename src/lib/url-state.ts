@@ -15,6 +15,7 @@ export type ComparisonState = {
   currentInsurerCode: string | null;
   currentFranchise: number | null;
   currentTarifart: Tarifart | null;
+  currentTarifCode: string | null;
   currentUnfalldeckung: boolean | null;
 };
 
@@ -32,6 +33,7 @@ export function encodeState(state: ComparisonState): URLSearchParams {
   if (state.currentInsurerCode) params.set("ci", state.currentInsurerCode);
   if (state.currentFranchise != null) params.set("cf", String(state.currentFranchise));
   if (state.currentTarifart) params.set("cm", state.currentTarifart);
+  if (state.currentTarifCode) params.set("ct", state.currentTarifCode);
   if (state.currentUnfalldeckung != null) params.set("ca", state.currentUnfalldeckung ? "1" : "0");
   return params;
 }
@@ -45,6 +47,7 @@ export function decodeState(params: URLSearchParams): ComparisonState {
   const modelsRaw = params.get("models");
   const cfRaw = params.get("cf");
   const cmRaw = params.get("cm");
+  const ctRaw = params.get("ct");
   const caRaw = params.get("ca");
 
   return {
@@ -60,6 +63,7 @@ export function decodeState(params: URLSearchParams): ComparisonState {
     currentInsurerCode: params.get("ci") || null,
     currentFranchise: cfRaw && /^\d+$/.test(cfRaw) ? Number(cfRaw) : null,
     currentTarifart: cmRaw && VALID_TARIFARTEN.includes(cmRaw as Tarifart) ? (cmRaw as Tarifart) : null,
+    currentTarifCode: ctRaw || null,
     currentUnfalldeckung: caRaw === "0" || caRaw === "1" ? caRaw === "1" : null,
   };
 }
