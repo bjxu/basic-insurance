@@ -1,5 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { parsePremiumRows } from "./parsePremiums";
+import {
+  parsePremiumRows,
+  VALID_CANTONS,
+  ALTERSKLASSE_MAP,
+  TARIFART_MAP,
+  parseFranchise,
+  parseRegionNumber,
+  parseUnfalldeckung,
+} from "./parsePremiums";
 
 const HEADER =
   "Versicherer,Kanton,Hoheitsgebiet,Geschäftsjahr,Erhebungsjahr,Region,Altersklasse,Unfalleinschluss,Tarif,Tariftyp,Altersuntergruppe,Franchisestufe,Franchise,Prämie,isBaseP,isBaseF,Tarifbezeichnung";
@@ -116,5 +124,41 @@ describe("parsePremiumRows", () => {
         NAMES,
       ),
     ).toThrow(/unknown insurer code/);
+  });
+});
+
+describe("exported parsing helpers (reused by validateIngest.ts)", () => {
+  it("VALID_CANTONS contains real cantons and excludes cross-border codes", () => {
+    expect(VALID_CANTONS.has("ZH")).toBe(true);
+    expect(VALID_CANTONS.has("ZE")).toBe(false);
+  });
+
+  it("ALTERSKLASSE_MAP maps all three real BAG codes", () => {
+    expect(ALTERSKLASSE_MAP["AKL-KIN"]).toBe("kind");
+    expect(ALTERSKLASSE_MAP["AKL-JUG"]).toBe("jung");
+    expect(ALTERSKLASSE_MAP["AKL-ERW"]).toBe("erwachsen");
+  });
+
+  it("TARIFART_MAP maps all four real BAG Tariftyp codes", () => {
+    expect(TARIFART_MAP["TAR-BASE"]).toBe("standard");
+    expect(TARIFART_MAP["TAR-HAM"]).toBe("hausarzt");
+    expect(TARIFART_MAP["TAR-HMO"]).toBe("hmo");
+    expect(TARIFART_MAP["TAR-DIV"]).toBe("telmed");
+  });
+
+  it("parseFranchise extracts the numeric value from a FRA-<n> code", () => {
+    expect(parseFranchise("FRA-300")).toBe(300);
+    expect(() => parseFranchise("XYZ")).toThrow(/Franchise/);
+  });
+
+  it("parseRegionNumber extracts the numeric value from a PR-REG CH<n> code", () => {
+    expect(parseRegionNumber("PR-REG CH1")).toBe("1");
+    expect(() => parseRegionNumber("XYZ")).toThrow(/Region/);
+  });
+
+  it("parseUnfalldeckung maps MIT-UNF/OHN-UNF to true/false", () => {
+    expect(parseUnfalldeckung("MIT-UNF")).toBe(true);
+    expect(parseUnfalldeckung("OHN-UNF")).toBe(false);
+    expect(() => parseUnfalldeckung("XYZ")).toThrow(/Unfalleinschluss/);
   });
 });
