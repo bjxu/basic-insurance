@@ -12,16 +12,14 @@ import { PlanList } from "./results/PlanList";
 import { EmptyState } from "./results/EmptyState";
 import { getAltersklasse, getFranchiseTiers } from "@/lib/ageband";
 import { resolveGemeinden, needsDisambiguation } from "@/lib/location";
-import { filterPlans, cheapestPerInsurer, sortPlans, findCurrentPlan, computeHeadline } from "@/lib/lookup";
+import { filterPlans, cheapestPerInsurer, sortPlans, findCurrentPlan, findMatchingProducts, computeHeadline } from "@/lib/lookup";
 import { encodeState, decodeState } from "@/lib/url-state";
 import type { CurrentPlan, Tarifart } from "@/lib/types";
 
-import premiums2026 from "@/data/premiums-2026.json";
 import insurersData from "@/data/insurers.json";
 import metadata from "@/data/metadata.json";
 import type { PremiumRow } from "@/lib/types";
 
-const ALL_PREMIUMS = premiums2026 as PremiumRow[];
 const INSURERS = insurersData as { insurerCode: string; insurerName: string }[];
 const ALT_MODELS: Tarifart[] = ["standard", "hausarzt", "telmed", "hmo", "andere"];
 
@@ -42,8 +40,12 @@ export function InsuranceComparator() {
     insurerCode: initial.currentInsurerCode ?? undefined,
     franchise: initial.currentFranchise ?? undefined,
     tarifart: initial.currentTarifart ?? undefined,
+    tarifCode: initial.currentTarifCode ?? undefined,
     unfalldeckung: initial.currentUnfalldeckung ?? undefined,
   });
+  const [premiumsByYear, setPremiumsByYear] = useState<Record<number, PremiumRow[]>>({});
+  const [premiumsLoading, setPremiumsLoading] = useState(false);
+  const [premiumsError, setPremiumsError] = useState(false);
 
   const gemeinden = plz.length === 4 ? resolveGemeinden(plz) : [];
   const ambiguous = needsDisambiguation(gemeinden);
@@ -71,6 +73,38 @@ export function InsuranceComparator() {
     }
   }, [altersklasse, franchise]);
 
+  // Fetch the active year's premium data once, on first need (architecture.md §3.4 —
+  // this file is large enough that it must be a fetched static asset, not bundled).
+  useEffect(() => {
+    if (premiumsByYear[year]) return;
+    let cancelled = false;
+    setPremiumsLoading(true);
+    setPremiumsError(false);
+    fetch(`/data/premiums-${year}.json`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`failed to load premium data for ${year}: HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((rows: PremiumRow[]) => {
+        if (!cancelled) setPremiumsByYear((prev) => ({ ...prev, [year]: rows }));
+      })
+      .catch((err) => {
+        // `.finally` below still fires and clears premiumsLoading, so a failure here
+        // would otherwise leave a silent blank page with no loading indicator and no
+        // way to recover. premiumsError drives a visible retry notice instead.
+        console.error(err);
+        if (!cancelled) setPremiumsError(true);
+      })
+      .finally(() => {
+        if (!cancelled) setPremiumsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [year, premiumsByYear]);
+
+  const ALL_PREMIUMS = premiumsByYear[year] ?? [];
+
   // Sync state to URL (REQ-11) — replace, not push, to avoid history spam.
   useEffect(() => {
     const params = encodeState({
@@ -84,6 +118,7 @@ export function InsuranceComparator() {
       currentInsurerCode: currentPlan.insurerCode ?? null,
       currentFranchise: currentPlan.franchise ?? null,
       currentTarifart: currentPlan.tarifart ?? null,
+      currentTarifCode: currentPlan.tarifCode ?? null,
       currentUnfalldeckung: currentPlan.unfalldeckung ?? null,
     });
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
@@ -92,8 +127,43 @@ export function InsuranceComparator() {
 
   const inputsValid = Boolean(praemienregionId && altersklasse && franchise);
 
+  const currentPlanCoreProvided = Boolean(
+    currentPlan.insurerCode && currentPlan.franchise != null && currentPlan.tarifart && currentPlan.unfalldeckung != null,
+  );
+
+  const currentPlanProductOptions = useMemo(() => {
+    if (!currentPlanCoreProvided || !praemienregionId || !altersklasse) return null;
+    return findMatchingProducts(ALL_PREMIUMS, {
+      insurerCode: currentPlan.insurerCode!,
+      franchise: currentPlan.franchise!,
+      tarifart: currentPlan.tarifart!,
+      unfalldeckung: currentPlan.unfalldeckung!,
+      praemienregionId,
+      altersklasse,
+      year,
+    }).map((r) => ({ tarifCode: r.tarifCode, productName: r.productName }));
+  }, [currentPlanCoreProvided, praemienregionId, altersklasse, year, currentPlan.insurerCode, currentPlan.franchise, currentPlan.tarifart, currentPlan.unfalldeckung, ALL_PREMIUMS]);
+
+  // currentPlan.tarifCode is only valid for the exact combination of insurer/
+  // franchise/model/accident-coverage it was picked under (bug fix: without this,
+  // a stale tarifCode from a since-changed combination could either produce a false
+  // "not found" or, worse, silently resolve to a different, wrong product that
+  // happens to share the same code under a different insurer — see
+  // docs/superpowers/plans/2026-08-12-product-disambiguation-and-bundle-size.md's
+  // final-review fix wave).
+  useEffect(() => {
+    if (ALL_PREMIUMS.length === 0) return;
+    if (
+      currentPlan.tarifCode &&
+      currentPlanProductOptions &&
+      !currentPlanProductOptions.some((o) => o.tarifCode === currentPlan.tarifCode)
+    ) {
+      setCurrentPlan((p) => ({ ...p, tarifCode: undefined }));
+    }
+  }, [currentPlanProductOptions, currentPlan.tarifCode, ALL_PREMIUMS]);
+
   const results = useMemo(() => {
-    if (!inputsValid || !praemienregionId || !altersklasse || !franchise) return null;
+    if (!inputsValid || !praemienregionId || !altersklasse || !franchise || ALL_PREMIUMS.length === 0) return null;
 
     const filtered = filterPlans(ALL_PREMIUMS, {
       praemienregionId,
@@ -105,15 +175,17 @@ export function InsuranceComparator() {
     });
     const cheapestRows = sortPlans(cheapestPerInsurer(filtered));
 
-    const currentPlanProvided = Boolean(
-      currentPlan.insurerCode && currentPlan.franchise != null && currentPlan.tarifart && currentPlan.unfalldeckung != null,
-    );
+    // A current plan isn't "provided" for headline purposes until any real ambiguity
+    // (>1 matching product, requirement.md §11.2) is resolved by the user's pick.
+    const currentPlanProvided =
+      currentPlanCoreProvided && (currentPlanProductOptions == null || currentPlanProductOptions.length <= 1 || Boolean(currentPlan.tarifCode));
     const currentRow = currentPlanProvided
       ? findCurrentPlan(ALL_PREMIUMS, {
           insurerCode: currentPlan.insurerCode!,
           franchise: currentPlan.franchise!,
           tarifart: currentPlan.tarifart!,
           unfalldeckung: currentPlan.unfalldeckung!,
+          tarifCode: currentPlan.tarifCode,
           praemienregionId,
           altersklasse,
           year,
@@ -123,7 +195,19 @@ export function InsuranceComparator() {
     const headline = computeHeadline(currentRow, cheapestRows[0] ?? null, currentPlanProvided);
 
     return { plans: cheapestRows, headline };
-  }, [inputsValid, praemienregionId, altersklasse, franchise, altModelsActive, unfalldeckung, year, currentPlan]);
+  }, [
+    inputsValid,
+    praemienregionId,
+    altersklasse,
+    franchise,
+    altModelsActive,
+    unfalldeckung,
+    year,
+    currentPlan,
+    currentPlanCoreProvided,
+    currentPlanProductOptions,
+    ALL_PREMIUMS,
+  ]);
 
   const handleGemeindeSelect = useCallback((newBfsNr: number) => setBfsNr(newBfsNr), []);
 
@@ -171,8 +255,37 @@ export function InsuranceComparator() {
           franchiseTiers={franchiseTiers.length ? franchiseTiers : [300, 500, 1000, 1500, 2000, 2500]}
           value={currentPlan}
           onChange={setCurrentPlan}
+          productOptions={currentPlanProductOptions}
         />
       </div>
+
+      {premiumsLoading && !results && (
+        <p className="text-sm text-gray-500 mt-4" role="status">
+          Prämiendaten werden geladen…
+        </p>
+      )}
+
+      {premiumsError && !premiumsLoading && !results && (
+        <div className="mt-4 bg-red-50 border border-red-200 rounded-md p-3.5" role="alert">
+          <p className="text-sm text-gray-700 mb-2">
+            Prämiendaten konnten nicht geladen werden. Bitte versuche es erneut.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setPremiumsError(false);
+              setPremiumsByYear((prev) => {
+                const next = { ...prev };
+                delete next[year];
+                return next;
+              });
+            }}
+            className="px-3 py-1.5 rounded-md border border-red-300 text-sm text-red-700 bg-white hover:bg-red-50"
+          >
+            Erneut versuchen
+          </button>
+        </div>
+      )}
 
       {results && (
         <div aria-live="polite">

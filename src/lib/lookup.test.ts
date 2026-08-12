@@ -1,15 +1,15 @@
 import { describe, it, expect } from "vitest";
-import { filterPlans, cheapestPerInsurer, sortPlans, findCurrentPlan, computeHeadline } from "@/lib/lookup";
+import { filterPlans, cheapestPerInsurer, sortPlans, findCurrentPlan, findMatchingProducts, computeHeadline } from "@/lib/lookup";
 import type { PremiumRow } from "@/lib/types";
 
 const ROWS: PremiumRow[] = [
-  { year: 2026, insurerCode: "A", insurerName: "Assura", praemienregionId: "ZH-1", altersklasse: "erwachsen", franchise: 500, unfalldeckung: true, tarifart: "standard", monthlyPremium: 301.1 },
-  { year: 2026, insurerCode: "B", insurerName: "Sanitas", praemienregionId: "ZH-1", altersklasse: "erwachsen", franchise: 500, unfalldeckung: true, tarifart: "telmed", monthlyPremium: 221.8 },
-  { year: 2026, insurerCode: "B", insurerName: "Sanitas", praemienregionId: "ZH-1", altersklasse: "erwachsen", franchise: 500, unfalldeckung: true, tarifart: "standard", monthlyPremium: 290.0 },
-  { year: 2026, insurerCode: "C", insurerName: "Helsana", praemienregionId: "ZH-1", altersklasse: "erwachsen", franchise: 500, unfalldeckung: true, tarifart: "standard", monthlyPremium: 412.4 },
-  { year: 2026, insurerCode: "C", insurerName: "Helsana", praemienregionId: "ZH-1", altersklasse: "erwachsen", franchise: 500, unfalldeckung: true, tarifart: "hmo", monthlyPremium: 362.1 },
+  { year: 2026, insurerCode: "A", insurerName: "Assura", praemienregionId: "ZH-1", altersklasse: "erwachsen", franchise: 500, unfalldeckung: true, tarifart: "standard", monthlyPremium: 301.1, tarifCode: "A-STD", productName: "Grundversicherung" },
+  { year: 2026, insurerCode: "B", insurerName: "Sanitas", praemienregionId: "ZH-1", altersklasse: "erwachsen", franchise: 500, unfalldeckung: true, tarifart: "telmed", monthlyPremium: 221.8, tarifCode: "B-TEL", productName: "Sanitas Telmed" },
+  { year: 2026, insurerCode: "B", insurerName: "Sanitas", praemienregionId: "ZH-1", altersklasse: "erwachsen", franchise: 500, unfalldeckung: true, tarifart: "standard", monthlyPremium: 290.0, tarifCode: "B-STD", productName: "Grundversicherung" },
+  { year: 2026, insurerCode: "C", insurerName: "Helsana", praemienregionId: "ZH-1", altersklasse: "erwachsen", franchise: 500, unfalldeckung: true, tarifart: "standard", monthlyPremium: 412.4, tarifCode: "C-STD", productName: "Grundversicherung" },
+  { year: 2026, insurerCode: "C", insurerName: "Helsana", praemienregionId: "ZH-1", altersklasse: "erwachsen", franchise: 500, unfalldeckung: true, tarifart: "hmo", monthlyPremium: 362.1, tarifCode: "C-HMO", productName: "Helsana HMO" },
   // Different region — should be filtered out.
-  { year: 2026, insurerCode: "D", insurerName: "Visana", praemienregionId: "BE-1", altersklasse: "erwachsen", franchise: 500, unfalldeckung: true, tarifart: "standard", monthlyPremium: 100 },
+  { year: 2026, insurerCode: "D", insurerName: "Visana", praemienregionId: "BE-1", altersklasse: "erwachsen", franchise: 500, unfalldeckung: true, tarifart: "standard", monthlyPremium: 100, tarifCode: "D-STD", productName: "Grundversicherung" },
 ];
 
 describe("filterPlans", () => {
@@ -64,8 +64,40 @@ describe("sortPlans", () => {
   });
 });
 
+describe("findMatchingProducts", () => {
+  it("returns every row matching the core fields, regardless of product", () => {
+    const rowsWithDuplicateProduct: PremiumRow[] = [
+      ...ROWS,
+      { ...ROWS[2], tarifCode: "B-STD-2", productName: "Sanitas Alternative Grundversicherung", monthlyPremium: 295.0 },
+    ];
+    const found = findMatchingProducts(rowsWithDuplicateProduct, {
+      insurerCode: "B",
+      franchise: 500,
+      tarifart: "standard",
+      unfalldeckung: true,
+      praemienregionId: "ZH-1",
+      altersklasse: "erwachsen",
+      year: 2026,
+    });
+    expect(found.map((r) => r.tarifCode).sort()).toEqual(["B-STD", "B-STD-2"]);
+  });
+
+  it("returns an empty array when nothing matches the core fields", () => {
+    const found = findMatchingProducts(ROWS, {
+      insurerCode: "UNKNOWN",
+      franchise: 500,
+      tarifart: "standard",
+      unfalldeckung: true,
+      praemienregionId: "ZH-1",
+      altersklasse: "erwachsen",
+      year: 2026,
+    });
+    expect(found).toEqual([]);
+  });
+});
+
 describe("findCurrentPlan", () => {
-  it("finds an exact match regardless of active filters", () => {
+  it("resolves automatically when the core fields match exactly one row", () => {
     const found = findCurrentPlan(ROWS, {
       insurerCode: "C",
       franchise: 500,
@@ -89,6 +121,41 @@ describe("findCurrentPlan", () => {
       year: 2026,
     });
     expect(found).toBeNull();
+  });
+
+  it("returns null (ambiguous) when the core fields match multiple products and no tarifCode was given", () => {
+    const rowsWithDuplicateProduct: PremiumRow[] = [
+      ...ROWS,
+      { ...ROWS[2], tarifCode: "B-STD-2", productName: "Sanitas Alternative Grundversicherung", monthlyPremium: 295.0 },
+    ];
+    const found = findCurrentPlan(rowsWithDuplicateProduct, {
+      insurerCode: "B",
+      franchise: 500,
+      tarifart: "standard",
+      unfalldeckung: true,
+      praemienregionId: "ZH-1",
+      altersklasse: "erwachsen",
+      year: 2026,
+    });
+    expect(found).toBeNull();
+  });
+
+  it("resolves to the exact product when tarifCode is given, even among ambiguous candidates", () => {
+    const rowsWithDuplicateProduct: PremiumRow[] = [
+      ...ROWS,
+      { ...ROWS[2], tarifCode: "B-STD-2", productName: "Sanitas Alternative Grundversicherung", monthlyPremium: 295.0 },
+    ];
+    const found = findCurrentPlan(rowsWithDuplicateProduct, {
+      insurerCode: "B",
+      franchise: 500,
+      tarifart: "standard",
+      unfalldeckung: true,
+      tarifCode: "B-STD-2",
+      praemienregionId: "ZH-1",
+      altersklasse: "erwachsen",
+      year: 2026,
+    });
+    expect(found?.monthlyPremium).toBe(295.0);
   });
 });
 
