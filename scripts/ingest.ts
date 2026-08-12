@@ -4,7 +4,7 @@
 // spreadsheet, validates and reshapes them, and writes typed JSON to src/data/.
 
 import { existsSync } from "node:fs";
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import * as XLSX from "xlsx";
 import { parsePremiumRows } from "./ingest/parsePremiums";
@@ -14,6 +14,7 @@ import { downloadRawFiles } from "./ingest/downloadRaw";
 import type { Metadata } from "../src/lib/types";
 
 const DATA_DIR = join(process.cwd(), "src", "data");
+const PUBLIC_DATA_DIR = join(process.cwd(), "public", "data");
 const PUBLICATION_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 type Args = { local?: string; publicationDate?: string };
@@ -72,7 +73,8 @@ async function main() {
   const year = rows[0].year;
   const metadata: Metadata = { publicationDate: args.publicationDate, availableYears: [year] };
 
-  await writeFile(join(DATA_DIR, `premiums-${year}.json`), JSON.stringify(rows));
+  await mkdir(PUBLIC_DATA_DIR, { recursive: true });
+  await writeFile(join(PUBLIC_DATA_DIR, `premiums-${year}.json`), JSON.stringify(rows));
   await writeFile(join(DATA_DIR, "plz-map.json"), JSON.stringify(plzMap, null, 2));
   await writeFile(join(DATA_DIR, "gemeinde-region-map.json"), JSON.stringify(gemeindeRegionMap, null, 2));
   await writeFile(join(DATA_DIR, "insurers.json"), JSON.stringify(buildInsurersJson(), null, 2));

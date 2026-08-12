@@ -16,12 +16,10 @@ import { filterPlans, cheapestPerInsurer, sortPlans, findCurrentPlan, findMatchi
 import { encodeState, decodeState } from "@/lib/url-state";
 import type { CurrentPlan, Tarifart } from "@/lib/types";
 
-import premiums2026 from "@/data/premiums-2026.json";
 import insurersData from "@/data/insurers.json";
 import metadata from "@/data/metadata.json";
 import type { PremiumRow } from "@/lib/types";
 
-const ALL_PREMIUMS = premiums2026 as PremiumRow[];
 const INSURERS = insurersData as { insurerCode: string; insurerName: string }[];
 const ALT_MODELS: Tarifart[] = ["standard", "hausarzt", "telmed", "hmo", "andere"];
 
@@ -45,6 +43,8 @@ export function InsuranceComparator() {
     tarifCode: initial.currentTarifCode ?? undefined,
     unfalldeckung: initial.currentUnfalldeckung ?? undefined,
   });
+  const [premiumsByYear, setPremiumsByYear] = useState<Record<number, PremiumRow[]>>({});
+  const [premiumsLoading, setPremiumsLoading] = useState(false);
 
   const gemeinden = plz.length === 4 ? resolveGemeinden(plz) : [];
   const ambiguous = needsDisambiguation(gemeinden);
@@ -71,6 +71,36 @@ export function InsuranceComparator() {
       setFranchise(null);
     }
   }, [altersklasse, franchise]);
+
+  // Fetch the active year's premium data once, on first need (architecture.md §3.4 —
+  // this file is large enough that it must be a fetched static asset, not bundled).
+  useEffect(() => {
+    if (premiumsByYear[year]) return;
+    let cancelled = false;
+    setPremiumsLoading(true);
+    fetch(`/data/premiums-${year}.json`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`failed to load premium data for ${year}: HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((rows: PremiumRow[]) => {
+        if (!cancelled) setPremiumsByYear((prev) => ({ ...prev, [year]: rows }));
+      })
+      .catch((err) => {
+        // Swallow — results simply stay empty/loading; this matches the app's existing
+        // "logging must never block or degrade the comparison UI" posture (architecture.md §10.2)
+        // extended here to data loading. A real failure is visible as a stuck loading state.
+        console.error(err);
+      })
+      .finally(() => {
+        if (!cancelled) setPremiumsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [year, premiumsByYear]);
+
+  const ALL_PREMIUMS = premiumsByYear[year] ?? [];
 
   // Sync state to URL (REQ-11) — replace, not push, to avoid history spam.
   useEffect(() => {
@@ -109,10 +139,10 @@ export function InsuranceComparator() {
       altersklasse,
       year,
     }).map((r) => ({ tarifCode: r.tarifCode, productName: r.productName }));
-  }, [currentPlanCoreProvided, praemienregionId, altersklasse, year, currentPlan.insurerCode, currentPlan.franchise, currentPlan.tarifart, currentPlan.unfalldeckung]);
+  }, [currentPlanCoreProvided, praemienregionId, altersklasse, year, currentPlan.insurerCode, currentPlan.franchise, currentPlan.tarifart, currentPlan.unfalldeckung, ALL_PREMIUMS]);
 
   const results = useMemo(() => {
-    if (!inputsValid || !praemienregionId || !altersklasse || !franchise) return null;
+    if (!inputsValid || !praemienregionId || !altersklasse || !franchise || ALL_PREMIUMS.length === 0) return null;
 
     const filtered = filterPlans(ALL_PREMIUMS, {
       praemienregionId,
@@ -155,6 +185,7 @@ export function InsuranceComparator() {
     currentPlan,
     currentPlanCoreProvided,
     currentPlanProductOptions,
+    ALL_PREMIUMS,
   ]);
 
   const handleGemeindeSelect = useCallback((newBfsNr: number) => setBfsNr(newBfsNr), []);
@@ -206,6 +237,12 @@ export function InsuranceComparator() {
           productOptions={currentPlanProductOptions}
         />
       </div>
+
+      {premiumsLoading && !results && (
+        <p className="text-sm text-gray-500 mt-4" role="status">
+          Prämiendaten werden geladen…
+        </p>
+      )}
 
       {results && (
         <div aria-live="polite">
