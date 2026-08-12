@@ -12,7 +12,7 @@ import { PlanList } from "./results/PlanList";
 import { EmptyState } from "./results/EmptyState";
 import { getAltersklasse, getFranchiseTiers } from "@/lib/ageband";
 import { resolveGemeinden, needsDisambiguation } from "@/lib/location";
-import { filterPlans, cheapestPerInsurer, sortPlans, findCurrentPlan, computeHeadline } from "@/lib/lookup";
+import { filterPlans, cheapestPerInsurer, sortPlans, findCurrentPlan, findMatchingProducts, computeHeadline } from "@/lib/lookup";
 import { encodeState, decodeState } from "@/lib/url-state";
 import type { CurrentPlan, Tarifart } from "@/lib/types";
 
@@ -94,6 +94,23 @@ export function InsuranceComparator() {
 
   const inputsValid = Boolean(praemienregionId && altersklasse && franchise);
 
+  const currentPlanCoreProvided = Boolean(
+    currentPlan.insurerCode && currentPlan.franchise != null && currentPlan.tarifart && currentPlan.unfalldeckung != null,
+  );
+
+  const currentPlanProductOptions = useMemo(() => {
+    if (!currentPlanCoreProvided || !praemienregionId || !altersklasse) return null;
+    return findMatchingProducts(ALL_PREMIUMS, {
+      insurerCode: currentPlan.insurerCode!,
+      franchise: currentPlan.franchise!,
+      tarifart: currentPlan.tarifart!,
+      unfalldeckung: currentPlan.unfalldeckung!,
+      praemienregionId,
+      altersklasse,
+      year,
+    }).map((r) => ({ tarifCode: r.tarifCode, productName: r.productName }));
+  }, [currentPlanCoreProvided, praemienregionId, altersklasse, year, currentPlan.insurerCode, currentPlan.franchise, currentPlan.tarifart, currentPlan.unfalldeckung]);
+
   const results = useMemo(() => {
     if (!inputsValid || !praemienregionId || !altersklasse || !franchise) return null;
 
@@ -107,15 +124,17 @@ export function InsuranceComparator() {
     });
     const cheapestRows = sortPlans(cheapestPerInsurer(filtered));
 
-    const currentPlanProvided = Boolean(
-      currentPlan.insurerCode && currentPlan.franchise != null && currentPlan.tarifart && currentPlan.unfalldeckung != null,
-    );
+    // A current plan isn't "provided" for headline purposes until any real ambiguity
+    // (>1 matching product, requirement.md §11.2) is resolved by the user's pick.
+    const currentPlanProvided =
+      currentPlanCoreProvided && (currentPlanProductOptions == null || currentPlanProductOptions.length <= 1 || Boolean(currentPlan.tarifCode));
     const currentRow = currentPlanProvided
       ? findCurrentPlan(ALL_PREMIUMS, {
           insurerCode: currentPlan.insurerCode!,
           franchise: currentPlan.franchise!,
           tarifart: currentPlan.tarifart!,
           unfalldeckung: currentPlan.unfalldeckung!,
+          tarifCode: currentPlan.tarifCode,
           praemienregionId,
           altersklasse,
           year,
@@ -125,7 +144,18 @@ export function InsuranceComparator() {
     const headline = computeHeadline(currentRow, cheapestRows[0] ?? null, currentPlanProvided);
 
     return { plans: cheapestRows, headline };
-  }, [inputsValid, praemienregionId, altersklasse, franchise, altModelsActive, unfalldeckung, year, currentPlan]);
+  }, [
+    inputsValid,
+    praemienregionId,
+    altersklasse,
+    franchise,
+    altModelsActive,
+    unfalldeckung,
+    year,
+    currentPlan,
+    currentPlanCoreProvided,
+    currentPlanProductOptions,
+  ]);
 
   const handleGemeindeSelect = useCallback((newBfsNr: number) => setBfsNr(newBfsNr), []);
 
@@ -173,6 +203,7 @@ export function InsuranceComparator() {
           franchiseTiers={franchiseTiers.length ? franchiseTiers : [300, 500, 1000, 1500, 2000, 2500]}
           value={currentPlan}
           onChange={setCurrentPlan}
+          productOptions={currentPlanProductOptions}
         />
       </div>
 
