@@ -1,4 +1,5 @@
-@import "tailwindcss";
+@import "tailwindcss" source(none);
+@source "../";
 
 /* App UI is light-only: every component uses hardcoded light Tailwind
    classes (bg-white, text-gray-500, ...) with no dark: variants. Without
