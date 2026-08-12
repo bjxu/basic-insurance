@@ -32,7 +32,7 @@ export function CurrentPlanSection({ insurers, franchiseTiers, value, onChange, 
           <select
             id="current-insurer"
             value={value.insurerCode ?? ""}
-            onChange={(e) => onChange({ ...value, insurerCode: e.target.value })}
+            onChange={(e) => onChange({ ...value, insurerCode: e.target.value, tarifCode: undefined })}
             className="w-full h-10 px-3 rounded-md border border-gray-200 text-[15px] bg-white outline-none focus:border-blue-600"
           >
             <option value="">–</option>
@@ -50,7 +50,7 @@ export function CurrentPlanSection({ insurers, franchiseTiers, value, onChange, 
           <select
             id="current-franchise"
             value={value.franchise ?? ""}
-            onChange={(e) => onChange({ ...value, franchise: Number(e.target.value) })}
+            onChange={(e) => onChange({ ...value, franchise: Number(e.target.value), tarifCode: undefined })}
             className="w-full h-10 px-3 rounded-md border border-gray-200 text-[15px] bg-white outline-none focus:border-blue-600"
           >
             <option value="">–</option>
@@ -68,7 +68,7 @@ export function CurrentPlanSection({ insurers, franchiseTiers, value, onChange, 
           <select
             id="current-model"
             value={value.tarifart ?? ""}
-            onChange={(e) => onChange({ ...value, tarifart: e.target.value as Tarifart })}
+            onChange={(e) => onChange({ ...value, tarifart: e.target.value as Tarifart, tarifCode: undefined })}
             className="w-full h-10 px-3 rounded-md border border-gray-200 text-[15px] bg-white outline-none focus:border-blue-600"
           >
             <option value="">–</option>
@@ -86,7 +86,7 @@ export function CurrentPlanSection({ insurers, franchiseTiers, value, onChange, 
           <select
             id="current-accident"
             value={value.unfalldeckung == null ? "" : value.unfalldeckung ? "1" : "0"}
-            onChange={(e) => onChange({ ...value, unfalldeckung: e.target.value === "1" })}
+            onChange={(e) => onChange({ ...value, unfalldeckung: e.target.value === "1", tarifCode: undefined })}
             className="w-full h-10 px-3 rounded-md border border-gray-200 text-[15px] bg-white outline-none focus:border-blue-600"
           >
             <option value="">–</option>
