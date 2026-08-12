@@ -18,7 +18,7 @@ export function PlzInput({ value, onChange, notFound }: Props) {
 
   return (
     <div>
-      <label htmlFor="plz" className="block text-sm font-semibold text-gray-600 mb-1.5">
+      <label htmlFor="plz" className="block text-label-large text-on-surface-variant mb-1.5">
         Postleitzahl (PLZ)
       </label>
       <input
@@ -31,12 +31,12 @@ export function PlzInput({ value, onChange, notFound }: Props) {
         onChange={(e) => onChange(e.target.value)}
         aria-describedby="plz-hint"
         aria-invalid={!result.valid}
-        className={`w-full h-10 px-3 rounded-md border text-[15px] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-blue-200 ${
-          result.valid ? "border-gray-200 focus:border-blue-600" : "border-red-600 focus:border-red-600"
+        className={`w-full h-10 px-3 rounded-md border text-[15px] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-primary-container ${
+          result.valid ? "border-outline-variant focus:border-primary" : "border-error focus:border-error"
         }`}
       />
       {!result.valid && (
-        <p id="plz-hint" className="text-xs text-red-600 mt-1">
+        <p id="plz-hint" className="text-body-small text-error mt-1">
           {result.message}
         </p>
       )}
