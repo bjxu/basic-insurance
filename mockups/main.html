@@ -15,42 +15,81 @@
   <!-- On parameterised URLs only (added server-side): -->
   <!-- <link rel="canonical" href="https://example.com/"> -->
   <!-- <meta name="robots" content="noindex"> -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --blue:       #2563eb;
-      --blue-light: #eff6ff;
-      --blue-dark:  #1d4ed8;
-      --gray-50:    #f9fafb;
-      --gray-100:   #f3f4f6;
-      --gray-200:   #e5e7eb;
-      --gray-400:   #9ca3af;
-      --gray-500:   #6b7280;
-      --gray-600:   #4b5563;
-      --gray-700:   #374151;
-      --gray-900:   #111827;
-      --green:      #16a34a;
-      --green-light:#f0fdf4;
-      --red:        #dc2626;
-      --red-light:  #fef2f2;
+      --md-sys-color-primary:                  #0053db;
+      --md-sys-color-on-primary:                #ffffff;
+      --md-sys-color-primary-container:         #dbe1ff;
+      --md-sys-color-on-primary-container:      #00174b;
+      --md-sys-color-primary-hover:             #003ea8;
+      --md-sys-color-tertiary-container:        #ffd6f8;
+      --md-sys-color-on-tertiary-container:     #2b122b;
+      --md-sys-color-error:                     #ba1a1a;
+      --md-sys-color-error-container:           #ffdad6;
+      --md-sys-color-on-error-container:        #410002;
+      --md-sys-color-success:                   #006e2d;
+      --md-sys-color-success-container:         #7ffc97;
+      --md-sys-color-on-success-container:      #002109;
+      --md-sys-color-warning-container:         #ffddb8;
+      --md-sys-color-on-warning-container:      #2a1700;
+      --md-sys-color-surface:                   #fefbff;
+      --md-sys-color-on-surface:                #1b1b1f;
+      --md-sys-color-on-surface-variant:        #45464f;
+      --md-sys-color-surface-variant:           #e2e2ec;
+      --md-sys-color-outline:                   #757680;
+      --md-sys-color-outline-variant:           #c5c6d0;
+
+      --md-sys-typescale-title-large-font:         Roboto, sans-serif;
+      --md-sys-typescale-title-large-size:         22px;
+      --md-sys-typescale-title-large-line-height:  28px;
+      --md-sys-typescale-title-large-weight:       400;
+      --md-sys-typescale-title-medium-font:        Roboto, sans-serif;
+      --md-sys-typescale-title-medium-size:        16px;
+      --md-sys-typescale-title-medium-line-height: 24px;
+      --md-sys-typescale-title-medium-weight:      500;
+      --md-sys-typescale-title-medium-tracking:    0.15px;
+      --md-sys-typescale-label-large-font:         Roboto, sans-serif;
+      --md-sys-typescale-label-large-size:         14px;
+      --md-sys-typescale-label-large-line-height:  20px;
+      --md-sys-typescale-label-large-weight:       500;
+      --md-sys-typescale-label-large-tracking:     0.1px;
+      --md-sys-typescale-body-medium-font:         Roboto, sans-serif;
+      --md-sys-typescale-body-medium-size:         14px;
+      --md-sys-typescale-body-medium-line-height:  20px;
+      --md-sys-typescale-body-medium-weight:       400;
+      --md-sys-typescale-body-medium-tracking:     0.25px;
+      --md-sys-typescale-body-small-font:          Roboto, sans-serif;
+      --md-sys-typescale-body-small-size:          12px;
+      --md-sys-typescale-body-small-line-height:   16px;
+      --md-sys-typescale-body-small-weight:        400;
+      --md-sys-typescale-body-small-tracking:      0.4px;
+      --md-sys-typescale-headline-small-font:        Roboto, sans-serif;
+      --md-sys-typescale-headline-small-size:        24px;
+      --md-sys-typescale-headline-small-line-height: 32px;
+      --md-sys-typescale-headline-small-weight:      400;
+
       --radius:     8px;
       --shadow-sm:  0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
       --shadow:     0 4px 12px rgba(0,0,0,.08);
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-      background: var(--gray-50);
-      color: var(--gray-900);
+      font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
       font-size: 15px;
       line-height: 1.5;
     }
 
     /* ── Header ── */
     header {
-      background: #fff;
-      border-bottom: 1px solid var(--gray-200);
+      background: var(--md-sys-color-surface);
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
       padding: 0 24px;
       height: 56px;
       display: flex;
@@ -60,12 +99,12 @@
     header .logo {
       font-size: 17px;
       font-weight: 700;
-      color: var(--blue);
+      color: var(--md-sys-color-primary);
       letter-spacing: -.3px;
     }
     header .sub {
       font-size: 13px;
-      color: var(--gray-500);
+      color: var(--md-sys-color-on-surface-variant);
     }
 
     /* ── Page wrapper ── */
@@ -77,8 +116,8 @@
 
     /* ── Card ── */
     .card {
-      background: #fff;
-      border: 1px solid var(--gray-200);
+      background: var(--md-sys-color-surface);
+      border: 1px solid var(--md-sys-color-outline-variant);
       border-radius: var(--radius);
       box-shadow: var(--shadow-sm);
     }
@@ -88,13 +127,13 @@
       padding: 24px;
     }
     .input-section h1 {
-      font-size: 20px;
-      font-weight: 700;
+      font: var(--md-sys-typescale-title-large-weight) var(--md-sys-typescale-title-large-size)/var(--md-sys-typescale-title-large-line-height) var(--md-sys-typescale-title-large-font);
       margin-bottom: 4px;
     }
     .input-section .tagline {
-      font-size: 14px;
-      color: var(--gray-500);
+      font: var(--md-sys-typescale-body-medium-weight) var(--md-sys-typescale-body-medium-size)/var(--md-sys-typescale-body-medium-line-height) var(--md-sys-typescale-body-medium-font);
+      letter-spacing: var(--md-sys-typescale-body-medium-tracking);
+      color: var(--md-sys-color-on-surface-variant);
       margin-bottom: 20px;
     }
 
@@ -109,40 +148,40 @@
 
     .field label {
       display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--gray-600);
+      font: var(--md-sys-typescale-label-large-weight) var(--md-sys-typescale-label-large-size)/var(--md-sys-typescale-label-large-line-height) var(--md-sys-typescale-label-large-font);
+      letter-spacing: var(--md-sys-typescale-label-large-tracking);
+      color: var(--md-sys-color-on-surface-variant);
       margin-bottom: 6px;
     }
     .field input, .field select {
       width: 100%;
       height: 40px;
       padding: 0 12px;
-      border: 1px solid var(--gray-200);
+      border: 1px solid var(--md-sys-color-outline-variant);
       border-radius: 6px;
       font-size: 15px;
-      color: var(--gray-900);
-      background: #fff;
+      color: var(--md-sys-color-on-surface);
+      background: var(--md-sys-color-surface);
       outline: none;
       transition: border-color .15s;
     }
     .field input:focus, .field select:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 0 3px rgba(0,83,219,.12);
     }
     .field .hint {
       font-size: 12px;
-      color: var(--gray-400);
+      color: var(--md-sys-color-outline);
       margin-top: 4px;
     }
-    .field .hint.error { color: var(--red); }
+    .field .hint.error { color: var(--md-sys-color-error); }
     .field input.error-field {
-      border-color: var(--red);
-      box-shadow: 0 0 0 3px rgba(220,38,38,.10);
+      border-color: var(--md-sys-color-error);
+      box-shadow: 0 0 0 3px rgba(186,26,26,.10);
     }
     .field .resolved {
       font-size: 12px;
-      color: var(--blue);
+      color: var(--md-sys-color-primary);
       margin-top: 4px;
       display: flex;
       align-items: center;
@@ -152,14 +191,14 @@
     /* ── Gemeinde picker ── */
     .gemeinde-picker {
       margin-top: 12px;
-      background: var(--blue-light);
-      border: 1px solid #bfdbfe;
+      background: var(--md-sys-color-primary-container);
+      border: 1px solid var(--md-sys-color-primary-container);
       border-radius: 6px;
       padding: 12px 14px;
     }
     .gemeinde-picker p {
       font-size: 13px;
-      color: var(--gray-700);
+      color: var(--md-sys-color-on-surface-variant);
       margin-bottom: 8px;
     }
     .gemeinde-options {
@@ -170,51 +209,51 @@
     .gemeinde-options button {
       padding: 5px 12px;
       border-radius: 20px;
-      border: 1px solid #93c5fd;
-      background: #fff;
+      border: 1px solid var(--md-sys-color-primary-container);
+      background: var(--md-sys-color-surface);
       font-size: 13px;
       cursor: pointer;
-      color: var(--gray-700);
+      color: var(--md-sys-color-on-surface-variant);
     }
     .gemeinde-options button.selected {
-      background: var(--blue);
-      border-color: var(--blue);
-      color: #fff;
+      background: var(--md-sys-color-primary);
+      border-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
       font-weight: 600;
     }
 
     /* ── Not-found notice (REQ-14) ── */
     .plan-not-found {
-      background: #fffbeb;
-      border: 1px solid #fde68a;
+      background: var(--md-sys-color-warning-container);
+      border: 1px solid var(--md-sys-color-warning-container);
       border-radius: var(--radius);
       padding: 12px 16px;
       font-size: 13px;
-      color: #92400e;
+      color: var(--md-sys-color-on-warning-container);
       margin-bottom: 8px;
     }
     .plan-not-found strong { font-weight: 600; }
     /* ── Empty state (REQ-15) ── */
     .empty-state {
-      background: #fff;
-      border: 1px solid var(--gray-200);
+      background: var(--md-sys-color-surface);
+      border: 1px solid var(--md-sys-color-outline-variant);
       border-radius: var(--radius);
       padding: 40px 24px;
       text-align: center;
-      color: var(--gray-500);
+      color: var(--md-sys-color-on-surface-variant);
     }
     .empty-state .empty-title { font-size: 15px; margin-bottom: 4px; }
-    .empty-state .empty-sub   { font-size: 13px; color: var(--gray-400); }
+    .empty-state .empty-sub   { font: var(--md-sys-typescale-body-small-weight) var(--md-sys-typescale-body-small-size)/var(--md-sys-typescale-body-small-line-height) var(--md-sys-typescale-body-small-font); letter-spacing: var(--md-sys-typescale-body-small-tracking); color: var(--md-sys-color-outline); }
     /* ── Section label (mockup annotation) ── */
     .mockup-label {
-      font-size: 11px; font-weight: 600; color: var(--gray-400);
+      font-size: 11px; font-weight: 600; color: var(--md-sys-color-outline);
       text-transform: uppercase; letter-spacing: .5px;
       margin: 24px 0 8px;
     }
     /* ── Current plan (collapsible) ── */
     .current-plan-divider {
       margin-top: 20px;
-      border-top: 1px solid var(--gray-100);
+      border-top: 1px solid var(--md-sys-color-surface-variant);
       padding-top: 16px;
     }
     /* summary is a direct child of details per HTML spec (REQ-17 / WCAG) */
@@ -224,9 +263,9 @@
       gap: 8px;
       cursor: pointer;
       list-style: none;
-      font-size: 14px;
-      color: var(--blue);
-      font-weight: 600;
+      font: var(--md-sys-typescale-title-medium-weight) var(--md-sys-typescale-title-medium-size)/var(--md-sys-typescale-title-medium-line-height) var(--md-sys-typescale-title-medium-font);
+      letter-spacing: var(--md-sys-typescale-title-medium-tracking);
+      color: var(--md-sys-color-primary);
       user-select: none;
     }
     details > summary::-webkit-details-marker { display: none; }
@@ -234,7 +273,7 @@
     details[open] > summary::before { content: "▾"; }
     details > summary .label-sub {
       font-weight: 400;
-      color: var(--gray-500);
+      color: var(--md-sys-color-on-surface-variant);
     }
 
     .current-plan-fields {
@@ -257,16 +296,16 @@
       gap: 14px;
     }
     .headline.savings {
-      background: var(--green-light);
-      border: 1px solid #bbf7d0;
+      background: var(--md-sys-color-success-container);
+      border: 1px solid var(--md-sys-color-success-container);
     }
     .headline.cheapest {
-      background: var(--blue-light);
-      border: 1px solid #bfdbfe;
+      background: var(--md-sys-color-primary-container);
+      border: 1px solid var(--md-sys-color-primary-container);
     }
     .headline.already-cheapest {
-      background: var(--green-light);
-      border: 1px solid #bbf7d0;
+      background: var(--md-sys-color-success-container);
+      border: 1px solid var(--md-sys-color-success-container);
     }
     .headline-icon {
       font-size: 22px;
@@ -282,10 +321,10 @@
     }
     .headline-text span {
       font-size: 13px;
-      color: var(--gray-600);
+      color: var(--md-sys-color-on-surface-variant);
     }
     .headline-text .saving-amount {
-      color: var(--green);
+      color: var(--md-sys-color-success);
       font-weight: 700;
     }
 
@@ -299,13 +338,13 @@
     }
     .filter-label {
       font-size: 13px;
-      color: var(--gray-500);
+      color: var(--md-sys-color-on-surface-variant);
       margin-right: 4px;
     }
 
     .toggle-group {
       display: flex;
-      border: 1px solid var(--gray-200);
+      border: 1px solid var(--md-sys-color-outline-variant);
       border-radius: 6px;
       overflow: hidden;
     }
@@ -313,15 +352,15 @@
       padding: 6px 14px;
       font-size: 13px;
       border: none;
-      background: #fff;
+      background: var(--md-sys-color-surface);
       cursor: pointer;
-      color: var(--gray-600);
-      border-right: 1px solid var(--gray-200);
+      color: var(--md-sys-color-on-surface-variant);
+      border-right: 1px solid var(--md-sys-color-outline-variant);
     }
     .toggle-group button:last-child { border-right: none; }
     .toggle-group button.active {
-      background: var(--blue);
-      color: #fff;
+      background: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
       font-weight: 600;
     }
 
@@ -330,38 +369,38 @@
       align-items: center;
       gap: 6px;
       padding: 5px 12px;
-      border: 1px solid var(--gray-200);
+      border: 1px solid var(--md-sys-color-outline-variant);
       border-radius: 20px;
-      background: #fff;
+      background: var(--md-sys-color-surface);
       font-size: 13px;
       cursor: pointer;
-      color: var(--gray-600);
+      color: var(--md-sys-color-on-surface-variant);
       user-select: none;
     }
     .chip-toggle.active {
-      background: var(--blue-light);
-      border-color: #93c5fd;
-      color: var(--blue);
+      background: var(--md-sys-color-primary-container);
+      border-color: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-primary);
       font-weight: 600;
     }
     .chip-toggle .dot {
       width: 8px; height: 8px;
       border-radius: 50%;
-      background: var(--gray-300);
+      background: var(--md-sys-color-outline);
     }
-    .chip-toggle.active .dot { background: var(--blue); }
+    .chip-toggle.active .dot { background: var(--md-sys-color-primary); }
 
     .filter-sep {
       width: 1px;
       height: 24px;
-      background: var(--gray-200);
+      background: var(--md-sys-color-outline-variant);
       margin: 0 4px;
     }
 
     /* ── Results ── */
     .results-count {
       font-size: 13px;
-      color: var(--gray-500);
+      color: var(--md-sys-color-on-surface-variant);
       margin-top: 16px;
       margin-bottom: 8px;
     }
@@ -373,8 +412,8 @@
     }
 
     .plan-row {
-      background: #fff;
-      border: 1px solid var(--gray-200);
+      background: var(--md-sys-color-surface);
+      border: 1px solid var(--md-sys-color-outline-variant);
       border-radius: var(--radius);
       padding: 14px 16px;
       display: flex;
@@ -388,12 +427,12 @@
     .plan-rank {
       font-size: 13px;
       font-weight: 700;
-      color: var(--gray-400);
+      color: var(--md-sys-color-outline);
       width: 20px;
       flex-shrink: 0;
       text-align: center;
     }
-    .plan-rank.first { color: var(--blue); }
+    .plan-rank.first { color: var(--md-sys-color-primary); }
 
     .plan-insurer {
       flex: 1;
@@ -411,7 +450,7 @@
       align-items: center;
       gap: 4px;
       font-size: 12px;
-      color: var(--gray-500);
+      color: var(--md-sys-color-on-surface-variant);
       margin-top: 2px;
     }
     .model-tag {
@@ -419,12 +458,12 @@
       border-radius: 4px;
       font-size: 11px;
       font-weight: 600;
-      background: var(--gray-100);
-      color: var(--gray-600);
+      background: var(--md-sys-color-surface-variant);
+      color: var(--md-sys-color-on-surface-variant);
     }
-    .model-tag.hmo    { background: #fef3c7; color: #92400e; }
-    .model-tag.telmed { background: #ede9fe; color: #5b21b6; }
-    .model-tag.haus   { background: #d1fae5; color: #065f46; }
+    .model-tag.hmo    { background: var(--md-sys-color-warning-container); color: var(--md-sys-color-on-warning-container); }
+    .model-tag.telmed { background: var(--md-sys-color-tertiary-container); color: var(--md-sys-color-on-tertiary-container); }
+    .model-tag.haus   { background: var(--md-sys-color-success-container); color: var(--md-sys-color-on-success-container); }
 
     .plan-yoy {
       font-size: 12px;
@@ -433,48 +472,49 @@
       border-radius: 4px;
       flex-shrink: 0;
     }
-    .plan-yoy.up   { background: var(--red-light);  color: var(--red); }
-    .plan-yoy.down { background: var(--green-light); color: var(--green); }
-    .plan-yoy.flat { color: var(--gray-400); font-weight: 400; }
+    .plan-yoy.up   { background: var(--md-sys-color-error-container);  color: var(--md-sys-color-error); }
+    .plan-yoy.down { background: var(--md-sys-color-success-container); color: var(--md-sys-color-success); }
+    .plan-yoy.flat { color: var(--md-sys-color-outline); font-weight: 400; }
 
     .plan-price {
       text-align: right;
       flex-shrink: 0;
     }
     .plan-price .amount {
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--gray-900);
+      font: var(--md-sys-typescale-headline-small-weight) var(--md-sys-typescale-headline-small-size)/var(--md-sys-typescale-headline-small-line-height) var(--md-sys-typescale-headline-small-font);
+      color: var(--md-sys-color-on-surface);
     }
     .plan-price .per {
-      font-size: 12px;
-      color: var(--gray-400);
+      font: var(--md-sys-typescale-body-small-weight) var(--md-sys-typescale-body-small-size)/var(--md-sys-typescale-body-small-line-height) var(--md-sys-typescale-body-small-font);
+      letter-spacing: var(--md-sys-typescale-body-small-tracking);
+      color: var(--md-sys-color-outline);
     }
-    .plan-price.cheapest .amount { color: var(--blue); }
+    .plan-price.cheapest .amount { color: var(--md-sys-color-primary); }
 
     .plan-row.current-plan {
-      border-color: #fca5a5;
-      background: #fff8f8;
+      border-color: var(--md-sys-color-error);
+      background: var(--md-sys-color-error-container);
     }
     .current-plan-tag {
       font-size: 11px;
       font-weight: 600;
       padding: 2px 6px;
       border-radius: 4px;
-      background: #fee2e2;
-      color: var(--red);
+      background: var(--md-sys-color-error-container);
+      color: var(--md-sys-color-error);
       flex-shrink: 0;
     }
 
     /* ── Data notice ── */
     .data-notice {
       margin-top: 24px;
-      font-size: 12px;
-      color: var(--gray-400);
+      font: var(--md-sys-typescale-body-small-weight) var(--md-sys-typescale-body-small-size)/var(--md-sys-typescale-body-small-line-height) var(--md-sys-typescale-body-small-font);
+      letter-spacing: var(--md-sys-typescale-body-small-tracking);
+      color: var(--md-sys-color-outline);
       text-align: center;
       padding-bottom: 40px;
     }
-    .data-notice a { color: var(--blue); text-decoration: none; }
+    .data-notice a { color: var(--md-sys-color-primary); text-decoration: none; }
   </style>
 </head>
 <body>
@@ -524,7 +564,7 @@
       </div>
     </div>
     <!-- Post-selection: picker collapses; municipality always visible (REQ-1) -->
-    <!-- <div class="resolved" style="margin-top:8px;">&#10003; Zürich (ZH Region 1) · <a href="#" style="color:var(--blue)">ändern</a></div> -->
+    <!-- <div class="resolved" style="margin-top:8px;">&#10003; Zürich (ZH Region 1) · <a href="#" style="color:var(--md-sys-color-primary)">ändern</a></div> -->
 
     <!-- Current plan — summary is a DIRECT child of details (REQ-17 fix) -->
     <div class="current-plan-divider">
@@ -552,7 +592,7 @@
     </div>
 
     <!-- Validation error states (REQ-13) -->
-    <hr style="margin:24px 0 0;border:none;border-top:1px solid var(--gray-100);">
+    <hr style="margin:24px 0 0;border:none;border-top:1px solid var(--md-sys-color-surface-variant);">
     <p class="mockup-label" style="margin-top:16px;">Fehler-Zustände (REQ-13)</p>
     <div class="fields-row">
       <div class="field">
@@ -809,7 +849,7 @@
       </div>
     </div>
   </div>
-  <p style="font-size:12px;color:var(--gray-400);margin-top:6px;">* Deine aktuelle Kasse ist Helsana Standard (CHF 412.40/Monat). Helsanas günstigstes Angebot bei CHF 500 Franchise ist das HMO-Modell (CHF 362.10/Monat).</p>
+  <p style="font-size:12px;color:var(--md-sys-color-outline);margin-top:6px;">* Deine aktuelle Kasse ist Helsana Standard (CHF 412.40/Monat). Helsanas günstigstes Angebot bei CHF 500 Franchise ist das HMO-Modell (CHF 362.10/Monat).</p>
 
   <!-- ══ Empty state (REQ-15) ══ -->
   <p class="mockup-label">Leere Ergebnisliste (REQ-15)</p>
