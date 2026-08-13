@@ -13,18 +13,18 @@
 import { parse } from "csv-parse/sync";
 import type { Altersklasse, PremiumRow, Tarifart } from "../../src/lib/types";
 
-const VALID_CANTONS = new Set([
+export const VALID_CANTONS = new Set([
   "AG", "AI", "AR", "BE", "BL", "BS", "FR", "GE", "GL", "GR", "JU", "LU", "NE",
   "NW", "OW", "SG", "SH", "SO", "SZ", "TG", "TI", "UR", "VD", "VS", "ZG", "ZH",
 ]);
 
-const ALTERSKLASSE_MAP: Record<string, Altersklasse> = {
+export const ALTERSKLASSE_MAP: Record<string, Altersklasse> = {
   "AKL-KIN": "kind",
   "AKL-JUG": "jung",
   "AKL-ERW": "erwachsen",
 };
 
-const TARIFART_MAP: Record<string, Tarifart> = {
+export const TARIFART_MAP: Record<string, Tarifart> = {
   "TAR-BASE": "standard",
   "TAR-HAM": "hausarzt",
   "TAR-HMO": "hmo",
@@ -74,10 +74,7 @@ export function parsePremiumRows(
       tarifart = "andere"; // requirement.md §11.4 — BAG-classification-driven, not hardcoded
     }
 
-    let unfalldeckung: boolean;
-    if (r.Unfalleinschluss === "MIT-UNF") unfalldeckung = true;
-    else if (r.Unfalleinschluss === "OHN-UNF") unfalldeckung = false;
-    else throw new Error(`parsePremiumRows: unrecognized Unfalleinschluss "${r.Unfalleinschluss}"`);
+    const unfalldeckung = parseUnfalldeckung(r.Unfalleinschluss);
 
     const insurerName = insurerNames[r.Versicherer];
     if (!insurerName) {
@@ -104,14 +101,20 @@ export function parsePremiumRows(
   return { rows, skippedCantons, unknownTariftypes };
 }
 
-function parseFranchise(code: string): number {
+export function parseFranchise(code: string): number {
   const match = /^FRA-(\d+)$/.exec(code);
-  if (!match) throw new Error(`parsePremiumRows: unrecognized Franchise code "${code}"`);
+  if (!match) throw new Error(`parseFranchise: unrecognized Franchise code "${code}"`);
   return Number(match[1]);
 }
 
-function parseRegionNumber(code: string): string {
+export function parseRegionNumber(code: string): string {
   const match = /^PR-REG CH(\d+)$/.exec(code);
-  if (!match) throw new Error(`parsePremiumRows: unrecognized Region code "${code}"`);
+  if (!match) throw new Error(`parseRegionNumber: unrecognized Region code "${code}"`);
   return match[1];
+}
+
+export function parseUnfalldeckung(code: string): boolean {
+  if (code === "MIT-UNF") return true;
+  if (code === "OHN-UNF") return false;
+  throw new Error(`parseUnfalldeckung: unrecognized Unfalleinschluss "${code}"`);
 }

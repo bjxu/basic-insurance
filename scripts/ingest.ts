@@ -7,13 +7,14 @@
 // bundled, so it goes to public/data/ instead (architecture.md §3.4).
 
 import { existsSync } from "node:fs";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import * as XLSX from "xlsx";
 import { parsePremiumRows } from "./ingest/parsePremiums";
 import { parseRegionRows, type RawRegionRow } from "./ingest/parseRegions";
 import { buildInsurersJson, INSURER_NAMES } from "./ingest/insurers";
 import { downloadRawFiles } from "./ingest/downloadRaw";
+import { validateIngestOutput, verifyWrittenFile } from "./ingest/validateIngest";
 import type { Metadata } from "../src/lib/types";
 
 const DATA_DIR = join(process.cwd(), "src", "data");
@@ -73,11 +74,26 @@ async function main() {
   const { rows, skippedCantons, unknownTariftypes } = parsePremiumRows(csvText, INSURER_NAMES);
   if (rows.length === 0) fail("parsed 0 premium rows — check the CSV format/columns.");
 
+  const validation = validateIngestOutput(csvText, rows);
+  if (!validation.ok) {
+    fail(`ingest output failed validation against source data:\n  ${validation.errors.join("\n  ")}`);
+  }
+
   const year = rows[0].year;
   const metadata: Metadata = { publicationDate: args.publicationDate, availableYears: [year] };
 
   await mkdir(PUBLIC_DATA_DIR, { recursive: true });
-  await writeFile(join(PUBLIC_DATA_DIR, `premiums-${year}.json`), JSON.stringify(rows));
+  const premiumsJson = JSON.stringify(rows);
+  await writeFile(join(PUBLIC_DATA_DIR, `premiums-${year}.json`), premiumsJson);
+  const premiumsWrittenBack = await readFile(join(PUBLIC_DATA_DIR, `premiums-${year}.json`), "utf-8");
+  const roundTrip = verifyWrittenFile(premiumsJson, premiumsWrittenBack);
+  if (!roundTrip.ok) {
+    // Don't leave a corrupted premiums-{year}.json on disk under the same filename
+    // the (unmodified) metadata.json already references — fail() exits before any
+    // other file is written, so removing this one restores the pre-run state.
+    await unlink(join(PUBLIC_DATA_DIR, `premiums-${year}.json`)).catch(() => {});
+    fail(`premiums file failed round-trip verification:\n  ${roundTrip.errors.join("\n  ")}`);
+  }
   await writeFile(join(DATA_DIR, "plz-map.json"), JSON.stringify(plzMap, null, 2));
   await writeFile(join(DATA_DIR, "gemeinde-region-map.json"), JSON.stringify(gemeindeRegionMap, null, 2));
   await writeFile(join(DATA_DIR, "insurers.json"), JSON.stringify(buildInsurersJson(), null, 2));
