@@ -7,7 +7,7 @@
 // bundled, so it goes to public/data/ instead (architecture.md §3.4).
 
 import { existsSync } from "node:fs";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import * as XLSX from "xlsx";
 import { parsePremiumRows } from "./ingest/parsePremiums";
@@ -88,6 +88,10 @@ async function main() {
   const premiumsWrittenBack = await readFile(join(PUBLIC_DATA_DIR, `premiums-${year}.json`), "utf-8");
   const roundTrip = verifyWrittenFile(premiumsJson, premiumsWrittenBack);
   if (!roundTrip.ok) {
+    // Don't leave a corrupted premiums-{year}.json on disk under the same filename
+    // the (unmodified) metadata.json already references — fail() exits before any
+    // other file is written, so removing this one restores the pre-run state.
+    await unlink(join(PUBLIC_DATA_DIR, `premiums-${year}.json`)).catch(() => {});
     fail(`premiums file failed round-trip verification:\n  ${roundTrip.errors.join("\n  ")}`);
   }
   await writeFile(join(DATA_DIR, "plz-map.json"), JSON.stringify(plzMap, null, 2));
