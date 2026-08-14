@@ -51,5 +51,5 @@ export type SelfReportedPlan = {
 
 export type HeadlineState =
   | { kind: "savings"; current: SelfReportedPlan; cheapest: PremiumRow; savingsPerYear: number }
-  | { kind: "already-cheapest"; current: SelfReportedPlan }
+  | { kind: "already-cheapest"; current: SelfReportedPlan; cheapest: PremiumRow | null }
   | { kind: "no-current-plan"; cheapest: PremiumRow | null };

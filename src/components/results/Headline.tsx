@@ -27,12 +27,16 @@ export function Headline({ headline, year }: Props) {
   }
 
   if (headline.kind === "already-cheapest") {
+    const isExactMatch =
+      headline.cheapest != null && headline.current.monthlyPremium === headline.cheapest.monthlyPremium;
     return (
       <div role="status" className="mt-6 rounded-lg p-5 flex gap-3.5 bg-success-container border border-success-container">
         <span className="text-xl" aria-hidden>✅</span>
         <p className="text-sm text-on-success-container">
           <strong className="block text-base font-bold text-on-surface mb-0.5">
-            Du hast bereits das günstigste Angebot für dein Profil.
+            {isExactMatch
+              ? "Du hast bereits das günstigste Angebot für dein Profil."
+              : "Dein Beitrag liegt unter allen Angeboten für dieses Profil — prüfe, ob Franchise und Modell vergleichbar sind."}
           </strong>
           {headline.current.insurerName} · {formatChf(headline.current.monthlyPremium)}/Monat.
         </p>

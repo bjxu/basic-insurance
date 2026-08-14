@@ -114,6 +114,13 @@ time.
   - If the current plan's premium *is exactly* the cheapest currently-filtered match (a
     tie for the top rank — no fuzzy "near-cheapest" threshold): *"You already have the
     cheapest matching plan for your profile."* No savings figure is shown in this case.
+  - If the current plan's premium is *strictly lower* than the cheapest currently-filtered
+    match (possible because the self-reported premium carries no franchise/model/region of
+    its own, so it isn't guaranteed to be comparable to the currently-filtered profile): the
+    headline avoids claiming the user's plan is confirmed cheapest for the profile and
+    instead prompts them to check their franchise/model against what's currently selected —
+    e.g. *"Your premium is below every match for this profile — check whether your
+    deductible and model are comparable."*
 - **If no current plan was provided:** *"Cheapest available to you [this year / next
   year]: CHF Y/month with [insurer]."* plus a nudge to add their current plan to see
   savings.

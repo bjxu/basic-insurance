@@ -131,6 +131,9 @@ describe("computeHeadline", () => {
     const current: SelfReportedPlan = { insurerCode: "B", insurerName: "Sanitas", monthlyPremium: cheapest.monthlyPremium };
     const result = computeHeadline(current, cheapest);
     expect(result.kind).toBe("already-cheapest");
+    if (result.kind === "already-cheapest") {
+      expect(result.cheapest).toBe(cheapest);
+    }
   });
 
   it("returns already-cheapest (not savings) when the self-reported premium is strictly cheaper than the filtered cheapest", () => {
@@ -139,5 +142,8 @@ describe("computeHeadline", () => {
     const current: SelfReportedPlan = { insurerCode: "Z", insurerName: "SomeInsurer", monthlyPremium: cheapest.monthlyPremium - 10 };
     const result = computeHeadline(current, cheapest);
     expect(result.kind).toBe("already-cheapest");
+    if (result.kind === "already-cheapest") {
+      expect(result.cheapest).toBe(cheapest);
+    }
   });
 });

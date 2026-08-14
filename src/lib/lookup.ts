@@ -74,7 +74,7 @@ export function computeHeadline(current: SelfReportedPlan | null, cheapest: Prem
   // undercut the filtered cheapest. Without this, that case would fall into "savings"
   // with a negative amount.
   if (!cheapest || current.monthlyPremium <= cheapest.monthlyPremium) {
-    return { kind: "already-cheapest", current };
+    return { kind: "already-cheapest", current, cheapest };
   }
   const savingsPerYear = (current.monthlyPremium - cheapest.monthlyPremium) * 12;
   return { kind: "savings", current, cheapest, savingsPerYear };
