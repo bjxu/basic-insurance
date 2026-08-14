@@ -1,6 +1,6 @@
 import type { PremiumRow } from "@/lib/types";
 import { TARIFART_LABELS, TARIFART_DESCRIPTIONS } from "@/lib/copy";
-import { formatChf } from "@/lib/format";
+import { formatChf, formatMemberCount, formatMemberCountDetail } from "@/lib/format";
 
 type Props = {
   plan: PremiumRow;
@@ -8,6 +8,8 @@ type Props = {
   isCheapest: boolean;
   isCurrentPlan: boolean;
   discountPct: number | null;
+  memberCount?: number;
+  memberCountAsOf: number;
   previousYearPremium?: number;
 };
 
@@ -20,7 +22,16 @@ const MODEL_TAG_CLASSES: Record<string, string> = {
 };
 const DEFAULT_MODEL_TAG_CLASSES = "bg-surface-variant text-on-surface-variant";
 
-export function PlanRow({ plan, rank, isCheapest, isCurrentPlan, discountPct, previousYearPremium }: Props) {
+export function PlanRow({
+  plan,
+  rank,
+  isCheapest,
+  isCurrentPlan,
+  discountPct,
+  memberCount,
+  memberCountAsOf,
+  previousYearPremium,
+}: Props) {
   const yoy =
     previousYearPremium != null && previousYearPremium !== plan.monthlyPremium
       ? ((plan.monthlyPremium - previousYearPremium) / previousYearPremium) * 100
@@ -54,6 +65,17 @@ export function PlanRow({ plan, rank, isCheapest, isCurrentPlan, discountPct, pr
           <span>· {TARIFART_DESCRIPTIONS[plan.tarifart]}</span>
         </div>
       </div>
+      {memberCount != null && (
+        <div
+          className="hidden sm:flex flex-col items-end gap-0.5 flex-shrink-0"
+          title={formatMemberCountDetail(memberCount, memberCountAsOf)}
+          aria-label={formatMemberCountDetail(memberCount, memberCountAsOf)}
+        >
+          <span className="text-[11px] font-semibold px-1.5 py-px rounded bg-surface-variant text-on-surface-variant whitespace-nowrap">
+            <span aria-hidden="true">👥</span> {formatMemberCount(memberCount)}
+          </span>
+        </div>
+      )}
       {isCurrentPlan && (
         <span className="text-[11px] font-semibold px-1.5 py-px rounded bg-error-container text-error">
           Deine Kasse

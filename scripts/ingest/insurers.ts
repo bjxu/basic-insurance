@@ -7,6 +7,9 @@
 //
 // If scripts/ingest/parsePremiums.ts ever throws "unknown insurer code", it means BAG
 // added a new insurer or renumbered one — add the missing code here.
+
+import type { Insurer } from "../../src/lib/types";
+
 export const INSURER_NAMES: Record<string, string> = {
   "8": "CSS",
   "32": "Aquilana",
@@ -46,8 +49,12 @@ export const INSURER_NAMES: Record<string, string> = {
 
 export function buildInsurersJson(
   names: Record<string, string> = INSURER_NAMES,
-): { insurerCode: string; insurerName: string }[] {
+  memberCounts: Record<string, number> = {},
+): Insurer[] {
   return Object.entries(names)
-    .map(([insurerCode, insurerName]) => ({ insurerCode, insurerName }))
+    .map(([insurerCode, insurerName]): Insurer => {
+      const memberCount = memberCounts[insurerCode];
+      return memberCount != null ? { insurerCode, insurerName, memberCount } : { insurerCode, insurerName };
+    })
     .sort((a, b) => a.insurerName.localeCompare(b.insurerName, "de-CH"));
 }

@@ -1,138 +1,172 @@
 [
   {
     "insurerCode": "1560",
-    "insurerName": "Agrisano"
+    "insurerName": "Agrisano",
+    "memberCount": 151415
   },
   {
     "insurerCode": "1507",
-    "insurerName": "AMB Assurances (Groupe Mutuel)"
+    "insurerName": "AMB Assurances (Groupe Mutuel)",
+    "memberCount": 11050
   },
   {
     "insurerCode": "32",
-    "insurerName": "Aquilana"
+    "insurerName": "Aquilana",
+    "memberCount": 88204
   },
   {
     "insurerCode": "1542",
-    "insurerName": "Assura"
+    "insurerName": "Assura",
+    "memberCount": 682061
   },
   {
     "insurerCode": "312",
-    "insurerName": "Atupri"
+    "insurerName": "Atupri",
+    "memberCount": 150966
   },
   {
     "insurerCode": "343",
-    "insurerName": "Avenir Assurance (Groupe Mutuel)"
+    "insurerName": "Avenir Assurance (Groupe Mutuel)",
+    "memberCount": 341921
   },
   {
     "insurerCode": "1113",
-    "insurerName": "Caisse-maladie de la vallée d'Entremont"
+    "insurerName": "Caisse-maladie de la vallée d'Entremont",
+    "memberCount": 5855
   },
   {
     "insurerCode": "290",
-    "insurerName": "Concordia"
+    "insurerName": "Concordia",
+    "memberCount": 672886
   },
   {
     "insurerCode": "8",
-    "insurerName": "CSS"
+    "insurerName": "CSS",
+    "memberCount": 1537730
   },
   {
     "insurerCode": "820",
-    "insurerName": "curaulta"
+    "insurerName": "curaulta",
+    "memberCount": 6172
   },
   {
     "insurerCode": "881",
-    "insurerName": "EGK"
+    "insurerName": "EGK",
+    "memberCount": 120968
   },
   {
     "insurerCode": "134",
-    "insurerName": "Einsiedler Krankenkasse"
+    "insurerName": "Einsiedler Krankenkasse",
+    "memberCount": 8457
   },
   {
     "insurerCode": "1386",
-    "insurerName": "Galenos"
+    "insurerName": "Galenos",
+    "memberCount": 60985
   },
   {
     "insurerCode": "780",
-    "insurerName": "Glarner Krankenversicherung"
+    "insurerName": "Glarner Krankenversicherung",
+    "memberCount": 9814
   },
   {
     "insurerCode": "1562",
-    "insurerName": "Helsana"
+    "insurerName": "Helsana",
+    "memberCount": 1290207
   },
   {
     "insurerCode": "376",
-    "insurerName": "KPT"
+    "insurerName": "KPT",
+    "memberCount": 546009
   },
   {
     "insurerCode": "1322",
-    "insurerName": "Krankenkasse Birchmeier"
+    "insurerName": "Krankenkasse Birchmeier",
+    "memberCount": 2792
   },
   {
     "insurerCode": "360",
-    "insurerName": "Krankenkasse Luzerner Hinterland"
+    "insurerName": "Krankenkasse Luzerner Hinterland",
+    "memberCount": 25585
   },
   {
     "insurerCode": "246",
-    "insurerName": "Krankenkasse Steffisburg"
+    "insurerName": "Krankenkasse Steffisburg",
+    "memberCount": 11435
   },
   {
     "insurerCode": "1040",
-    "insurerName": "Krankenkasse Visperterminen"
+    "insurerName": "Krankenkasse Visperterminen",
+    "memberCount": 4889
   },
   {
     "insurerCode": "1318",
-    "insurerName": "Krankenkasse Wädenswil"
+    "insurerName": "Krankenkasse Wädenswil",
+    "memberCount": 21202
   },
   {
     "insurerCode": "1479",
-    "insurerName": "Mutuel Assurance (Groupe Mutuel)"
+    "insurerName": "Mutuel Assurance (Groupe Mutuel)",
+    "memberCount": 500892
   },
   {
     "insurerCode": "455",
-    "insurerName": "ÖKK"
+    "insurerName": "ÖKK",
+    "memberCount": 175385
   },
   {
     "insurerCode": "1535",
-    "insurerName": "Philos Assurance (Groupe Mutuel)"
+    "insurerName": "Philos Assurance (Groupe Mutuel)",
+    "memberCount": 200097
   },
   {
     "insurerCode": "1401",
-    "insurerName": "rhenusana"
+    "insurerName": "rhenusana",
+    "memberCount": 12207
   },
   {
     "insurerCode": "1568",
-    "insurerName": "sana24"
+    "insurerName": "sana24",
+    "memberCount": 89262
   },
   {
     "insurerCode": "1509",
-    "insurerName": "Sanitas"
+    "insurerName": "Sanitas",
+    "memberCount": 639302
   },
   {
     "insurerCode": "923",
-    "insurerName": "SLKK"
+    "insurerName": "SLKK",
+    "memberCount": 13408
   },
   {
     "insurerCode": "941",
-    "insurerName": "sodalis"
+    "insurerName": "sodalis",
+    "memberCount": 41449
   },
   {
     "insurerCode": "194",
-    "insurerName": "Sumiswalder Krankenkasse"
+    "insurerName": "Sumiswalder Krankenkasse",
+    "memberCount": 31773
   },
   {
     "insurerCode": "1384",
-    "insurerName": "Swica"
+    "insurerName": "Swica",
+    "memberCount": 813080
   },
   {
     "insurerCode": "509",
-    "insurerName": "Sympany"
+    "insurerName": "Sympany",
+    "memberCount": 211968
   },
   {
     "insurerCode": "1555",
-    "insurerName": "Visana"
+    "insurerName": "Visana",
+    "memberCount": 509645
   },
   {
     "insurerCode": "966",
-    "insurerName": "vita surselva"
+    "insurerName": "vita surselva",
+    "memberCount": 4182
   }
 ]

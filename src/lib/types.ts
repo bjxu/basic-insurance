@@ -30,9 +30,16 @@ export type Gemeinde = {
   praemienregionId: string;
 };
 
+export type Insurer = {
+  insurerCode: string;
+  insurerName: string;
+  memberCount?: number; // OKP enrollment (BAG Versichertenbestand), absent if unmatched
+};
+
 export type Metadata = {
   publicationDate: string; // ISO date, e.g. "2025-10-15"
   availableYears: number[];
+  memberCountAsOf: number; // publication year of the Versichertenbestand data (lags publicationDate)
 };
 
 export type CurrentPlan = {
