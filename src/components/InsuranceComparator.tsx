@@ -14,6 +14,7 @@ import { getAltersklasse, getFranchiseTiers } from "@/lib/ageband";
 import { resolveGemeinden, needsDisambiguation } from "@/lib/location";
 import { filterPlans, cheapestPerInsurer, sortPlans, computeHeadline, standardPremiumsByInsurer } from "@/lib/lookup";
 import { encodeState, decodeState } from "@/lib/url-state";
+import { validateCurrentPremium } from "@/lib/validate";
 import type { CurrentPlan, SelfReportedPlan, Tarifart } from "@/lib/types";
 
 import insurersData from "@/data/insurers.json";
@@ -125,8 +126,7 @@ export function InsuranceComparator() {
   const currentPlanProvided = Boolean(
     currentPlan.insurerCode &&
       currentPlan.monthlyPremium != null &&
-      Number.isFinite(currentPlan.monthlyPremium) &&
-      currentPlan.monthlyPremium > 0,
+      validateCurrentPremium(currentPlan.monthlyPremium).valid,
   );
 
   const results = useMemo(() => {

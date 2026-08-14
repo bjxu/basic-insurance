@@ -1,5 +1,6 @@
 "use client";
 
+import { validateCurrentPremium } from "@/lib/validate";
 import type { CurrentPlan } from "@/lib/types";
 
 type Insurer = { insurerCode: string; insurerName: string };
@@ -11,6 +12,8 @@ type Props = {
 };
 
 export function CurrentPlanSection({ insurers, value, onChange }: Props) {
+  const result = value.monthlyPremium != null ? validateCurrentPremium(value.monthlyPremium) : { valid: true as const };
+
   return (
     <details className="mt-5 pt-4 border-t border-surface-variant">
       <summary className="flex items-center gap-2 cursor-pointer select-none text-title-medium text-primary list-none [&::-webkit-details-marker]:hidden before:content-['▸'] before:text-xs [details[open]_&]:before:content-['▾']">
@@ -56,9 +59,18 @@ export function CurrentPlanSection({ insurers, value, onChange }: Props) {
                 const raw = e.target.value;
                 onChange({ ...value, monthlyPremium: raw === "" ? undefined : Number(raw) });
               }}
-              className="w-full h-10 pl-11 pr-3 rounded-md border border-outline-variant text-[15px] bg-surface outline-none focus:border-primary"
+              aria-describedby="current-premium-hint"
+              aria-invalid={!result.valid}
+              className={`w-full h-10 pl-11 pr-3 rounded-md border text-[15px] bg-surface outline-none transition-colors ${
+                result.valid ? "border-outline-variant focus:border-primary" : "border-error focus:border-error"
+              }`}
             />
           </div>
+          {!result.valid && (
+            <p id="current-premium-hint" className="text-body-small text-error mt-1">
+              {result.message}
+            </p>
+          )}
         </div>
       </div>
     </details>
