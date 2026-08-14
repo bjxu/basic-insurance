@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Roboto, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const roboto = Roboto({
@@ -44,7 +45,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="de" className={`${roboto.variable} ${geistMono.variable}`}>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
