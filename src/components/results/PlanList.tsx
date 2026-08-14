@@ -1,4 +1,4 @@
-import type { PremiumRow, ServiceQualityRating } from "@/lib/types";
+import type { PremiumRow } from "@/lib/types";
 import { discountVsStandardPct } from "@/lib/lookup";
 import { PlanRow } from "./PlanRow";
 
@@ -8,10 +8,9 @@ type Props = {
   standardBaseline: Map<string, number>;
   memberCounts: Record<string, number>;
   memberCountAsOf: number;
-  serviceQuality: Record<string, ServiceQualityRating>;
 };
 
-export function PlanList({ plans, currentInsurerCode, standardBaseline, memberCounts, memberCountAsOf, serviceQuality }: Props) {
+export function PlanList({ plans, currentInsurerCode, standardBaseline, memberCounts, memberCountAsOf }: Props) {
   return (
     <div role="list" className="flex flex-col gap-1.5">
       {plans.map((plan, i) => (
@@ -24,7 +23,6 @@ export function PlanList({ plans, currentInsurerCode, standardBaseline, memberCo
           discountPct={plan.tarifart === "standard" ? null : discountVsStandardPct(standardBaseline.get(plan.insurerCode), plan.monthlyPremium)}
           memberCount={memberCounts[plan.insurerCode]}
           memberCountAsOf={memberCountAsOf}
-          serviceQuality={serviceQuality[plan.insurerCode]}
         />
       ))}
     </div>

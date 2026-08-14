@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { filterPlans, cheapestPerInsurer, sortPlans, computeHeadline, standardPremiumsByInsurer, discountVsStandardPct, averageServiceQualityPct } from "@/lib/lookup";
-import type { PremiumRow, SelfReportedPlan, ServiceQualitySourceScore } from "@/lib/types";
+import { filterPlans, cheapestPerInsurer, sortPlans, computeHeadline, standardPremiumsByInsurer, discountVsStandardPct } from "@/lib/lookup";
+import type { PremiumRow, SelfReportedPlan } from "@/lib/types";
 
 const ROWS: PremiumRow[] = [
   { year: 2026, insurerCode: "A", insurerName: "Assura", praemienregionId: "ZH-1", altersklasse: "erwachsen", franchise: 500, unfalldeckung: true, tarifart: "standard", monthlyPremium: 301.1, tarifCode: "A-STD", productName: "Grundversicherung" },
@@ -145,33 +145,5 @@ describe("computeHeadline", () => {
     if (result.kind === "already-cheapest") {
       expect(result.cheapest).toBe(cheapest);
     }
-  });
-});
-
-describe("averageServiceQualityPct", () => {
-  it("returns the source's own fraction when there's only one", () => {
-    const sources: ServiceQualitySourceScore[] = [
-      { sourceName: "bonus.ch", rawScore: 5.2, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.bonus.ch" },
-    ];
-    expect(averageServiceQualityPct(sources)).toBeCloseTo(86.666666667, 6);
-  });
-
-  it("normalizes each source to its own scale before averaging (real CSS 2026 figures)", () => {
-    const sources: ServiceQualitySourceScore[] = [
-      { sourceName: "comparis.ch", rawScore: 4.9, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.presseportal.ch/de/pm/100003671/100941089" },
-      { sourceName: "bonus.ch", rawScore: 5.2, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.bonus.ch" },
-    ];
-    // (4.9/6 + 5.2/6) / 2 = 0.841666... -> 84.1666...%, NOT a naive raw average of 4.9/5.2.
-    expect(averageServiceQualityPct(sources)).toBeCloseTo(84.166666667, 6);
-  });
-
-  it("normalizes a 1-10 scale alongside 1-6 scales (real Helsana 2026 figures)", () => {
-    const sources: ServiceQualitySourceScore[] = [
-      { sourceName: "moneyland.ch", rawScore: 8.0, scaleMax: 10, sourceYear: 2026, sourceUrl: "https://www.moneyland.ch/de/krankenkassen-zufriedenheit-2026" },
-      { sourceName: "comparis.ch", rawScore: 5.1, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.presseportal.ch/de/pm/100003671/100941089" },
-      { sourceName: "bonus.ch", rawScore: 5.2, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.bonus.ch" },
-    ];
-    // (0.8 + 0.85 + 0.866666...) / 3 = 0.838888... -> 83.8888...%
-    expect(averageServiceQualityPct(sources)).toBeCloseTo(83.888888889, 6);
   });
 });
