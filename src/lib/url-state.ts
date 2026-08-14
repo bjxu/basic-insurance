@@ -28,7 +28,9 @@ export function encodeState(state: ComparisonState): URLSearchParams {
   params.set("acc", state.unfalldeckung ? "1" : "0");
   if (state.models.length) params.set("models", state.models.join(","));
   if (state.currentInsurerCode) params.set("ci", state.currentInsurerCode);
-  if (state.currentMonthlyPremium != null) params.set("cp", String(state.currentMonthlyPremium));
+  if (state.currentMonthlyPremium != null) {
+    params.set("cp", String(Math.round(state.currentMonthlyPremium * 100) / 100));
+  }
   return params;
 }
 

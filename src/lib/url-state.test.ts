@@ -39,4 +39,19 @@ describe("encodeState / decodeState — currentMonthlyPremium round-trip", () =>
   it("rejects a non-numeric cp value on decode", () => {
     expect(decodeState(new URLSearchParams("cp=abc")).currentMonthlyPremium).toBeNull();
   });
+
+  it("rounds a 3-decimal currentMonthlyPremium to 2 decimals at encode time so it round-trips (REQ-11)", () => {
+    const params = encodeState({ ...BASE_STATE, currentMonthlyPremium: 350.567 });
+    const decoded = decodeState(params);
+    expect(decoded.currentMonthlyPremium).not.toBeNull();
+    expect(decoded.currentMonthlyPremium as number).toBeCloseTo(350.57, 2);
+  });
+
+  it("decodes a 2-decimal cp value", () => {
+    expect(decodeState(new URLSearchParams("cp=350.55")).currentMonthlyPremium).toBe(350.55);
+  });
+
+  it("decodes a bare-integer cp value with no decimal point", () => {
+    expect(decodeState(new URLSearchParams("cp=350")).currentMonthlyPremium).toBe(350);
+  });
 });
