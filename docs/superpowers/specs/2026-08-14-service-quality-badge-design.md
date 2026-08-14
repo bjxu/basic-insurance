@@ -16,6 +16,16 @@
 > only a single, undisclosed-methodology, conflicted source (bonus.ch) were showing
 > misleadingly higher badges than insurers rated by multiple independent surveys. See
 > the plan and `src/data/serviceQuality.ts`'s header comment for the full reasoning.
+>
+> **Further correction (2026-08-14, post-PR):** the moneyland figures below were
+> re-checked against a direct screenshot of moneyland's own table, which covers 12
+> insurers, not the 7 reported by an earlier indirect web-search summary — and shows
+> Groupe Mutuel scored 7.4 on the same "Gesamtzufriedenheit" scale as everyone else, not
+> a separate excluded metric as this doc originally claimed. `src/data/serviceQuality.ts`
+> now reflects the corrected data. A further correction the same day, from a direct
+> screenshot of comparis's own table, added 3 more Groupe Mutuel sub-brand scores
+> (including Mutuel Assurance, previously uncovered by any source) and requalified
+> Avenir, Philos, and Agrisano. As shipped: 18 insurers carry a badge (was 14).
 
 ## Problem
 
@@ -55,19 +65,27 @@ Three sources, none of them open/licensed government data:
 
 | Source | Methodology | Scale | Sample | Coverage confirmed so far |
 |---|---|---|---|---|
-| moneyland.ch | Ipsos survey, single "Gesamtzufriedenheit" question | 1–10 | n=1,500 (DE-/FR-CH, 18–74) | 7 insurers (see below) |
-| comparis.ch | Innofact survey, composite of 5 criteria | ~1–6 (Swiss school-grade style) | n=4,500 | 3 of 18 confirmed (Helsana/Swica/ÖKK=5.1, Assura=4.7) |
+| moneyland.ch | Ipsos survey, single "Gesamtzufriedenheit" question | 1–10 | n=1,500 (DE-/FR-CH, 18–74) | 12 insurers (see below) |
+| comparis.ch | Innofact survey, composite of 5 criteria | ~1–6 (Swiss school-grade style) | n=4,500 | 18 insurers (see below) |
 | bonus.ch | Undisclosed algorithm; bonus.ch is an insurance broker with paid "Partner" insurers | ~1–6 | undisclosed | ~12 of ~35 confirmed |
 
-**Verified 2026 moneyland figures** (own the cleanest methodology, used as-is):
-Helsana 8.0, ÖKK 8.0, Sanitas 8.0, Swica 8.0, Atupri 7.9, Concordia 7.9, Visana 7.9.
-**Groupe Mutuel's listed 6.5 is excluded** — moneyland's own article marks it as a
-price/value score, not "Gesamtzufriedenheit" like the other 7, so it isn't the same
-metric and would misrepresent it to include as if comparable.
+**Verified 2026 moneyland figures** (own the cleanest methodology, used as-is) —
+corrected 2026-08-14 against a direct screenshot of moneyland's own results table,
+which covers 12 insurers, not the 7 an earlier indirect web-search summary reported:
+Helsana 8.0, ÖKK 8.0, Sanitas 8.0, Swica 8.0, Atupri 7.9, Concordia 7.9, Visana 7.9,
+CSS 7.8, KPT 7.8, Sympany 7.5, Groupe Mutuel 7.4, Assura 7.2. The earlier claim that
+Groupe Mutuel's figure (reported then as 6.5) was a different, excluded metric did not
+hold up against the real table — Groupe Mutuel appears in the same Punkte/Note columns
+as every other insurer, scored 7.4 ("Gut"), the same "Gesamtzufriedenheit" scale as the
+rest. Applied to Avenir Assurance (343) and Philos Assurance (1535) — the two Groupe
+Mutuel sub-brands that also carry a bonus.ch score — giving each 2 independent sources.
 
-**Verified 2026 comparis figures**: Helsana/Swica/ÖKK = 5.1 (tied first), Assura = 4.7
-(lowest of 18 rated). The remaining ~14 insurers' individual scores need verification
-before implementation — flagged, not guessed at.
+**Verified 2026 comparis figures** — corrected 2026-08-14 against a direct screenshot of
+comparis's own results table (18 insurers, "Note" column): Helsana/Swica/ÖKK 5.1,
+Aquilana/Concordia/EGK-Gesundheitskasse/KPT/Sana24/Sanitas/Visana 5.0, Atupri/CSS/Sympany
+4.9, Agrisano/Avenir/Mutuel Assurance/Philos 4.8, Assura 4.7. Notably, comparis rates
+three Groupe Mutuel sub-brands independently (Avenir, Philos, Mutuel Assurance — all
+4.8), including Mutuel Assurance, which no other source covers at all.
 
 **Verified bonus.ch figures** (undated snapshot, re-verify at implementation time):
 Assura 4.9, CSS 5.2, KPT 5.1, Sanitas 5.2, Aquilana 5.4, Atupri 5.2, EGK 5.3, Helsana
@@ -131,12 +149,13 @@ as one covered by all 3 — no special case.
 `insurerCode` mapping note: moneyland/comparis/bonus.ch rate insurer *brands*, which
 mostly map 1:1 to a single BAG code (e.g. Helsana → `1562`), except **Groupe Mutuel**,
 which is 4 separate BAG codes (`343`, `1479`, `1507`, `1535` — see `INSURER_NAMES` in
-[insurers.ts](../../../scripts/ingest/insurers.ts)). If Groupe Mutuel ends up covered
-by comparis/bonus.ch's genuine overall-satisfaction figures (its moneyland figure is
-excluded, see above), the same `sources` array is duplicated across all 4 of its
-`ServiceQualityRating` entries — one real rating, applied to every legal entity under
-that brand, the same way a customer experiences "Groupe Mutuel" as one brand regardless
-of which entity underwrites their specific product.
+[insurers.ts](../../../scripts/ingest/insurers.ts)). As shipped, each of Groupe Mutuel's
+sub-brands gets its own distinct `sources` array, not a duplicated one — Avenir (343)
+and Philos (1535) each carry moneyland's brand-level figure plus their own comparis and
+bonus.ch scores (3 sources), Mutuel Assurance (1479) carries moneyland plus its own
+comparis score but no bonus.ch coverage (2 sources), and AMB Assurances (1507) has no
+entry at all (no source covers it). Only moneyland's single brand-level figure is ever
+reused across entries — everything else is a genuine per-entity measurement.
 
 ### Computation — `lookup.ts`
 
@@ -177,11 +196,10 @@ export function averageServiceQualityPct(sources: ServiceQualitySourceScore[]): 
 
 ### Coverage note
 
-Because bonus.ch and comparis cover insurers moneyland doesn't (e.g. CSS, KPT, Assura,
-Aquilana, EGK, Sympany), the badge's effective coverage is the **union** of all three
-sources' insurers, not just moneyland's 7 — likely 15–20 of the 34 known insurer codes
-once comparis/bonus.ch's remaining figures are verified, though the exact count depends
-on the Open Items below.
+Because bonus.ch and comparis cover insurers moneyland doesn't (e.g. Aquilana, EGK), the
+badge's effective coverage is the **union** of all three sources' insurers, further
+narrowed by the >=2-source policy (see the fix-wave note at the top of this doc). As
+shipped: 18 of the 34 known insurer codes carry a badge.
 
 ## Testing strategy
 
@@ -196,26 +214,25 @@ on the Open Items below.
   the member-count badge there's no CSV parser to catch typos —
   - every `insurerCode` in `SERVICE_QUALITY_RATINGS` exists in `INSURER_NAMES`;
   - every `rawScore` is `> 0` and `<= scaleMax`;
-  - Groupe Mutuel's 4 codes (if present) carry identical `sources` arrays.
+  - Groupe Mutuel's sub-brands each carry their own real, distinct `sources` array (not
+    a duplicated one — see the `insurerCode` mapping note above).
 - `PlanRow` component: no test file (project has no React testing infra — see the
   member-count badge plan's Global Constraints); verified by running the app.
 
-## Open Items (implementation-start work, not guessed at here)
+## Open Items — all resolved as of 2026-08-14 (post-PR corrections)
 
-1. **Complete comparis.ch figures** for the ~14 insurers beyond Helsana/Swica/ÖKK/Assura
-   (of its 18 rated) — needs direct verification against comparis's 2026 published
-   ranking before writing `SERVICE_QUALITY_RATINGS`.
-2. **Complete bonus.ch figures** for insurers beyond the ~12 confirmed above, and
-   confirmation that bonus.ch's scale ceiling is really 6 (not verified from its site
-   directly — inferred from comparis's similar range).
-3. **Whether Groupe Mutuel gets a badge at all**: depends on whether comparis/bonus.ch's
-   figures for it (if any) are genuine overall-satisfaction numbers, not another
-   different-metric case like moneyland's.
-4. **Sequencing**: this design assumes the member-count badge
-   ([2026-08-14-member-count-badge.md](../plans/2026-08-14-member-count-badge.md)) is
-   implemented first, since the column layout and prop-threading pattern build directly
-   on top of it. If that plan hasn't landed yet, the implementation plan for this badge
-   needs to build both, in order.
+1. ~~Complete comparis.ch figures~~ — **Resolved.** All 18 rated insurers verified
+   against a direct screenshot of comparis's own table (see "Verified 2026 comparis
+   figures" above), including 3 previously-unknown Groupe Mutuel sub-brand scores.
+2. ~~Complete bonus.ch figures~~ — **Resolved.** bonus.ch's scale is confirmed 1–6
+   ("1 (not acceptable) to 6 (very good)", per bonus.ch's own methodology page).
+3. ~~Whether Groupe Mutuel gets a badge at all~~ — **Resolved, yes for 3 of 4
+   sub-brands.** moneyland rates the brand as one figure (7.4, genuinely
+   "Gesamtzufriedenheit," not a different metric as this doc originally, incorrectly,
+   claimed); comparis rates 3 sub-brands independently. Avenir, Philos, and Mutuel
+   Assurance each qualify; AMB Assurances has no score from any source.
+4. ~~Sequencing~~ — **Resolved.** The member-count badge plan landed first (merged to
+   `main` before this feature's implementation began), as this design assumed.
 
 ## Self-Review
 
