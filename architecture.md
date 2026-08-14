@@ -123,7 +123,7 @@ src/
     current-plan/
       CurrentPlanSection.tsx  # collapsible "what do you pay now?" (§5.1)
   lib/
-    lookup.ts           # pure functions: filterPlans(), sortPlans(), findCurrentPlan()
+    lookup.ts           # pure functions: filterPlans(), sortPlans(), computeHeadline(), standardPremiumsByInsurer()
     ageband.ts          # birthYear + calendarYear → AgeKlasse + franchise tiers
     location.ts         # plz → Gemeinde[], Gemeinde → praemienregionId
     url-state.ts        # encodeState() / decodeState() — URL ↔ app state
