@@ -12,6 +12,7 @@ import { join } from "node:path";
 import * as XLSX from "xlsx";
 import { parsePremiumRows } from "./ingest/parsePremiums";
 import { parseRegionRows, type RawRegionRow } from "./ingest/parseRegions";
+import { parseMemberCounts } from "./ingest/members";
 import { buildInsurersJson, INSURER_NAMES } from "./ingest/insurers";
 import { downloadRawFiles } from "./ingest/downloadRaw";
 import { validateIngestOutput, verifyWrittenFile } from "./ingest/validateIngest";
@@ -64,8 +65,9 @@ async function main() {
   const rawDir = await resolveRawDir(args);
   const premiumsPath = join(rawDir, "praemien.csv");
   const regionsPath = join(rawDir, "praemienregionen.xlsx");
-  if (!existsSync(premiumsPath) || !existsSync(regionsPath)) {
-    fail(`expected ${premiumsPath} and ${regionsPath} to exist.`);
+  const membersPath = join(rawDir, "versichertenbestand.csv");
+  if (!existsSync(premiumsPath) || !existsSync(regionsPath) || !existsSync(membersPath)) {
+    fail(`expected ${premiumsPath}, ${regionsPath}, and ${membersPath} to exist.`);
   }
 
   const { gemeinden, plzMap, gemeindeRegionMap } = parseRegionRows(readRegionRows(regionsPath));
@@ -74,13 +76,22 @@ async function main() {
   const { rows, skippedCantons, unknownTariftypes } = parsePremiumRows(csvText, INSURER_NAMES);
   if (rows.length === 0) fail("parsed 0 premium rows — check the CSV format/columns.");
 
+  const membersCsvText = await readFile(membersPath, "utf-8");
+  const { counts: memberCounts, year: memberCountAsOf, unmatchedCodes } = parseMemberCounts(
+    membersCsvText,
+    INSURER_NAMES,
+  );
+  if (Object.keys(memberCounts).length === 0) {
+    fail("parsed 0 member counts — check the Versichertenbestand CSV format/columns.");
+  }
+
   const validation = validateIngestOutput(csvText, rows);
   if (!validation.ok) {
     fail(`ingest output failed validation against source data:\n  ${validation.errors.join("\n  ")}`);
   }
 
   const year = rows[0].year;
-  const metadata: Metadata = { publicationDate: args.publicationDate, availableYears: [year] };
+  const metadata: Metadata = { publicationDate: args.publicationDate, availableYears: [year], memberCountAsOf };
 
   await mkdir(PUBLIC_DATA_DIR, { recursive: true });
   const premiumsJson = JSON.stringify(rows);
@@ -96,7 +107,10 @@ async function main() {
   }
   await writeFile(join(DATA_DIR, "plz-map.json"), JSON.stringify(plzMap, null, 2));
   await writeFile(join(DATA_DIR, "gemeinde-region-map.json"), JSON.stringify(gemeindeRegionMap, null, 2));
-  await writeFile(join(DATA_DIR, "insurers.json"), JSON.stringify(buildInsurersJson(), null, 2));
+  await writeFile(
+    join(DATA_DIR, "insurers.json"),
+    JSON.stringify(buildInsurersJson(INSURER_NAMES, memberCounts), null, 2),
+  );
   await writeFile(join(DATA_DIR, "metadata.json"), JSON.stringify(metadata, null, 2));
 
   console.log(
@@ -111,6 +125,11 @@ async function main() {
     console.log(
       `  ⚠ unrecognized Tariftyp code(s) mapped to "andere": ${[...unknownTariftypes].join(", ")} ` +
         `— check requirement.md §11.4`,
+    );
+  }
+  if (unmatchedCodes.size > 0) {
+    console.log(
+      `  ⚠ Versichertenbestand code(s) with no matching insurer, skipped: ${[...unmatchedCodes].join(", ")}`,
     );
   }
 }
