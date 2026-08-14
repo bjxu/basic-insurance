@@ -58,7 +58,7 @@ const COMPARIS_2026 = {
   sourceName: "comparis.ch",
   scaleMax: 6,
   sourceYear: 2026,
-  sourceUrl: "https://www.presseportal.ch/de/pm/100003671/100941089",
+  sourceUrl: "https://www.comparis.ch/krankenkassen/beste-krankenkasse",
 } as const;
 
 // bonus.ch doesn't date-stamp its rankings the way moneyland/comparis publish dated

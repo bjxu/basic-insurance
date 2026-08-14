@@ -309,7 +309,7 @@ export function InsuranceComparator() {
         </a>
         ,{" "}
         <a
-          href="https://www.presseportal.ch/de/pm/100003671/100941089"
+          href="https://www.comparis.ch/krankenkassen/beste-krankenkasse"
           target="_blank"
           rel="noopener noreferrer"
           className="underline hover:text-on-surface-variant"

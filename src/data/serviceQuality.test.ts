@@ -33,7 +33,7 @@ describe("SERVICE_QUALITY_RATINGS", () => {
     const helsana = SERVICE_QUALITY_RATINGS.find((r) => r.insurerCode === "1562");
     expect(helsana?.sources).toEqual([
       { sourceName: "moneyland.ch", rawScore: 8.0, scaleMax: 10, sourceYear: 2026, sourceUrl: "https://www.moneyland.ch/de/krankenkassen-zufriedenheit-2026" },
-      { sourceName: "comparis.ch", rawScore: 5.1, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.presseportal.ch/de/pm/100003671/100941089" },
+      { sourceName: "comparis.ch", rawScore: 5.1, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.comparis.ch/krankenkassen/beste-krankenkasse" },
       { sourceName: "bonus.ch", rawScore: 5.2, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.bonus.ch/Krankenkasse/Note/KPT-CPT-Kundenzufriedenheitsumfrage.aspx" },
     ]);
   });
@@ -44,7 +44,7 @@ describe("SERVICE_QUALITY_RATINGS", () => {
     for (const rating of [avenir, philos]) {
       expect(rating?.sources).toEqual([
         { sourceName: "moneyland.ch", rawScore: 7.4, scaleMax: 10, sourceYear: 2026, sourceUrl: "https://www.moneyland.ch/de/krankenkassen-zufriedenheit-2026" },
-        { sourceName: "comparis.ch", rawScore: 4.8, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.presseportal.ch/de/pm/100003671/100941089" },
+        { sourceName: "comparis.ch", rawScore: 4.8, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.comparis.ch/krankenkassen/beste-krankenkasse" },
         { sourceName: "bonus.ch", rawScore: 5.2, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.bonus.ch/Krankenkasse/Note/KPT-CPT-Kundenzufriedenheitsumfrage.aspx" },
       ]);
     }
@@ -54,7 +54,7 @@ describe("SERVICE_QUALITY_RATINGS", () => {
     const mutuel = SERVICE_QUALITY_RATINGS.find((r) => r.insurerCode === "1479");
     expect(mutuel?.sources).toEqual([
       { sourceName: "moneyland.ch", rawScore: 7.4, scaleMax: 10, sourceYear: 2026, sourceUrl: "https://www.moneyland.ch/de/krankenkassen-zufriedenheit-2026" },
-      { sourceName: "comparis.ch", rawScore: 4.8, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.presseportal.ch/de/pm/100003671/100941089" },
+      { sourceName: "comparis.ch", rawScore: 4.8, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.comparis.ch/krankenkassen/beste-krankenkasse" },
     ]);
   });
 
@@ -65,7 +65,7 @@ describe("SERVICE_QUALITY_RATINGS", () => {
   it("Agrisano (1560) requalified once comparis.ch gave it a 2nd source (was excluded, bonus.ch-only)", () => {
     const agrisano = SERVICE_QUALITY_RATINGS.find((r) => r.insurerCode === "1560");
     expect(agrisano?.sources).toEqual([
-      { sourceName: "comparis.ch", rawScore: 4.8, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.presseportal.ch/de/pm/100003671/100941089" },
+      { sourceName: "comparis.ch", rawScore: 4.8, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.comparis.ch/krankenkassen/beste-krankenkasse" },
       { sourceName: "bonus.ch", rawScore: 5.2, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.bonus.ch/Krankenkasse/Note/KPT-CPT-Kundenzufriedenheitsumfrage.aspx" },
     ]);
   });
