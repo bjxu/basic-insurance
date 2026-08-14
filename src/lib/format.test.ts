@@ -1,6 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatChf, formatMemberCount, formatMemberCountDetail, formatServiceQualityPct, formatServiceQualityDetail } from "@/lib/format";
-import type { ServiceQualityRating } from "@/lib/types";
+import { formatChf, formatMemberCount, formatMemberCountDetail } from "@/lib/format";
 
 describe("formatChf", () => {
   it("formats with apostrophe thousands separator and two decimals", () => {
@@ -44,43 +43,5 @@ describe("formatMemberCountDetail", () => {
   });
   it("rounds a fractional count before grouping", () => {
     expect(formatMemberCountDetail(2791.6, 2024)).toBe("2'792 Versicherte · Stand 2024");
-  });
-});
-
-describe("formatServiceQualityPct", () => {
-  it("rounds to the nearest whole percent, prefixed with the average marker", () => {
-    expect(formatServiceQualityPct(83.888888889)).toBe("Ø 84%");
-    expect(formatServiceQualityPct(84.166666667)).toBe("Ø 84%");
-  });
-  it("rounds .5 up", () => {
-    expect(formatServiceQualityPct(82.5)).toBe("Ø 83%");
-  });
-});
-
-describe("formatServiceQualityDetail", () => {
-  it("lists every source's raw score, scale, and a shared year, singular 'Quelle' for one source", () => {
-    const rating: ServiceQualityRating = {
-      insurerCode: "1560",
-      sources: [
-        { sourceName: "bonus.ch", rawScore: 5.2, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.bonus.ch" },
-      ],
-    };
-    expect(formatServiceQualityDetail(rating, 86.666666667)).toBe(
-      "Ø 87% aus 1 Quelle (2026)\nbonus.ch: 5.2/6",
-    );
-  });
-
-  it("lists all three sources, plural 'Quellen', using the real Helsana 2026 figures", () => {
-    const rating: ServiceQualityRating = {
-      insurerCode: "1562",
-      sources: [
-        { sourceName: "moneyland.ch", rawScore: 8.0, scaleMax: 10, sourceYear: 2026, sourceUrl: "https://www.moneyland.ch/de/krankenkassen-zufriedenheit-2026" },
-        { sourceName: "comparis.ch", rawScore: 5.1, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.comparis.ch/krankenkassen/beste-krankenkasse" },
-        { sourceName: "bonus.ch", rawScore: 5.2, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.bonus.ch" },
-      ],
-    };
-    expect(formatServiceQualityDetail(rating, 83.888888889)).toBe(
-      "Ø 84% aus 3 Quellen (2026)\nmoneyland.ch: 8.0/10\ncomparis.ch: 5.1/6\nbonus.ch: 5.2/6",
-    );
   });
 });

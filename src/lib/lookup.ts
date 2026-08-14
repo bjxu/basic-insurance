@@ -1,6 +1,6 @@
 // Pure lookup functions (architecture.md §6). Testable in isolation, no I/O.
 
-import type { HeadlineState, PremiumRow, SelfReportedPlan, ServiceQualitySourceScore, Tarifart } from "./types";
+import type { HeadlineState, PremiumRow, SelfReportedPlan, Tarifart } from "./types";
 
 export type FilterParams = {
   praemienregionId: string;
@@ -101,14 +101,4 @@ export function standardPremiumsByInsurer(
 export function discountVsStandardPct(standardPremium: number | undefined, premium: number): number | null {
   if (standardPremium == null || standardPremium <= 0) return null;
   return ((standardPremium - premium) / standardPremium) * 100;
-}
-
-/** Mean of each source's (rawScore / scaleMax), as an unrounded 0–100 percentage.
- *  Normalizes before averaging so a 1–10 scale and a 1–6 scale aren't blended as raw
- *  numbers. Works the same whether `sources` has 1, 2, or 3 entries — no special-casing
- *  for partial coverage (docs/superpowers/specs/2026-08-14-service-quality-badge-design.md). */
-export function averageServiceQualityPct(sources: ServiceQualitySourceScore[]): number {
-  const fractions = sources.map((s) => s.rawScore / s.scaleMax);
-  const mean = fractions.reduce((sum, f) => sum + f, 0) / fractions.length;
-  return mean * 100;
 }

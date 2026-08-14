@@ -1,5 +1,3 @@
-import type { ServiceQualityRating } from "./types";
-
 // Swiss-convention monetary formatting (requirement.md §9): apostrophe thousands
 // separator, two decimal places, "CHF" prefix.
 
@@ -34,23 +32,4 @@ export function formatMemberCount(count: number): string {
 // (the enrollment data lags the premium year — see Metadata.memberCountAsOf).
 export function formatMemberCountDetail(count: number, asOfYear: number): string {
   return `${groupThousands(String(Math.round(count)))} Versicherte · Stand ${asOfYear}`;
-}
-
-// Disclosed cross-source average for the service-quality badge (PlanRow). "Ø" (German
-// for "average") is part of the label deliberately — the badge shouldn't read as more
-// authoritative than an average across differing methodologies actually is. See
-// docs/superpowers/specs/2026-08-14-service-quality-badge-design.md.
-export function formatServiceQualityPct(pct: number): string {
-  return `Ø ${Math.round(pct)}%`;
-}
-
-// Full disclosure for the badge's tooltip: every contributing source's own raw score
-// and scale, not just the blended output, so a skeptical user can see exactly what was
-// averaged.
-export function formatServiceQualityDetail(rating: ServiceQualityRating, averagePct: number): string {
-  const year = rating.sources[0].sourceYear;
-  const count = rating.sources.length;
-  const header = `${formatServiceQualityPct(averagePct)} aus ${count} Quelle${count === 1 ? "" : "n"} (${year})`;
-  const lines = rating.sources.map((s) => `${s.sourceName}: ${s.rawScore.toFixed(1)}/${s.scaleMax}`);
-  return [header, ...lines].join("\n");
 }

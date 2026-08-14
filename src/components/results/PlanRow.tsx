@@ -1,7 +1,6 @@
-import type { PremiumRow, ServiceQualityRating } from "@/lib/types";
+import type { PremiumRow } from "@/lib/types";
 import { TARIFART_LABELS, TARIFART_DESCRIPTIONS } from "@/lib/copy";
-import { formatChf, formatMemberCount, formatMemberCountDetail, formatServiceQualityPct, formatServiceQualityDetail } from "@/lib/format";
-import { averageServiceQualityPct } from "@/lib/lookup";
+import { formatChf, formatMemberCount, formatMemberCountDetail } from "@/lib/format";
 
 type Props = {
   plan: PremiumRow;
@@ -11,7 +10,6 @@ type Props = {
   discountPct: number | null;
   memberCount?: number;
   memberCountAsOf: number;
-  serviceQuality?: ServiceQualityRating;
   previousYearPremium?: number;
 };
 
@@ -32,14 +30,12 @@ export function PlanRow({
   discountPct,
   memberCount,
   memberCountAsOf,
-  serviceQuality,
   previousYearPremium,
 }: Props) {
   const yoy =
     previousYearPremium != null && previousYearPremium !== plan.monthlyPremium
       ? ((plan.monthlyPremium - previousYearPremium) / previousYearPremium) * 100
       : null;
-  const serviceQualityAvgPct = serviceQuality != null ? averageServiceQualityPct(serviceQuality.sources) : null;
 
   return (
     <div
@@ -69,26 +65,15 @@ export function PlanRow({
           <span>· {TARIFART_DESCRIPTIONS[plan.tarifart]}</span>
         </div>
       </div>
-      {(memberCount != null || serviceQuality != null) && (
-        <div className="hidden sm:flex flex-col items-end gap-0.5 flex-shrink-0">
-          {memberCount != null && (
-            <span
-              className="text-[11px] font-semibold px-1.5 py-px rounded bg-surface-variant text-on-surface-variant whitespace-nowrap"
-              title={formatMemberCountDetail(memberCount, memberCountAsOf)}
-              aria-label={formatMemberCountDetail(memberCount, memberCountAsOf)}
-            >
-              <span aria-hidden="true">👥</span> {formatMemberCount(memberCount)}
-            </span>
-          )}
-          {serviceQuality != null && serviceQualityAvgPct != null && (
-            <span
-              className="text-[11px] font-semibold px-1.5 py-px rounded bg-surface-variant text-on-surface-variant whitespace-nowrap"
-              title={formatServiceQualityDetail(serviceQuality, serviceQualityAvgPct)}
-              aria-label={formatServiceQualityDetail(serviceQuality, serviceQualityAvgPct)}
-            >
-              <span aria-hidden="true">⭐</span> {formatServiceQualityPct(serviceQualityAvgPct)}
-            </span>
-          )}
+      {memberCount != null && (
+        <div
+          className="hidden sm:flex flex-col items-end gap-0.5 flex-shrink-0"
+          title={formatMemberCountDetail(memberCount, memberCountAsOf)}
+          aria-label={formatMemberCountDetail(memberCount, memberCountAsOf)}
+        >
+          <span className="text-[11px] font-semibold px-1.5 py-px rounded bg-surface-variant text-on-surface-variant whitespace-nowrap">
+            <span aria-hidden="true">👥</span> {formatMemberCount(memberCount)}
+          </span>
         </div>
       )}
       {isCurrentPlan && (
