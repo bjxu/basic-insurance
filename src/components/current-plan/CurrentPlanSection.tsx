@@ -1,9 +1,7 @@
 "use client";
 
 import { validateCurrentPremium } from "@/lib/validate";
-import type { CurrentPlan } from "@/lib/types";
-
-type Insurer = { insurerCode: string; insurerName: string };
+import type { CurrentPlan, Insurer } from "@/lib/types";
 
 type Props = {
   insurers: Insurer[];
