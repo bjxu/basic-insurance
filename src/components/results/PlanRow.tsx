@@ -7,6 +7,7 @@ type Props = {
   rank: number;
   isCheapest: boolean;
   isCurrentPlan: boolean;
+  discountPct: number | null;
   previousYearPremium?: number;
 };
 
@@ -19,7 +20,7 @@ const MODEL_TAG_CLASSES: Record<string, string> = {
 };
 const DEFAULT_MODEL_TAG_CLASSES = "bg-surface-variant text-on-surface-variant";
 
-export function PlanRow({ plan, rank, isCheapest, isCurrentPlan, previousYearPremium }: Props) {
+export function PlanRow({ plan, rank, isCheapest, isCurrentPlan, discountPct, previousYearPremium }: Props) {
   const yoy =
     previousYearPremium != null && previousYearPremium !== plan.monthlyPremium
       ? ((plan.monthlyPremium - previousYearPremium) / previousYearPremium) * 100
@@ -37,15 +38,20 @@ export function PlanRow({ plan, rank, isCheapest, isCurrentPlan, previousYearPre
       </div>
       <div className="flex-1 min-w-0">
         <div className="font-semibold text-[15px] truncate">{plan.insurerName}</div>
-        <div className="text-xs text-on-surface-variant mt-0.5">
+        <div className="text-xs text-on-surface-variant mt-0.5 flex flex-wrap items-center gap-1">
           <span
-            className={`inline-block px-1.5 py-px rounded text-[11px] font-semibold mr-1 ${
+            className={`inline-block px-1.5 py-px rounded text-[11px] font-semibold ${
               MODEL_TAG_CLASSES[plan.tarifart] ?? DEFAULT_MODEL_TAG_CLASSES
             }`}
           >
             {TARIFART_LABELS[plan.tarifart]}
           </span>
-          · {TARIFART_DESCRIPTIONS[plan.tarifart]}
+          {discountPct != null && (
+            <span className="inline-block px-1.5 py-px rounded text-[11px] font-bold bg-primary-container text-on-primary-container whitespace-nowrap">
+              bis zu −{discountPct.toFixed(1)}% ggü. Standard
+            </span>
+          )}
+          <span>· {TARIFART_DESCRIPTIONS[plan.tarifart]}</span>
         </div>
       </div>
       {isCurrentPlan && (
