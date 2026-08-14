@@ -36,6 +36,26 @@ export type Insurer = {
   memberCount?: number; // OKP enrollment (BAG Versichertenbestand), absent if unmatched
 };
 
+export type ServiceQualitySourceScore = {
+  sourceName: string; // "moneyland.ch" | "comparis.ch" | "bonus.ch"
+  rawScore: number; // as published, e.g. 8.0 or 5.1
+  scaleMax: number; // the source's own ceiling — 10 for moneyland, 6 for comparis/bonus.ch
+  sourceYear: number;
+  sourceUrl: string;
+};
+
+// Customer-satisfaction rating for one insurer, disclosed as an average across
+// whichever of moneyland.ch/comparis.ch/bonus.ch cover it — see
+// docs/superpowers/specs/2026-08-14-service-quality-badge-design.md.
+export type ServiceQualityRating = {
+  insurerCode: string; // BAG insurer code — see INSURER_NAMES
+  // Non-empty by construction: a badge requires >=2 independent sources (see
+  // src/data/serviceQuality.ts's header comment), and this tuple type turns an
+  // empty-sources entry into a compile-time error rather than a runtime crash in
+  // formatServiceQualityDetail (which reads sources[0]).
+  sources: [ServiceQualitySourceScore, ...ServiceQualitySourceScore[]]; // 2–3 entries, whichever sources cover this insurer
+};
+
 export type Metadata = {
   publicationDate: string; // ISO date, e.g. "2025-10-15"
   availableYears: number[];

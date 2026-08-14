@@ -15,10 +15,11 @@ import { resolveGemeinden, needsDisambiguation } from "@/lib/location";
 import { filterPlans, cheapestPerInsurer, sortPlans, computeHeadline, standardPremiumsByInsurer } from "@/lib/lookup";
 import { encodeState, decodeState } from "@/lib/url-state";
 import { validateCurrentPremium } from "@/lib/validate";
-import type { CurrentPlan, Insurer, SelfReportedPlan, Tarifart } from "@/lib/types";
+import type { CurrentPlan, Insurer, SelfReportedPlan, ServiceQualityRating, Tarifart } from "@/lib/types";
 
 import insurersData from "@/data/insurers.json";
 import metadata from "@/data/metadata.json";
+import { SERVICE_QUALITY_RATINGS } from "@/data/serviceQuality";
 import type { PremiumRow } from "@/lib/types";
 
 const INSURERS = insurersData as Insurer[];
@@ -26,6 +27,10 @@ const INSURERS = insurersData as Insurer[];
 // once at module load, same lifecycle as INSURERS itself (no useMemo needed).
 const MEMBER_COUNTS: Record<string, number> = Object.fromEntries(
   INSURERS.filter((i) => i.memberCount != null).map((i) => [i.insurerCode, i.memberCount!]),
+);
+// Same lifecycle as MEMBER_COUNTS — SERVICE_QUALITY_RATINGS is a module-level import.
+const SERVICE_QUALITY: Record<string, ServiceQualityRating> = Object.fromEntries(
+  SERVICE_QUALITY_RATINGS.map((r) => [r.insurerCode, r]),
 );
 const ALT_MODELS: Tarifart[] = ["standard", "hausarzt", "telmed", "hmo", "andere"];
 
@@ -279,6 +284,7 @@ export function InsuranceComparator() {
               standardBaseline={results.standardBaseline}
               memberCounts={MEMBER_COUNTS}
               memberCountAsOf={metadata.memberCountAsOf}
+              serviceQuality={SERVICE_QUALITY}
             />
           ) : (
             <EmptyState message="Für die aktuelle Kombination sind keine Prämien in den BAG-Daten vorhanden. Bitte überprüfe deine Eingaben oder passe die Filter an." />
@@ -286,10 +292,41 @@ export function InsuranceComparator() {
         </div>
       )}
 
-      <p className="text-body-small text-outline text-center mt-6 pb-10">
+      <p className="text-body-small text-outline text-center mt-6">
         Daten: BAG Opendata · Publikation{" "}
         {new Date(metadata.publicationDate).toLocaleDateString("de-CH", { day: "numeric", month: "long", year: "numeric" })} ·
         Nur Pflichtleistungen (OKP) · Kein Sponsoring, keine Vermittlungslinks
+      </p>
+      <p className="text-body-small text-outline text-center pb-10">
+        Servicequalität-Badge: Ø aus{" "}
+        <a
+          href="https://www.moneyland.ch/de/krankenkassen-zufriedenheit-2026"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-on-surface-variant"
+        >
+          moneyland.ch
+        </a>
+        ,{" "}
+        <a
+          href="https://www.presseportal.ch/de/pm/100003671/100941089"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-on-surface-variant"
+        >
+          comparis.ch
+        </a>
+        ,{" "}
+        <a
+          href="https://www.bonus.ch/Krankenkasse/Vergleich/Krankenkassenpraemie.aspx"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-on-surface-variant"
+        >
+          bonus.ch
+        </a>{" "}
+        (Angaben der jeweiligen Anbieter, keine BAG-Daten) — Zitatlinks zu den
+        Veröffentlichungen der Quellen, keine Vermittlungslinks.
       </p>
     </main>
   );
