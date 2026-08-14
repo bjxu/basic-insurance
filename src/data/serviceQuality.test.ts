@@ -37,4 +37,20 @@ describe("SERVICE_QUALITY_RATINGS", () => {
       { sourceName: "bonus.ch", rawScore: 5.2, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.bonus.ch/Krankenkasse/Vergleich/Krankenkassenpraemie.aspx" },
     ]);
   });
+
+  it("Groupe Mutuel's moneyland figure (7.4, brand-level) is applied to both Avenir Assurance (343) and Philos Assurance (1535), each alongside their own bonus.ch score", () => {
+    const avenir = SERVICE_QUALITY_RATINGS.find((r) => r.insurerCode === "343");
+    const philos = SERVICE_QUALITY_RATINGS.find((r) => r.insurerCode === "1535");
+    for (const rating of [avenir, philos]) {
+      expect(rating?.sources).toEqual([
+        { sourceName: "moneyland.ch", rawScore: 7.4, scaleMax: 10, sourceYear: 2026, sourceUrl: "https://www.moneyland.ch/de/krankenkassen-zufriedenheit-2026" },
+        { sourceName: "bonus.ch", rawScore: 5.2, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.bonus.ch/Krankenkasse/Vergleich/Krankenkassenpraemie.aspx" },
+      ]);
+    }
+  });
+
+  it("AMB Assurances (1507) and Mutuel Assurance (1479) still have no entry — moneyland-only would be a single source", () => {
+    expect(SERVICE_QUALITY_RATINGS.find((r) => r.insurerCode === "1507")).toBeUndefined();
+    expect(SERVICE_QUALITY_RATINGS.find((r) => r.insurerCode === "1479")).toBeUndefined();
+  });
 });
