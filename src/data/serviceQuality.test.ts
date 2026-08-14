@@ -23,9 +23,9 @@ describe("SERVICE_QUALITY_RATINGS", () => {
     expect(new Set(codes).size).toBe(codes.length);
   });
 
-  it("every rating has at least one source", () => {
+  it("every rating has at least 2 independent sources", () => {
     for (const rating of SERVICE_QUALITY_RATINGS) {
-      expect(rating.sources.length).toBeGreaterThan(0);
+      expect(rating.sources.length).toBeGreaterThanOrEqual(2);
     }
   });
 

@@ -49,7 +49,11 @@ export type ServiceQualitySourceScore = {
 // docs/superpowers/specs/2026-08-14-service-quality-badge-design.md.
 export type ServiceQualityRating = {
   insurerCode: string; // BAG insurer code — see INSURER_NAMES
-  sources: ServiceQualitySourceScore[]; // 1–3 entries, whichever sources cover this insurer
+  // Non-empty by construction: a badge requires >=2 independent sources (see
+  // src/data/serviceQuality.ts's header comment), and this tuple type turns an
+  // empty-sources entry into a compile-time error rather than a runtime crash in
+  // formatServiceQualityDetail (which reads sources[0]).
+  sources: [ServiceQualitySourceScore, ...ServiceQualitySourceScore[]]; // 2–3 entries, whichever sources cover this insurer
 };
 
 export type Metadata = {

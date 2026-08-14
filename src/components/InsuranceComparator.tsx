@@ -292,10 +292,41 @@ export function InsuranceComparator() {
         </div>
       )}
 
-      <p className="text-body-small text-outline text-center mt-6 pb-10">
+      <p className="text-body-small text-outline text-center mt-6">
         Daten: BAG Opendata · Publikation{" "}
         {new Date(metadata.publicationDate).toLocaleDateString("de-CH", { day: "numeric", month: "long", year: "numeric" })} ·
         Nur Pflichtleistungen (OKP) · Kein Sponsoring, keine Vermittlungslinks
+      </p>
+      <p className="text-body-small text-outline text-center pb-10">
+        Servicequalität-Badge: Ø aus{" "}
+        <a
+          href="https://www.moneyland.ch/de/krankenkassen-zufriedenheit-2026"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-on-surface-variant"
+        >
+          moneyland.ch
+        </a>
+        ,{" "}
+        <a
+          href="https://www.presseportal.ch/de/pm/100003671/100941089"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-on-surface-variant"
+        >
+          comparis.ch
+        </a>
+        ,{" "}
+        <a
+          href="https://www.bonus.ch/Krankenkasse/Vergleich/Krankenkassenpraemie.aspx"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-on-surface-variant"
+        >
+          bonus.ch
+        </a>{" "}
+        (Angaben der jeweiligen Anbieter, keine BAG-Daten) — Zitatlinks zu den
+        Veröffentlichungen der Quellen, keine Vermittlungslinks.
       </p>
     </main>
   );

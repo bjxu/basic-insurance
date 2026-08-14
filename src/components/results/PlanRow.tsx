@@ -39,6 +39,7 @@ export function PlanRow({
     previousYearPremium != null && previousYearPremium !== plan.monthlyPremium
       ? ((plan.monthlyPremium - previousYearPremium) / previousYearPremium) * 100
       : null;
+  const serviceQualityAvgPct = serviceQuality != null ? averageServiceQualityPct(serviceQuality.sources) : null;
 
   return (
     <div
@@ -79,13 +80,13 @@ export function PlanRow({
               <span aria-hidden="true">👥</span> {formatMemberCount(memberCount)}
             </span>
           )}
-          {serviceQuality != null && (
+          {serviceQuality != null && serviceQualityAvgPct != null && (
             <span
               className="text-[11px] font-semibold px-1.5 py-px rounded bg-surface-variant text-on-surface-variant whitespace-nowrap"
-              title={formatServiceQualityDetail(serviceQuality, averageServiceQualityPct(serviceQuality.sources))}
-              aria-label={formatServiceQualityDetail(serviceQuality, averageServiceQualityPct(serviceQuality.sources))}
+              title={formatServiceQualityDetail(serviceQuality, serviceQualityAvgPct)}
+              aria-label={formatServiceQualityDetail(serviceQuality, serviceQualityAvgPct)}
             >
-              <span aria-hidden="true">⭐</span> {formatServiceQualityPct(averageServiceQualityPct(serviceQuality.sources))}
+              <span aria-hidden="true">⭐</span> {formatServiceQualityPct(serviceQualityAvgPct)}
             </span>
           )}
         </div>

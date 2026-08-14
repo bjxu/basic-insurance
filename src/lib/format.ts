@@ -50,7 +50,7 @@ export function formatServiceQualityPct(pct: number): string {
 export function formatServiceQualityDetail(rating: ServiceQualityRating, averagePct: number): string {
   const year = rating.sources[0].sourceYear;
   const count = rating.sources.length;
-  const header = `Ø ${Math.round(averagePct)}% aus ${count} Quelle${count === 1 ? "" : "n"} (${year})`;
+  const header = `${formatServiceQualityPct(averagePct)} aus ${count} Quelle${count === 1 ? "" : "n"} (${year})`;
   const lines = rating.sources.map((s) => `${s.sourceName}: ${s.rawScore.toFixed(1)}/${s.scaleMax}`);
   return [header, ...lines].join("\n");
 }

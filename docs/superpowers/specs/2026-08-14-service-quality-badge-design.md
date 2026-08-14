@@ -3,6 +3,20 @@
 **Date:** 2026-08-14
 **Status:** Approved
 
+> **Note (added during a later fix wave):** read this doc alongside the
+> [implementation plan](../plans/2026-08-14-service-quality-badge.md), which supersedes
+> parts of it with real verified data:
+> (a) the Groupe Mutuel duplication guidance below turned out not to be needed — real
+> data showed sub-brands (Avenir Assurance, Philos Assurance, etc.) are rated
+> independently by bonus.ch, each with its own entry, no duplication;
+> (b) the "Open Items" section below was resolved during plan-writing with real,
+> verified source figures, not left open at implementation time;
+> (c) **as of this fix wave, the design also requires at least 2 independent sources per
+> badge** — a policy added after a final whole-branch review found that insurers with
+> only a single, undisclosed-methodology, conflicted source (bonus.ch) were showing
+> misleadingly higher badges than insurers rated by multiple independent surveys. See
+> the plan and `src/data/serviceQuality.ts`'s header comment for the full reasoning.
+
 ## Problem
 
 The member-count badge design ([2026-08-14-member-count-badge-design.md](2026-08-14-member-count-badge-design.md))
