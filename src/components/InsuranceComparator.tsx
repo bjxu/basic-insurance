@@ -318,7 +318,7 @@ export function InsuranceComparator() {
         </a>
         ,{" "}
         <a
-          href="https://www.bonus.ch/Krankenkasse/Vergleich/Krankenkassenpraemie.aspx"
+          href="https://www.bonus.ch/Krankenkasse/Note/KPT-CPT-Kundenzufriedenheitsumfrage.aspx"
           target="_blank"
           rel="noopener noreferrer"
           className="underline hover:text-on-surface-variant"

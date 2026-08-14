@@ -15,13 +15,17 @@
 // adds the 5 that were missing (CSS, KPT, Sympany, Groupe Mutuel, Assura).
 //
 // Groupe Mutuel's sub-brands (Avenir Assurance, Philos Assurance, AMB Assurances,
-// Mutuel Assurance — BAG codes 343/1535/1507/1479) are rated independently by bonus.ch —
-// there's still no single BAG code for "Groupe Mutuel" as a whole. moneyland's
-// brand-level 7.4 is applied to Avenir (343) and Philos (1535), the two sub-brands that
-// already carry their own bonus.ch score — each now has 2 independent sources and
-// requalifies under the >=2-source policy below. AMB (1507) and Mutuel Assurance (1479)
-// have no other source, so a moneyland-only entry for either would still fail that
-// policy — they're not added.
+// Mutuel Assurance — BAG codes 343/1535/1507/1479) don't share a single BAG code for
+// "Groupe Mutuel" as a whole, so each is tracked as its own entry. comparis.ch rates
+// three of them independently (Avenir/Philos/Mutuel Assurance, all 4.8 — apparently
+// comparis scores the group once and applies it to each sub-brand it lists, rather than
+// three genuinely distinct measurements); bonus.ch rates two (Avenir/Philos, not Mutuel
+// Assurance); moneyland.ch rates the brand as a single 7.4 figure, applied here to
+// whichever sub-brand already has at least one other real per-entity score (Avenir,
+// Philos, Mutuel Assurance). AMB Assurances (1507) has no score from any of the three
+// sources — not even a name match on comparis or bonus.ch's rated/unrated lists — so it
+// has no entry; extending moneyland's brand-level figure to it alone, with zero
+// corroboration, isn't the same situation as the other three.
 //
 // Policy: a badge requires at least 2 independent sources. A final whole-branch review
 // (2026-08-14) found 5 insurers relying on bonus.ch as their SOLE source — Avenir
@@ -34,6 +38,12 @@
 // design doc) — the same "too conflicted to use alone" problem the design spec already
 // used to reject the HSLU/IFZ source. Requiring >=2 independent sources means no single
 // conflicted/undisclosed source can, by itself, produce a badge.
+//
+// Update (2026-08-14, from a direct screenshot of comparis's own results table): 3 of
+// the 5 originally-removed insurers have since requalified — comparis rates Avenir
+// (343), Philos (1535), and Agrisano (1560) too, giving each a 2nd/3rd independent
+// source. sodalis (941) and Galenos (1386) don't appear on comparis's table either, so
+// they remain excluded (bonus.ch-only, still 1 source).
 
 import type { ServiceQualityRating } from "@/lib/types";
 
@@ -58,7 +68,7 @@ const BONUS_CH_2026 = {
   sourceName: "bonus.ch",
   scaleMax: 6,
   sourceYear: 2026,
-  sourceUrl: "https://www.bonus.ch/Krankenkasse/Vergleich/Krankenkassenpraemie.aspx",
+  sourceUrl: "https://www.bonus.ch/Krankenkasse/Note/KPT-CPT-Kundenzufriedenheitsumfrage.aspx",
 } as const;
 
 export const SERVICE_QUALITY_RATINGS: ServiceQualityRating[] = [
@@ -66,16 +76,18 @@ export const SERVICE_QUALITY_RATINGS: ServiceQualityRating[] = [
   { insurerCode: "32", sources: [{ ...COMPARIS_2026, rawScore: 5.0 }, { ...BONUS_CH_2026, rawScore: 5.4 }] }, // Aquilana
   { insurerCode: "290", sources: [{ ...MONEYLAND_2026, rawScore: 7.9 }, { ...COMPARIS_2026, rawScore: 5.0 }, { ...BONUS_CH_2026, rawScore: 5.2 }] }, // Concordia
   { insurerCode: "312", sources: [{ ...MONEYLAND_2026, rawScore: 7.9 }, { ...COMPARIS_2026, rawScore: 4.9 }, { ...BONUS_CH_2026, rawScore: 5.2 }] }, // Atupri
-  { insurerCode: "343", sources: [{ ...MONEYLAND_2026, rawScore: 7.4 }, { ...BONUS_CH_2026, rawScore: 5.2 }] }, // Avenir Assurance (Groupe Mutuel)
+  { insurerCode: "343", sources: [{ ...MONEYLAND_2026, rawScore: 7.4 }, { ...COMPARIS_2026, rawScore: 4.8 }, { ...BONUS_CH_2026, rawScore: 5.2 }] }, // Avenir Assurance (Groupe Mutuel)
   { insurerCode: "376", sources: [{ ...MONEYLAND_2026, rawScore: 7.8 }, { ...COMPARIS_2026, rawScore: 5.0 }, { ...BONUS_CH_2026, rawScore: 5.1 }] }, // KPT
   { insurerCode: "455", sources: [{ ...MONEYLAND_2026, rawScore: 8.0 }, { ...COMPARIS_2026, rawScore: 5.1 }, { ...BONUS_CH_2026, rawScore: 5.3 }] }, // ÖKK
   { insurerCode: "509", sources: [{ ...MONEYLAND_2026, rawScore: 7.5 }, { ...COMPARIS_2026, rawScore: 4.9 }, { ...BONUS_CH_2026, rawScore: 5.2 }] }, // Sympany
   { insurerCode: "881", sources: [{ ...COMPARIS_2026, rawScore: 5.0 }, { ...BONUS_CH_2026, rawScore: 5.3 }] }, // EGK
   { insurerCode: "1384", sources: [{ ...MONEYLAND_2026, rawScore: 8.0 }, { ...COMPARIS_2026, rawScore: 5.1 }, { ...BONUS_CH_2026, rawScore: 5.4 }] }, // Swica
+  { insurerCode: "1479", sources: [{ ...MONEYLAND_2026, rawScore: 7.4 }, { ...COMPARIS_2026, rawScore: 4.8 }] }, // Mutuel Assurance (Groupe Mutuel)
   { insurerCode: "1509", sources: [{ ...MONEYLAND_2026, rawScore: 8.0 }, { ...COMPARIS_2026, rawScore: 5.0 }, { ...BONUS_CH_2026, rawScore: 5.2 }] }, // Sanitas
-  { insurerCode: "1535", sources: [{ ...MONEYLAND_2026, rawScore: 7.4 }, { ...BONUS_CH_2026, rawScore: 5.2 }] }, // Philos Assurance (Groupe Mutuel)
+  { insurerCode: "1535", sources: [{ ...MONEYLAND_2026, rawScore: 7.4 }, { ...COMPARIS_2026, rawScore: 4.8 }, { ...BONUS_CH_2026, rawScore: 5.2 }] }, // Philos Assurance (Groupe Mutuel)
   { insurerCode: "1542", sources: [{ ...MONEYLAND_2026, rawScore: 7.2 }, { ...COMPARIS_2026, rawScore: 4.7 }, { ...BONUS_CH_2026, rawScore: 4.9 }] }, // Assura
   { insurerCode: "1555", sources: [{ ...MONEYLAND_2026, rawScore: 7.9 }, { ...COMPARIS_2026, rawScore: 5.0 }, { ...BONUS_CH_2026, rawScore: 5.2 }] }, // Visana
+  { insurerCode: "1560", sources: [{ ...COMPARIS_2026, rawScore: 4.8 }, { ...BONUS_CH_2026, rawScore: 5.2 }] }, // Agrisano
   { insurerCode: "1562", sources: [{ ...MONEYLAND_2026, rawScore: 8.0 }, { ...COMPARIS_2026, rawScore: 5.1 }, { ...BONUS_CH_2026, rawScore: 5.2 }] }, // Helsana
   { insurerCode: "1568", sources: [{ ...COMPARIS_2026, rawScore: 5.0 }, { ...BONUS_CH_2026, rawScore: 5.2 }] }, // sana24
 ];
