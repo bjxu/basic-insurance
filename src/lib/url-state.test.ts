@@ -10,27 +10,33 @@ const BASE_STATE: ComparisonState = {
   unfalldeckung: true,
   models: ["standard"],
   currentInsurerCode: "8",
-  currentFranchise: 300,
-  currentTarifart: "telmed",
-  currentTarifCode: "01_016",
-  currentUnfalldeckung: true,
+  currentMonthlyPremium: 350.5,
 };
 
-describe("encodeState / decodeState — currentTarifCode round-trip", () => {
-  it("encodes currentTarifCode as the ct param", () => {
+describe("encodeState / decodeState — currentMonthlyPremium round-trip", () => {
+  it("encodes currentMonthlyPremium as the cp param", () => {
     const params = encodeState(BASE_STATE);
-    expect(params.get("ct")).toBe("01_016");
+    expect(params.get("cp")).toBe("350.5");
   });
 
-  it("decodes ct back into currentTarifCode", () => {
+  it("decodes cp back into currentMonthlyPremium", () => {
     const params = encodeState(BASE_STATE);
     const decoded = decodeState(params);
-    expect(decoded.currentTarifCode).toBe("01_016");
+    expect(decoded.currentMonthlyPremium).toBe(350.5);
   });
 
-  it("omits ct when currentTarifCode is null, and decodes its absence as null", () => {
-    const params = encodeState({ ...BASE_STATE, currentTarifCode: null });
-    expect(params.has("ct")).toBe(false);
-    expect(decodeState(params).currentTarifCode).toBeNull();
+  it("omits cp when currentMonthlyPremium is null, and decodes its absence as null", () => {
+    const params = encodeState({ ...BASE_STATE, currentMonthlyPremium: null });
+    expect(params.has("cp")).toBe(false);
+    expect(decodeState(params).currentMonthlyPremium).toBeNull();
+  });
+
+  it("rejects a zero or negative cp value on decode (defensive — REQ-13)", () => {
+    expect(decodeState(new URLSearchParams("cp=0")).currentMonthlyPremium).toBeNull();
+    expect(decodeState(new URLSearchParams("cp=-5")).currentMonthlyPremium).toBeNull();
+  });
+
+  it("rejects a non-numeric cp value on decode", () => {
+    expect(decodeState(new URLSearchParams("cp=abc")).currentMonthlyPremium).toBeNull();
   });
 });
