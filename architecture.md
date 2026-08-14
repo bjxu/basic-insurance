@@ -160,10 +160,8 @@ All comparison state lives in `URLSearchParams` (REQ-11). No global state store
 | `year` | number | `2026` |
 | `acc` | `0\|1` | `1` (accident coverage included) |
 | `models` | comma-list | `standard,hmo` |
-| `ci` | string | BAG insurer code |
-| `cf` | number | current franchise |
-| `cm` | Tarifart | current model |
-| `ca` | `0\|1` | current accident coverage |
+| `ci` | string | current insurer's BAG code |
+| `cp` | number | current monthly premium, CHF, self-reported |
 
 On every input change, `encodeState()` pushes a new history entry via
 `router.replace()` (not `push()`) to avoid polluting back-button history with every
@@ -194,16 +192,21 @@ cheapestPerInsurer(rows)
 sortPlans(rows)
   → PremiumRow[]  // price asc, ties alpha by insurer name
 
-findCurrentPlan(rows, { insurerCode, franchise, tarifart, unfalldeckung, praemienregionId, altersklasse, year })
-  → PremiumRow | null
+standardPremiumsByInsurer(rows, { praemienregionId, altersklasse, franchise, unfalldeckung, year })
+  → Map<insurerCode, monthlyPremium>  // Standard-tarifart baseline for the discount badge (REQ-23)
 
-computeHeadline(current: PremiumRow | null, cheapest: PremiumRow | null, currentPlanProvided: boolean)
+discountVsStandardPct(standardPremium: number | undefined, premium: number)
+  → number | null
+
+computeHeadline(current: SelfReportedPlan | null, cheapest: PremiumRow | null)
   → HeadlineState
 ```
 
-The pipeline for each render is: `filterPlans → cheapestPerInsurer → sortPlans`.
-`findCurrentPlan` runs against the **unfiltered** set (all models, both accident-coverage
-variants) so the current plan is always findable regardless of active filters.
+The current-plan premium is self-reported by the user (requirement.md §5.1) —
+`computeHeadline` compares it directly against the filtered `cheapest` row, with no
+dataset lookup/matching step. `standardPremiumsByInsurer` runs its own
+`filterPlans → cheapestPerInsurer` pass restricted to `models: ["standard"]`,
+independent of whichever models are currently toggled into the main results list.
 
 Age band is computed by `ageband.ts`:
 
