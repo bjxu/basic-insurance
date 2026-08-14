@@ -13,10 +13,10 @@ export function Headline({ headline, year }: Props) {
         <span className="text-xl" aria-hidden>💡</span>
         <p className="text-sm text-on-success-container">
           <strong className="block text-base font-bold text-on-surface mb-0.5">
-            Wenn du nichts tust: {formatChf(headline.current.monthlyPremium)}/Monat {year} bei{" "}
+            Wenn du nichts tust: {formatChf(headline.current.monthlyPremium)}/Monat bei{" "}
             {headline.current.insurerName}.
           </strong>
-          Günstigstes Angebot für dein Profil: {formatChf(headline.cheapest.monthlyPremium)}/Monat bei{" "}
+          Günstigstes Angebot für dein Profil {year}: {formatChf(headline.cheapest.monthlyPremium)}/Monat bei{" "}
           {headline.cheapest.insurerName} —{" "}
           <span className="text-success font-bold">
             spare {formatChf(headline.savingsPerYear)}/Jahr durch einen Wechsel.
@@ -34,21 +34,9 @@ export function Headline({ headline, year }: Props) {
           <strong className="block text-base font-bold text-on-surface mb-0.5">
             Du hast bereits das günstigste Angebot für dein Profil.
           </strong>
-          {headline.current.insurerName} · {formatChf(headline.current.monthlyPremium)}/Monat {year}.
+          {headline.current.insurerName} · {formatChf(headline.current.monthlyPremium)}/Monat.
         </p>
       </div>
-    );
-  }
-
-  if (headline.kind === "current-plan-not-found") {
-    return (
-      <>
-        <div className="rounded-lg p-3 text-sm text-on-warning-container bg-warning-container border border-warning-container mb-2">
-          <strong>Aktuelle Kasse nicht gefunden.</strong> Der angegebene Plan wurde in den BAG-Daten für
-          deine Region nicht gefunden. Das günstigste verfügbare Angebot wird angezeigt.
-        </div>
-        {headline.cheapest && <CheapestOnly cheapest={headline.cheapest} />}
-      </>
     );
   }
 
