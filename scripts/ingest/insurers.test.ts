@@ -17,4 +17,12 @@ describe("buildInsurersJson", () => {
       { insurerCode: "8", insurerName: "CSS" },
     ]);
   });
+
+  it("adds memberCount when the map has a match, omits the key when it doesn't", () => {
+    const result = buildInsurersJson({ "32": "Aquilana", "8": "CSS" }, { "8": 1537730 });
+    expect(result).toEqual([
+      { insurerCode: "32", insurerName: "Aquilana" },
+      { insurerCode: "8", insurerName: "CSS", memberCount: 1537730 },
+    ]);
+  });
 });

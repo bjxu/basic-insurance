@@ -1,3 +1,5 @@
+import type { Insurer } from "../../src/lib/types";
+
 //
 // Seed insurer code → display name lookup (requirement.md §6.1, architecture.md §3.2).
 // The premium CSV only carries the numeric `Versicherer` code, not a name, and BAG
@@ -46,8 +48,12 @@ export const INSURER_NAMES: Record<string, string> = {
 
 export function buildInsurersJson(
   names: Record<string, string> = INSURER_NAMES,
-): { insurerCode: string; insurerName: string }[] {
+  memberCounts: Record<string, number> = {},
+): Insurer[] {
   return Object.entries(names)
-    .map(([insurerCode, insurerName]) => ({ insurerCode, insurerName }))
+    .map(([insurerCode, insurerName]): Insurer => {
+      const memberCount = memberCounts[insurerCode];
+      return memberCount != null ? { insurerCode, insurerName, memberCount } : { insurerCode, insurerName };
+    })
     .sort((a, b) => a.insurerName.localeCompare(b.insurerName, "de-CH"));
 }
