@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { validatePlz, validateBirthYear } from "@/lib/validate";
+import { validatePlz, validateBirthYear, validateCurrentPremium } from "@/lib/validate";
 
 describe("validatePlz", () => {
   it("accepts a valid 4-digit PLZ", () => {
@@ -23,5 +23,19 @@ describe("validateBirthYear", () => {
   });
   it("rejects an implausibly old birth year", () => {
     expect(validateBirthYear(currentYear - 150).valid).toBe(false);
+  });
+});
+
+describe("validateCurrentPremium", () => {
+  it("accepts a positive premium", () => {
+    expect(validateCurrentPremium(350.5).valid).toBe(true);
+  });
+  it("rejects non-finite values", () => {
+    expect(validateCurrentPremium(NaN).valid).toBe(false);
+    expect(validateCurrentPremium(Infinity).valid).toBe(false);
+  });
+  it("rejects zero or negative values", () => {
+    expect(validateCurrentPremium(0).valid).toBe(false);
+    expect(validateCurrentPremium(-5).valid).toBe(false);
   });
 });

@@ -13,10 +13,7 @@ export type ComparisonState = {
   unfalldeckung: boolean;
   models: Tarifart[];
   currentInsurerCode: string | null;
-  currentFranchise: number | null;
-  currentTarifart: Tarifart | null;
-  currentTarifCode: string | null;
-  currentUnfalldeckung: boolean | null;
+  currentMonthlyPremium: number | null;
 };
 
 const VALID_TARIFARTEN: Tarifart[] = ["standard", "hmo", "hausarzt", "telmed", "andere"];
@@ -31,10 +28,9 @@ export function encodeState(state: ComparisonState): URLSearchParams {
   params.set("acc", state.unfalldeckung ? "1" : "0");
   if (state.models.length) params.set("models", state.models.join(","));
   if (state.currentInsurerCode) params.set("ci", state.currentInsurerCode);
-  if (state.currentFranchise != null) params.set("cf", String(state.currentFranchise));
-  if (state.currentTarifart) params.set("cm", state.currentTarifart);
-  if (state.currentTarifCode) params.set("ct", state.currentTarifCode);
-  if (state.currentUnfalldeckung != null) params.set("ca", state.currentUnfalldeckung ? "1" : "0");
+  if (state.currentMonthlyPremium != null) {
+    params.set("cp", String(Math.round(state.currentMonthlyPremium * 100) / 100));
+  }
   return params;
 }
 
@@ -45,10 +41,7 @@ export function decodeState(params: URLSearchParams): ComparisonState {
   const franRaw = params.get("fran");
   const yearRaw = params.get("year");
   const modelsRaw = params.get("models");
-  const cfRaw = params.get("cf");
-  const cmRaw = params.get("cm");
-  const ctRaw = params.get("ct");
-  const caRaw = params.get("ca");
+  const cpRaw = params.get("cp");
 
   return {
     plz: plz && /^\d{4}$/.test(plz) ? plz : null,
@@ -61,9 +54,6 @@ export function decodeState(params: URLSearchParams): ComparisonState {
       ? (modelsRaw.split(",").filter((m): m is Tarifart => VALID_TARIFARTEN.includes(m as Tarifart)))
       : ["standard"],
     currentInsurerCode: params.get("ci") || null,
-    currentFranchise: cfRaw && /^\d+$/.test(cfRaw) ? Number(cfRaw) : null,
-    currentTarifart: cmRaw && VALID_TARIFARTEN.includes(cmRaw as Tarifart) ? (cmRaw as Tarifart) : null,
-    currentTarifCode: ctRaw || null,
-    currentUnfalldeckung: caRaw === "0" || caRaw === "1" ? caRaw === "1" : null,
+    currentMonthlyPremium: cpRaw && /^\d+(\.\d{1,2})?$/.test(cpRaw) && Number(cpRaw) > 0 ? Number(cpRaw) : null,
   };
 }

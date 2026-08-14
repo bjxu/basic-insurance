@@ -37,14 +37,19 @@ export type Metadata = {
 
 export type CurrentPlan = {
   insurerCode: string;
-  franchise: number;
-  tarifart: Tarifart;
-  unfalldeckung: boolean;
-  tarifCode?: string; // set once the user picks a specific product, if disambiguation was needed
+  monthlyPremium: number; // CHF, self-reported by the user — not matched against the dataset (requirement.md Core Principle #3)
+};
+
+// The current-plan side of the headline comparison — deliberately narrower than
+// PremiumRow (no region/franchise/tarifart/etc.) since it's a self-reported figure,
+// not a matched dataset row (requirement.md §5.1).
+export type SelfReportedPlan = {
+  insurerCode: string;
+  insurerName: string;
+  monthlyPremium: number;
 };
 
 export type HeadlineState =
-  | { kind: "savings"; current: PremiumRow; cheapest: PremiumRow; savingsPerYear: number }
-  | { kind: "already-cheapest"; current: PremiumRow }
-  | { kind: "no-current-plan"; cheapest: PremiumRow | null }
-  | { kind: "current-plan-not-found"; cheapest: PremiumRow | null };
+  | { kind: "savings"; current: SelfReportedPlan; cheapest: PremiumRow; savingsPerYear: number }
+  | { kind: "already-cheapest"; current: SelfReportedPlan; cheapest: PremiumRow | null }
+  | { kind: "no-current-plan"; cheapest: PremiumRow | null };

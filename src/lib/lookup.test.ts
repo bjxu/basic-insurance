@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { filterPlans, cheapestPerInsurer, sortPlans, findCurrentPlan, findMatchingProducts, computeHeadline } from "@/lib/lookup";
-import type { PremiumRow } from "@/lib/types";
+import { filterPlans, cheapestPerInsurer, sortPlans, computeHeadline, standardPremiumsByInsurer, discountVsStandardPct } from "@/lib/lookup";
+import type { PremiumRow, SelfReportedPlan } from "@/lib/types";
 
 const ROWS: PremiumRow[] = [
   { year: 2026, insurerCode: "A", insurerName: "Assura", praemienregionId: "ZH-1", altersklasse: "erwachsen", franchise: 500, unfalldeckung: true, tarifart: "standard", monthlyPremium: 301.1, tarifCode: "A-STD", productName: "Grundversicherung" },
@@ -10,6 +10,8 @@ const ROWS: PremiumRow[] = [
   { year: 2026, insurerCode: "C", insurerName: "Helsana", praemienregionId: "ZH-1", altersklasse: "erwachsen", franchise: 500, unfalldeckung: true, tarifart: "hmo", monthlyPremium: 362.1, tarifCode: "C-HMO", productName: "Helsana HMO" },
   // Different region — should be filtered out.
   { year: 2026, insurerCode: "D", insurerName: "Visana", praemienregionId: "BE-1", altersklasse: "erwachsen", franchise: 500, unfalldeckung: true, tarifart: "standard", monthlyPremium: 100, tarifCode: "D-STD", productName: "Grundversicherung" },
+  // No Standard row for insurer E — the "no baseline" case for the discount helpers.
+  { year: 2026, insurerCode: "E", insurerName: "NoStandardKasse", praemienregionId: "ZH-1", altersklasse: "erwachsen", franchise: 500, unfalldeckung: true, tarifart: "hmo", monthlyPremium: 200, tarifCode: "E-HMO", productName: "NoStandardKasse HMO" },
 ];
 
 describe("filterPlans", () => {
@@ -41,7 +43,7 @@ describe("cheapestPerInsurer", () => {
     const helsana = result.find((r) => r.insurerCode === "C");
     expect(sanitas?.tarifart).toBe("telmed"); // cheaper than Sanitas Standard
     expect(helsana?.tarifart).toBe("hmo"); // cheaper than Helsana Standard
-    expect(result).toHaveLength(3);
+    expect(result).toHaveLength(4);
   });
 });
 
@@ -64,98 +66,44 @@ describe("sortPlans", () => {
   });
 });
 
-describe("findMatchingProducts", () => {
-  it("returns every row matching the core fields, regardless of product", () => {
-    const rowsWithDuplicateProduct: PremiumRow[] = [
-      ...ROWS,
-      { ...ROWS[2], tarifCode: "B-STD-2", productName: "Sanitas Alternative Grundversicherung", monthlyPremium: 295.0 },
-    ];
-    const found = findMatchingProducts(rowsWithDuplicateProduct, {
-      insurerCode: "B",
-      franchise: 500,
-      tarifart: "standard",
-      unfalldeckung: true,
+describe("standardPremiumsByInsurer", () => {
+  it("maps each insurer to its Standard premium at the given filter context", () => {
+    const result = standardPremiumsByInsurer(ROWS, {
       praemienregionId: "ZH-1",
       altersklasse: "erwachsen",
+      franchise: 500,
+      unfalldeckung: true,
       year: 2026,
     });
-    expect(found.map((r) => r.tarifCode).sort()).toEqual(["B-STD", "B-STD-2"]);
+    expect(result.get("A")).toBe(301.1);
+    expect(result.get("B")).toBe(290.0);
+    expect(result.get("C")).toBe(412.4);
   });
 
-  it("returns an empty array when nothing matches the core fields", () => {
-    const found = findMatchingProducts(ROWS, {
-      insurerCode: "UNKNOWN",
-      franchise: 500,
-      tarifart: "standard",
-      unfalldeckung: true,
+  it("omits insurers with no Standard row in that context (REQ-23 defensive case)", () => {
+    const result = standardPremiumsByInsurer(ROWS, {
       praemienregionId: "ZH-1",
       altersklasse: "erwachsen",
+      franchise: 500,
+      unfalldeckung: true,
       year: 2026,
     });
-    expect(found).toEqual([]);
+    expect(result.has("E")).toBe(false);
   });
 });
 
-describe("findCurrentPlan", () => {
-  it("resolves automatically when the core fields match exactly one row", () => {
-    const found = findCurrentPlan(ROWS, {
-      insurerCode: "C",
-      franchise: 500,
-      tarifart: "standard",
-      unfalldeckung: true,
-      praemienregionId: "ZH-1",
-      altersklasse: "erwachsen",
-      year: 2026,
-    });
-    expect(found?.monthlyPremium).toBe(412.4);
+describe("discountVsStandardPct", () => {
+  it("computes the percentage discount vs. the Standard baseline", () => {
+    expect(discountVsStandardPct(400, 300)).toBeCloseTo(25);
   });
 
-  it("returns null when no exact match exists", () => {
-    const found = findCurrentPlan(ROWS, {
-      insurerCode: "UNKNOWN",
-      franchise: 500,
-      tarifart: "standard",
-      unfalldeckung: true,
-      praemienregionId: "ZH-1",
-      altersklasse: "erwachsen",
-      year: 2026,
-    });
-    expect(found).toBeNull();
+  it("returns null when there's no Standard baseline", () => {
+    expect(discountVsStandardPct(undefined, 300)).toBeNull();
   });
 
-  it("returns null (ambiguous) when the core fields match multiple products and no tarifCode was given", () => {
-    const rowsWithDuplicateProduct: PremiumRow[] = [
-      ...ROWS,
-      { ...ROWS[2], tarifCode: "B-STD-2", productName: "Sanitas Alternative Grundversicherung", monthlyPremium: 295.0 },
-    ];
-    const found = findCurrentPlan(rowsWithDuplicateProduct, {
-      insurerCode: "B",
-      franchise: 500,
-      tarifart: "standard",
-      unfalldeckung: true,
-      praemienregionId: "ZH-1",
-      altersklasse: "erwachsen",
-      year: 2026,
-    });
-    expect(found).toBeNull();
-  });
-
-  it("resolves to the exact product when tarifCode is given, even among ambiguous candidates", () => {
-    const rowsWithDuplicateProduct: PremiumRow[] = [
-      ...ROWS,
-      { ...ROWS[2], tarifCode: "B-STD-2", productName: "Sanitas Alternative Grundversicherung", monthlyPremium: 295.0 },
-    ];
-    const found = findCurrentPlan(rowsWithDuplicateProduct, {
-      insurerCode: "B",
-      franchise: 500,
-      tarifart: "standard",
-      unfalldeckung: true,
-      tarifCode: "B-STD-2",
-      praemienregionId: "ZH-1",
-      altersklasse: "erwachsen",
-      year: 2026,
-    });
-    expect(found?.monthlyPremium).toBe(295.0);
+  it("returns null when the Standard baseline is zero or negative (defensive)", () => {
+    expect(discountVsStandardPct(0, 300)).toBeNull();
+    expect(discountVsStandardPct(-10, 300)).toBeNull();
   });
 });
 
@@ -163,31 +111,39 @@ describe("computeHeadline", () => {
   const cheapest = ROWS[1]; // Sanitas telmed 221.80
 
   it("returns no-current-plan when none provided", () => {
-    expect(computeHeadline(null, cheapest, false)).toEqual({ kind: "no-current-plan", cheapest });
+    expect(computeHeadline(null, cheapest)).toEqual({ kind: "no-current-plan", cheapest });
   });
 
-  it("returns current-plan-not-found when a plan was provided but not matched", () => {
-    expect(computeHeadline(null, cheapest, true)).toEqual({ kind: "current-plan-not-found", cheapest });
+  it("returns no-current-plan (with no cheapest) when neither is available", () => {
+    expect(computeHeadline(null, null)).toEqual({ kind: "no-current-plan", cheapest: null });
   });
 
-  it("returns savings when current plan is pricier than cheapest", () => {
-    const current = ROWS[3]; // Helsana standard 412.40
-    const result = computeHeadline(current, cheapest, true);
+  it("returns savings when the self-reported premium is pricier than cheapest", () => {
+    const current: SelfReportedPlan = { insurerCode: "C", insurerName: "Helsana", monthlyPremium: 412.4 };
+    const result = computeHeadline(current, cheapest);
     expect(result.kind).toBe("savings");
     if (result.kind === "savings") {
       expect(result.savingsPerYear).toBeCloseTo((412.4 - 221.8) * 12);
     }
   });
 
-  it("returns already-cheapest when current plan equals the cheapest", () => {
-    const result = computeHeadline(cheapest, cheapest, true);
+  it("returns already-cheapest when the self-reported premium equals the cheapest", () => {
+    const current: SelfReportedPlan = { insurerCode: "B", insurerName: "Sanitas", monthlyPremium: cheapest.monthlyPremium };
+    const result = computeHeadline(current, cheapest);
     expect(result.kind).toBe("already-cheapest");
+    if (result.kind === "already-cheapest") {
+      expect(result.cheapest).toBe(cheapest);
+    }
   });
 
-  it("returns already-cheapest (not savings) when current is strictly cheaper than the filtered cheapest", () => {
-    // findCurrentPlan runs unfiltered, so this can legitimately happen (REQ-10).
-    const cheaperThanCheapest: PremiumRow = { ...cheapest, monthlyPremium: cheapest.monthlyPremium - 10 };
-    const result = computeHeadline(cheaperThanCheapest, cheapest, true);
+  it("returns already-cheapest (not savings) when the self-reported premium is strictly cheaper than the filtered cheapest", () => {
+    // The self-reported premium isn't filtered by model/region at all — it's just a
+    // number the user typed in — so it can legitimately undercut the filtered cheapest (REQ-10).
+    const current: SelfReportedPlan = { insurerCode: "Z", insurerName: "SomeInsurer", monthlyPremium: cheapest.monthlyPremium - 10 };
+    const result = computeHeadline(current, cheapest);
     expect(result.kind).toBe("already-cheapest");
+    if (result.kind === "already-cheapest") {
+      expect(result.cheapest).toBe(cheapest);
+    }
   });
 });

@@ -12,6 +12,16 @@ export function validatePlz(raw: string): ValidationResult {
   return { valid: true };
 }
 
+export function validateCurrentPremium(raw: number): ValidationResult {
+  if (!Number.isFinite(raw)) {
+    return { valid: false, message: "Bitte eine gültige monatliche Prämie eingeben." };
+  }
+  if (raw <= 0) {
+    return { valid: false, message: "Die monatliche Prämie muss grösser als CHF 0 sein." };
+  }
+  return { valid: true };
+}
+
 export function validateBirthYear(raw: number): ValidationResult {
   if (!Number.isInteger(raw)) {
     return { valid: false, message: "Bitte einen gültigen Jahrgang eingeben." };

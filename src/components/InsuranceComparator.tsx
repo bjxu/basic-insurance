@@ -12,9 +12,10 @@ import { PlanList } from "./results/PlanList";
 import { EmptyState } from "./results/EmptyState";
 import { getAltersklasse, getFranchiseTiers } from "@/lib/ageband";
 import { resolveGemeinden, needsDisambiguation } from "@/lib/location";
-import { filterPlans, cheapestPerInsurer, sortPlans, findCurrentPlan, findMatchingProducts, computeHeadline } from "@/lib/lookup";
+import { filterPlans, cheapestPerInsurer, sortPlans, computeHeadline, standardPremiumsByInsurer } from "@/lib/lookup";
 import { encodeState, decodeState } from "@/lib/url-state";
-import type { CurrentPlan, Tarifart } from "@/lib/types";
+import { validateCurrentPremium } from "@/lib/validate";
+import type { CurrentPlan, SelfReportedPlan, Tarifart } from "@/lib/types";
 
 import insurersData from "@/data/insurers.json";
 import metadata from "@/data/metadata.json";
@@ -38,10 +39,7 @@ export function InsuranceComparator() {
   const [altModelsActive, setAltModelsActive] = useState(initial.models.length > 1);
   const [currentPlan, setCurrentPlan] = useState<Partial<CurrentPlan>>({
     insurerCode: initial.currentInsurerCode ?? undefined,
-    franchise: initial.currentFranchise ?? undefined,
-    tarifart: initial.currentTarifart ?? undefined,
-    tarifCode: initial.currentTarifCode ?? undefined,
-    unfalldeckung: initial.currentUnfalldeckung ?? undefined,
+    monthlyPremium: initial.currentMonthlyPremium ?? undefined,
   });
   const [premiumsByYear, setPremiumsByYear] = useState<Record<number, PremiumRow[]>>({});
   const [premiumsLoading, setPremiumsLoading] = useState(false);
@@ -55,7 +53,6 @@ export function InsuranceComparator() {
 
   const parsedBirthYear = birthYear ? Number(birthYear) : null;
   const altersklasse = parsedBirthYear ? getAltersklasse(parsedBirthYear, year) : null;
-  const franchiseTiers = altersklasse ? getFranchiseTiers(altersklasse) : [];
 
   // A PLZ edit invalidates any previously-picked Gemeinde from a different PLZ (bug fix:
   // without this, bfsNr could point at a Gemeinde not in the new PLZ's list, silently
@@ -116,10 +113,7 @@ export function InsuranceComparator() {
       unfalldeckung,
       models: altModelsActive ? ALT_MODELS : ["standard"],
       currentInsurerCode: currentPlan.insurerCode ?? null,
-      currentFranchise: currentPlan.franchise ?? null,
-      currentTarifart: currentPlan.tarifart ?? null,
-      currentTarifCode: currentPlan.tarifCode ?? null,
-      currentUnfalldeckung: currentPlan.unfalldeckung ?? null,
+      currentMonthlyPremium: currentPlan.monthlyPremium ?? null,
     });
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -127,40 +121,13 @@ export function InsuranceComparator() {
 
   const inputsValid = Boolean(praemienregionId && altersklasse && franchise);
 
-  const currentPlanCoreProvided = Boolean(
-    currentPlan.insurerCode && currentPlan.franchise != null && currentPlan.tarifart && currentPlan.unfalldeckung != null,
+  // A current plan is "provided" once both fields are filled with a usable value — no
+  // more dataset-matching/disambiguation step (requirement.md §5.1, REQ-14 removed).
+  const currentPlanProvided = Boolean(
+    currentPlan.insurerCode &&
+      currentPlan.monthlyPremium != null &&
+      validateCurrentPremium(currentPlan.monthlyPremium).valid,
   );
-
-  const currentPlanProductOptions = useMemo(() => {
-    if (!currentPlanCoreProvided || !praemienregionId || !altersklasse) return null;
-    return findMatchingProducts(ALL_PREMIUMS, {
-      insurerCode: currentPlan.insurerCode!,
-      franchise: currentPlan.franchise!,
-      tarifart: currentPlan.tarifart!,
-      unfalldeckung: currentPlan.unfalldeckung!,
-      praemienregionId,
-      altersklasse,
-      year,
-    }).map((r) => ({ tarifCode: r.tarifCode, productName: r.productName }));
-  }, [currentPlanCoreProvided, praemienregionId, altersklasse, year, currentPlan.insurerCode, currentPlan.franchise, currentPlan.tarifart, currentPlan.unfalldeckung, ALL_PREMIUMS]);
-
-  // currentPlan.tarifCode is only valid for the exact combination of insurer/
-  // franchise/model/accident-coverage it was picked under (bug fix: without this,
-  // a stale tarifCode from a since-changed combination could either produce a false
-  // "not found" or, worse, silently resolve to a different, wrong product that
-  // happens to share the same code under a different insurer — see
-  // docs/superpowers/plans/2026-08-12-product-disambiguation-and-bundle-size.md's
-  // final-review fix wave).
-  useEffect(() => {
-    if (ALL_PREMIUMS.length === 0) return;
-    if (
-      currentPlan.tarifCode &&
-      currentPlanProductOptions &&
-      !currentPlanProductOptions.some((o) => o.tarifCode === currentPlan.tarifCode)
-    ) {
-      setCurrentPlan((p) => ({ ...p, tarifCode: undefined }));
-    }
-  }, [currentPlanProductOptions, currentPlan.tarifCode, ALL_PREMIUMS]);
 
   const results = useMemo(() => {
     if (!inputsValid || !praemienregionId || !altersklasse || !franchise || ALL_PREMIUMS.length === 0) return null;
@@ -175,26 +142,25 @@ export function InsuranceComparator() {
     });
     const cheapestRows = sortPlans(cheapestPerInsurer(filtered));
 
-    // A current plan isn't "provided" for headline purposes until any real ambiguity
-    // (>1 matching product, requirement.md §11.2) is resolved by the user's pick.
-    const currentPlanProvided =
-      currentPlanCoreProvided && (currentPlanProductOptions == null || currentPlanProductOptions.length <= 1 || Boolean(currentPlan.tarifCode));
-    const currentRow = currentPlanProvided
-      ? findCurrentPlan(ALL_PREMIUMS, {
+    const standardBaseline = standardPremiumsByInsurer(ALL_PREMIUMS, {
+      praemienregionId,
+      altersklasse,
+      franchise,
+      unfalldeckung,
+      year,
+    });
+
+    const current: SelfReportedPlan | null = currentPlanProvided
+      ? {
           insurerCode: currentPlan.insurerCode!,
-          franchise: currentPlan.franchise!,
-          tarifart: currentPlan.tarifart!,
-          unfalldeckung: currentPlan.unfalldeckung!,
-          tarifCode: currentPlan.tarifCode,
-          praemienregionId,
-          altersklasse,
-          year,
-        })
+          insurerName: INSURERS.find((i) => i.insurerCode === currentPlan.insurerCode)?.insurerName ?? currentPlan.insurerCode!,
+          monthlyPremium: currentPlan.monthlyPremium!,
+        }
       : null;
 
-    const headline = computeHeadline(currentRow, cheapestRows[0] ?? null, currentPlanProvided);
+    const headline = computeHeadline(current, cheapestRows[0] ?? null);
 
-    return { plans: cheapestRows, headline };
+    return { plans: cheapestRows, headline, standardBaseline };
   }, [
     inputsValid,
     praemienregionId,
@@ -204,8 +170,7 @@ export function InsuranceComparator() {
     unfalldeckung,
     year,
     currentPlan,
-    currentPlanCoreProvided,
-    currentPlanProductOptions,
+    currentPlanProvided,
     ALL_PREMIUMS,
   ]);
 
@@ -252,13 +217,7 @@ export function InsuranceComparator() {
           <p className="text-xs text-primary mt-2">&#10003; Gemeinde: {resolvedGemeinde.name}</p>
         )}
 
-        <CurrentPlanSection
-          insurers={INSURERS}
-          franchiseTiers={franchiseTiers.length ? franchiseTiers : [300, 500, 1000, 1500, 2000, 2500]}
-          value={currentPlan}
-          onChange={setCurrentPlan}
-          productOptions={currentPlanProductOptions}
-        />
+        <CurrentPlanSection insurers={INSURERS} value={currentPlan} onChange={setCurrentPlan} />
       </div>
 
       {premiumsLoading && !results && (
@@ -309,7 +268,7 @@ export function InsuranceComparator() {
           </p>
 
           {results.plans.length > 0 ? (
-            <PlanList plans={results.plans} currentInsurerCode={currentPlan.insurerCode ?? null} />
+            <PlanList plans={results.plans} currentInsurerCode={currentPlan.insurerCode ?? null} standardBaseline={results.standardBaseline} />
           ) : (
             <EmptyState message="Für die aktuelle Kombination sind keine Prämien in den BAG-Daten vorhanden. Bitte überprüfe deine Eingaben oder passe die Filter an." />
           )}
