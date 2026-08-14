@@ -1,9 +1,10 @@
 // scripts/ingest/downloadRaw.ts
 //
-// Downloads the two real BAG source files (URLs verified live during planning,
-// 2026-08-11 — see this plan's Global Constraints) into destDir as
-// praemien.csv / praemienregionen.xlsx, matching the filenames scripts/ingest.ts
-// reads under --local.
+// Downloads the three real BAG source files (URLs verified live during planning —
+// praemien.csv and praemienregionen.xlsx on 2026-08-11, versichertenbestand.csv on
+// 2026-08-14 — see this plan's Global Constraints) into destDir as praemien.csv /
+// praemienregionen.xlsx / versichertenbestand.csv, matching the filenames
+// scripts/ingest.ts reads under --local.
 
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
