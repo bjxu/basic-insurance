@@ -1,6 +1,6 @@
 // Pure lookup functions (architecture.md §6). Testable in isolation, no I/O.
 
-import type { CurrentPlan, HeadlineState, PremiumRow, Tarifart } from "./types";
+import type { HeadlineState, PremiumRow, SelfReportedPlan, Tarifart } from "./types";
 
 export type FilterParams = {
   praemienregionId: string;
@@ -60,68 +60,45 @@ export function sortPlans(rows: PremiumRow[]): PremiumRow[] {
   });
 }
 
-/** Every row matching the current-plan's core fields (insurer, franchise, model,
- *  accident coverage, region, age band, year) regardless of product — runs against
- *  the full unfiltered dataset, same rationale as findCurrentPlan below. Used to
- *  detect whether a specific product needs to be asked for (requirement.md §11.2):
- *  BAG sometimes publishes several distinct named products at the same price-relevant
- *  combination (e.g. two different Telmed products), and callers must not guess which
- *  one the user actually has. */
-export function findMatchingProducts(
-  rows: PremiumRow[],
-  plan: Omit<CurrentPlan, "tarifCode"> & { praemienregionId: string; altersklasse: PremiumRow["altersklasse"]; year: number },
-): PremiumRow[] {
-  return rows.filter(
-    (row) =>
-      row.insurerCode === plan.insurerCode &&
-      row.franchise === plan.franchise &&
-      row.tarifart === plan.tarifart &&
-      row.unfalldeckung === plan.unfalldeckung &&
-      row.praemienregionId === plan.praemienregionId &&
-      row.altersklasse === plan.altersklasse &&
-      row.year === plan.year,
-  );
-}
-
-/** Runs against the full unfiltered dataset so the current plan is always findable
- *  regardless of the active model/accident-coverage filters (architecture.md §6).
- *  Resolves to a single row: if plan.tarifCode is given, matches on it too. If not
- *  given, resolves only when the core fields match exactly one product — when they
- *  match zero, that's "not found" (REQ-14); when they match more than one, that's
- *  ambiguous and this returns null too, since guessing which product the user has
- *  would misreport their real premium (requirement.md §11.2). Callers that want to
- *  distinguish "not found" from "ambiguous, ask the user" should call
- *  findMatchingProducts directly. */
-export function findCurrentPlan(
-  rows: PremiumRow[],
-  plan: CurrentPlan & { praemienregionId: string; altersklasse: PremiumRow["altersklasse"]; year: number },
-): PremiumRow | null {
-  const candidates = findMatchingProducts(rows, plan);
-  if (plan.tarifCode != null) {
-    return candidates.find((row) => row.tarifCode === plan.tarifCode) ?? null;
-  }
-  return candidates.length === 1 ? candidates[0] : null;
-}
-
-/** REQ-8/9/10/14: derive which headline variant to render. */
-export function computeHeadline(
-  current: PremiumRow | null,
-  cheapest: PremiumRow | null,
-  currentPlanProvided: boolean,
-): HeadlineState {
-  if (!currentPlanProvided) {
+/** REQ-8/9/10: derive which headline variant to render. `current` is the user's
+ *  self-reported plan (or null if not provided/invalid) — there's no "provided but not
+ *  found in the data" case (REQ-14, removed) since nothing is matched against the
+ *  dataset anymore. */
+export function computeHeadline(current: SelfReportedPlan | null, cheapest: PremiumRow | null): HeadlineState {
+  if (!current) {
     return { kind: "no-current-plan", cheapest };
   }
-  if (!current) {
-    return { kind: "current-plan-not-found", cheapest };
-  }
-  // REQ-10 defines this for the exact-equal case; <= also covers current being
-  // strictly cheaper than the filtered "cheapest" (possible because findCurrentPlan
-  // runs unfiltered, e.g. current uses a model excluded by the active filter) —
-  // without this, that case would fall into "savings" with a negative amount.
+  // REQ-10 defines this for the exact-equal case; <= also covers the self-reported
+  // premium being strictly cheaper than the filtered "cheapest" — it isn't filtered by
+  // model/region at all, it's just a number the user typed in, so it can legitimately
+  // undercut the filtered cheapest. Without this, that case would fall into "savings"
+  // with a negative amount.
   if (!cheapest || current.monthlyPremium <= cheapest.monthlyPremium) {
     return { kind: "already-cheapest", current };
   }
   const savingsPerYear = (current.monthlyPremium - cheapest.monthlyPremium) * 12;
   return { kind: "savings", current, cheapest, savingsPerYear };
+}
+
+/** Map from insurerCode to that insurer's Standard-tarifart monthlyPremium, for the given
+ *  filter context (region/age band/franchise/accident-coverage/year) — the baseline the
+ *  results list's discount badge (REQ-23) compares alternative-model rows against. Built
+ *  from a single filterPlans + cheapestPerInsurer pass (same pipeline as the results list
+ *  itself), independent of which models are currently toggled into view. */
+export function standardPremiumsByInsurer(
+  rows: PremiumRow[],
+  params: Omit<FilterParams, "models">,
+): Map<string, number> {
+  const standardRows = cheapestPerInsurer(filterPlans(rows, { ...params, models: ["standard"] }));
+  return new Map(standardRows.map((r) => [r.insurerCode, r.monthlyPremium]));
+}
+
+/** Discount of `premium` vs. `standardPremium`, as a percentage — the results list's
+ *  "bis zu −X% ggü. Standard" badge (REQ-23). Returns null when there's no Standard
+ *  baseline for this insurer to compare against — not reachable with current BAG data
+ *  (every insurer offers Standard) but handled defensively rather than assumed
+ *  impossible (requirement.md §8). */
+export function discountVsStandardPct(standardPremium: number | undefined, premium: number): number | null {
+  if (standardPremium == null || standardPremium <= 0) return null;
+  return ((standardPremium - premium) / standardPremium) * 100;
 }
