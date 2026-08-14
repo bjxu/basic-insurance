@@ -54,10 +54,12 @@ during implementation:
    phone number, or account creation).
 2. **Pure comparison tool.** No lead generation, no insurer referral links, no switching
    workflow. The app's job ends at giving the user accurate numbers.
-3. **Real data only.** Every premium shown, including the "current plan" premium used in
-   the headline, must trace back to officially published data (BAG / *Bundesamt für
-   Gesundheit* open data) via an exact match on all premium-determining fields. Nothing is
-   estimated, defaulted from an unrelated toggle, or synthesized.
+3. **Real data only.** Every premium shown — the results list, and the discount badges
+   (§5.3) — must trace back to officially published data (BAG / *Bundesamt für Gesundheit*
+   open data) via an exact match on all premium-determining fields. Nothing is estimated,
+   defaulted from an unrelated toggle, or synthesized. The one deliberate exception is the
+   current-plan premium (§5.1): it's what the user says they pay, entered directly and used
+   as-is for the savings comparison, not verified against the dataset — see §5.1 for why.
 4. **Minimal friction.** One page, no wizard, no required navigation between input and
    results, no explicit "submit" step once inputs are valid (§5.1).
 
@@ -82,11 +84,18 @@ The results list (§5.3) recomputes live as soon as all three required fields ar
 there is no separate "Compare"/submit action.
 
 Optional, collapsed by default:
-- **Current plan** — current insurer + current deductible + current insurance model +
-  current accident-coverage status (all four fields; accident coverage is included
-  because, like the other three, it's premium-determining — see §3 and REQ-7). Framed as
-  *"What do you pay now? (to see your savings)"*. Providing this unlocks the "cost of
-  doing nothing" headline (§5.2); omitting it is fully supported.
+- **Current plan** — current insurer (chosen from the real BAG insurer list) and monthly
+  premium (CHF, entered directly by the user — see REQ-7). Framed as *"What do you pay
+  now? (to see your savings)"*. Providing this unlocks the "cost of doing nothing" headline
+  (§5.2); omitting it is fully supported.
+  - Earlier drafts of this section asked for deductible, insurance model, and
+    accident-coverage status too, so the app could look up the user's exact premium row in
+    the dataset (matching Core Principle #3 in its original, stricter form). That was
+    dropped: knowing your exact Tarifart/deductible/accident-coverage combination is a lot
+    to ask, most people just know their monthly bill, and the app's savings message doesn't
+    actually need a verified figure to be useful — the discount badges (§5.3, REQ-23)
+    already carry the "how would I save" signal from real data; the self-reported premium
+    just gives the user's own number to compare it against.
 
 ### 5.2 Results & Headline
 
@@ -95,10 +104,12 @@ list. The headline's year always matches whichever year is currently active in t
 year toggle (§5.3) — the headline and the list never show different years at the same
 time.
 
-- **If a current plan was provided:** compare the current plan's premium for the active
-  year against the cheapest plan in the currently-filtered list for that same year.
+- **If a current plan was provided:** compare the current plan's self-reported premium
+  (the number the user typed in — the same figure regardless of which year is toggled,
+  since it isn't itself dated) against the cheapest plan in the currently-filtered list for
+  the active year.
   - If the current plan's premium is *not* the cheapest: *"If you do nothing: CHF X/month
-    [this year / next year] with [current insurer]. Cheapest match for you: CHF Y/month
+    with [current insurer]. Cheapest match for you [this year / next year]: CHF Y/month
     with [insurer] — save CHF Z/year by switching."*
   - If the current plan's premium *is exactly* the cheapest currently-filtered match (a
     tie for the top rank — no fuzzy "near-cheapest" threshold): *"You already have the
@@ -106,9 +117,6 @@ time.
 - **If no current plan was provided:** *"Cheapest available to you [this year / next
   year]: CHF Y/month with [insurer]."* plus a nudge to add their current plan to see
   savings.
-- **If the current plan's insurer/deductible/model/accident-coverage combination isn't
-  found in the data** (see §8), the headline falls back to the no-current-plan case above,
-  plus a visible notice explaining why.
 
 ### 5.3 Filters & List
 
@@ -120,7 +128,8 @@ Below the headline, one row per insurer is listed, showing that insurer's **chea
 
 Each row shows: insurer name, model badge with its restriction note, monthly premium, and
 — when next year's data is available and the premium differs — that plan's own
-year-over-year change.
+year-over-year change. Alternative-model rows additionally show a **discount badge** next
+to the model badge — see REQ-23.
 
 The list is not paginated (realistic result-set sizes are on the order of dozens of
 insurers, not hundreds).
@@ -130,7 +139,7 @@ fields — is reflected in the page's URL, and the page reconstructs its full st
 (including re-running the lookup and re-rendering the headline/list) when loaded from such
 a URL. This makes a full comparison, including its savings headline, shareable/bookmarkable
 without an account. Because this means a shared link can expose the sender's postal code,
-birth year, and current insurer/deductible, this is a deliberate, accepted trade-off in
+birth year, and current insurer/premium, this is a deliberate, accepted trade-off in
 favor of shareability (per product owner decision), not an oversight — no further consent
 step is required beyond the "current plan" fields being opt-in themselves.
 
@@ -170,14 +179,14 @@ municipality is always visible on screen (§5.1).
 | REQ-4 | User can toggle in alternative insurance models; when active, each insurer’s row shows whichever model (Standard or alternative) is cheapest for that insurer at the selected franchise, with a one-line plain-language description of its restriction. |
 | REQ-5 | User can toggle accident coverage off. |
 | REQ-6 | User can toggle between current-year and next-year results when next-year data is published; this toggle also determines the year shown in the headline (§5.2). |
-| REQ-7 | User can optionally enter their current insurer, deductible, model, and accident-coverage status (all four fields) to enable the savings comparison. |
-| REQ-8 | When a current plan is provided, the results headline states the current plan's premium for the active year vs. the cheapest currently-filtered alternative for that same year, and their difference. |
-| REQ-9 | The headline shows the no-current-plan (cheapest-only) framing when no current plan is provided, or when the provided current plan can't be matched in the data (REQ-14). |
+| REQ-7 | User can optionally enter their current insurer and their monthly premium (CHF, self-reported) to enable the savings comparison. |
+| REQ-8 | When a current plan is provided, the results headline states the current plan's self-reported premium vs. the cheapest currently-filtered alternative for the active year, and their difference. |
+| REQ-9 | The headline shows the no-current-plan (cheapest-only) framing when no current plan is provided. |
 | REQ-10 | When the current plan's premium exactly equals the cheapest currently-filtered match, the headline states the user already has the cheapest matching plan, with no savings figure shown — no fuzzy "near-cheapest" threshold applies. |
 | REQ-11 | All comparison state (required inputs, active filters, and optional current-plan fields) is written to the URL, and is read back from the URL to fully reconstruct the page (including headline/list) on load. |
 | REQ-12 | No input field is collected beyond what determines an applicable premium or powers the optional savings comparison (no name/email/phone/account). |
-| REQ-13 | Invalid postal codes and unrealistic birth years (future dates, or implying age beyond a plausible human lifespan) are rejected with an inline validation message; no results are computed. |
-| REQ-14 | If the entered current-plan combination doesn't exist in the data (unknown insurer, or that insurer doesn't offer the given deductible/model/accident-coverage combination in the resolved region), a visible notice is shown and the headline falls back per REQ-9. |
+| REQ-13 | Invalid postal codes, unrealistic birth years (future dates, or implying age beyond a plausible human lifespan), and non-positive or non-numeric self-reported current-plan premiums are rejected with an inline validation message; no results (or, for the premium field, no savings headline) are computed from the invalid value. |
+| REQ-14 | *(Removed.)* Superseded by the current-plan simplification (2026-08-14 design doc, §11 item 2): the current-plan premium is now self-reported rather than matched against a dataset row, so a "combination not found in the data" case no longer applies. |
 | REQ-15 | If no plans match the current required inputs and active filters (e.g. an insurer doesn't operate in that region), a clear empty-state message is shown instead of a blank list. |
 | REQ-16 | Next-year lookups (list and headline) use the age band and deductible tier applicable to next year, not the current year, for users whose age band changes between the two (e.g. turning 19 or 26). |
 | REQ-17 | The page is usable at viewport widths from ~360px up (mobile) through desktop, and meets WCAG 2.1 AA. |
@@ -186,6 +195,7 @@ municipality is always visible on screen (§5.1).
 | REQ-20 | Parameterized comparison URLs are `noindex` with a canonical tag to the base URL; only the base URL is indexed, and is the sitemap's sole entry. |
 | REQ-21 | Every price inquiry (defined as: all required inputs valid and results rendered) is logged server-side for activity monitoring. Each log entry records timestamp, resolved Prämienregion, Altersklasse, Franchise, active year, and active filters (model set, accident coverage). It does **not** record IP address, the optional current-plan fields, or any other data not needed for aggregate usage analysis. Logged data is used solely for understanding usage patterns (popular regions, peak times, filter usage) and is never sold or shared. |
 | REQ-22 | A password-protected admin dashboard at `/admin` visualises aggregate inquiry activity. It is not publicly linked or indexed. Access is restricted by a secret token stored in an environment variable (no user account system required). The dashboard has a time-range selector (presets: Today, Last 7 days, Last 30 days, This month, Last 3 months, This year, and any custom from/to date; defaults to Last 30 days) that drives every panel on the page simultaneously. Panels: total inquiries in the selected range; a time-series trend chart (granularity auto-adapts: hourly for ≤2 days, daily for ≤90 days, monthly for >90 days); top 10 Prämienregionen by count; breakdown by Altersklasse; breakdown by Franchise tier; breakdown by active insurance model set; breakdown by accident-coverage toggle. The selected range is reflected in the page URL so it is bookmarkable. All figures are aggregate counts — no raw log rows are exposed through the UI. |
+| REQ-23 | Each alternative-model row in the results list (REQ-4) shows a discount badge next to its model badge, stating how much cheaper that row's premium is than the same insurer's own Standard premium at the same region/franchise/age band/accident-coverage — phrased "bis zu −X% ggü. Standard" (not a bare percentage), since a row shows that insurer's single cheapest matching product and the insurer may have other products in the same model that discount less. Standard rows show no badge. If that insurer has no Standard-tarifart premium for the same region/franchise/age band/accident-coverage to compare against, the badge is omitted for that row (not observed in current BAG data — every insurer offers Standard — but handled defensively, not as a crash/blank state). |
 
 ## 8. Edge Cases & Error Handling
 
@@ -194,9 +204,12 @@ municipality is always visible on screen (§5.1).
   message (REQ-13).
 - **No matching plans for the chosen combination** (e.g. an insurer doesn't operate in
   that region): clear empty state, not a blank list (REQ-15).
-- **Current plan not found in the data** (typo, discontinued insurer/product, or that
-  insurer doesn't offer that exact deductible/model/accident-coverage combination in the
-  user's region): visible notice; headline falls back to cheapest-only framing (REQ-14).
+- **Self-reported current-plan premium is invalid** (empty, non-numeric, zero, or
+  negative): inline validation message; current-plan fields are treated as not provided,
+  so the headline falls back to the no-current-plan framing (REQ-13).
+- **An alternative-model row's insurer has no Standard premium to compare against** for the
+  discount badge (REQ-23): the badge is simply omitted for that row; not currently
+  reachable with real BAG data (every insurer offers Standard) but handled defensively.
 - **User's age band changes between current and next year** (e.g. turning 19 or 26):
   next-year lookups must use the age band and deductible tier applicable to next year, not
   the current one (REQ-16). Per known BAG methodology, the age band is based on age
@@ -209,7 +222,8 @@ municipality is always visible on screen (§5.1).
 - The BAG publication date of the currently-displayed data is visibly shown (§6.1), so
   numbers are independently verifiable against the source.
 - Monetary values are displayed in Swiss convention (e.g. "CHF 1'234.50", apostrophe
-  thousands separator).
+  thousands separator). The self-reported monthly-premium input (REQ-7) accepts the same
+  convention on entry (decimal input for Rappen; a "CHF" affix, not a typed-in prefix).
 - Results render without a noticeable stall; a lightweight loading indicator covers any
   lookup that isn't effectively instant, consistent with the "minimal friction" principle
   (§4) — this is a UX expectation, not a technical performance target, which stays out of
@@ -249,14 +263,15 @@ parameterized URL to be crawled, shared, and correctly previewed.
 1. Age-band reference date (§8) — believed to be "age reached during the calendar year"
    per known BAG methodology; flagged for a quick confirmation against the official data
    documentation during implementation rather than a product decision.
-2. "Current plan" lookup assumes insurer + deductible + model + accident coverage uniquely
-   identifies a premium row (together with the region already entered). If BAG data has
-   additional product-level distinctions within the same model type (e.g. multiple Telmed
-   products from one insurer), this may need a further disambiguation step.
+2. ~~"Current plan" lookup assumes insurer + deductible + model + accident coverage
+   uniquely identifies a premium row...~~ — resolved by the 2026-08-14 current-plan
+   simplification: the app no longer looks up a dataset row for the current plan at all
+   (premium is self-reported), so this dataset-matching/disambiguation question no longer
+   applies.
 3. Some BAG-registered insurers are subsidiary brands of larger groups under distinct BAG
-   insurer codes. "Current insurer" matching (REQ-14) should be checked against the full
-   BAG insurer list including subsidiaries during implementation, so a real current plan
-   isn't wrongly reported as "not found."
+   insurer codes. The "Aktuelle Kasse" dropdown should be checked against the full BAG
+   insurer list including subsidiaries during implementation, so a user can always find
+   their real current insurer in the list.
 4. The alternative-model list in §3 (HMO, Hausarztmodell, Telmed, "other variants") should
    be driven by BAG's actual Tarifart classification during implementation rather than
    hardcoded to these three named models, in case the official classification is broader.
