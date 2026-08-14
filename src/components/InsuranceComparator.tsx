@@ -15,13 +15,18 @@ import { resolveGemeinden, needsDisambiguation } from "@/lib/location";
 import { filterPlans, cheapestPerInsurer, sortPlans, computeHeadline, standardPremiumsByInsurer } from "@/lib/lookup";
 import { encodeState, decodeState } from "@/lib/url-state";
 import { validateCurrentPremium } from "@/lib/validate";
-import type { CurrentPlan, SelfReportedPlan, Tarifart } from "@/lib/types";
+import type { CurrentPlan, Insurer, SelfReportedPlan, Tarifart } from "@/lib/types";
 
 import insurersData from "@/data/insurers.json";
 import metadata from "@/data/metadata.json";
 import type { PremiumRow } from "@/lib/types";
 
-const INSURERS = insurersData as { insurerCode: string; insurerName: string }[];
+const INSURERS = insurersData as Insurer[];
+// Static — INSURERS is a module-level import, not component state, so this is derived
+// once at module load, same lifecycle as INSURERS itself (no useMemo needed).
+const MEMBER_COUNTS: Record<string, number> = Object.fromEntries(
+  INSURERS.filter((i) => i.memberCount != null).map((i) => [i.insurerCode, i.memberCount!]),
+);
 const ALT_MODELS: Tarifart[] = ["standard", "hausarzt", "telmed", "hmo", "andere"];
 
 export function InsuranceComparator() {
@@ -268,7 +273,13 @@ export function InsuranceComparator() {
           </p>
 
           {results.plans.length > 0 ? (
-            <PlanList plans={results.plans} currentInsurerCode={currentPlan.insurerCode ?? null} standardBaseline={results.standardBaseline} />
+            <PlanList
+              plans={results.plans}
+              currentInsurerCode={currentPlan.insurerCode ?? null}
+              standardBaseline={results.standardBaseline}
+              memberCounts={MEMBER_COUNTS}
+              memberCountAsOf={metadata.memberCountAsOf}
+            />
           ) : (
             <EmptyState message="Für die aktuelle Kombination sind keine Prämien in den BAG-Daten vorhanden. Bitte überprüfe deine Eingaben oder passe die Filter an." />
           )}
