@@ -158,7 +158,7 @@ describe("averageServiceQualityPct", () => {
 
   it("normalizes each source to its own scale before averaging (real CSS 2026 figures)", () => {
     const sources: ServiceQualitySourceScore[] = [
-      { sourceName: "comparis.ch", rawScore: 4.9, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.comparis.ch/krankenkassen/beste-krankenkasse" },
+      { sourceName: "comparis.ch", rawScore: 4.9, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.presseportal.ch/de/pm/100003671/100941089" },
       { sourceName: "bonus.ch", rawScore: 5.2, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.bonus.ch" },
     ];
     // (4.9/6 + 5.2/6) / 2 = 0.841666... -> 84.1666...%, NOT a naive raw average of 4.9/5.2.
@@ -168,7 +168,7 @@ describe("averageServiceQualityPct", () => {
   it("normalizes a 1-10 scale alongside 1-6 scales (real Helsana 2026 figures)", () => {
     const sources: ServiceQualitySourceScore[] = [
       { sourceName: "moneyland.ch", rawScore: 8.0, scaleMax: 10, sourceYear: 2026, sourceUrl: "https://www.moneyland.ch/de/krankenkassen-zufriedenheit-2026" },
-      { sourceName: "comparis.ch", rawScore: 5.1, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.comparis.ch/krankenkassen/beste-krankenkasse" },
+      { sourceName: "comparis.ch", rawScore: 5.1, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.presseportal.ch/de/pm/100003671/100941089" },
       { sourceName: "bonus.ch", rawScore: 5.2, scaleMax: 6, sourceYear: 2026, sourceUrl: "https://www.bonus.ch" },
     ];
     // (0.8 + 0.85 + 0.866666...) / 3 = 0.838888... -> 83.8888...%
