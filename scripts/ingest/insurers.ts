@@ -1,5 +1,3 @@
-import type { Insurer } from "../../src/lib/types";
-
 //
 // Seed insurer code → display name lookup (requirement.md §6.1, architecture.md §3.2).
 // The premium CSV only carries the numeric `Versicherer` code, not a name, and BAG
@@ -9,6 +7,9 @@ import type { Insurer } from "../../src/lib/types";
 //
 // If scripts/ingest/parsePremiums.ts ever throws "unknown insurer code", it means BAG
 // added a new insurer or renumbered one — add the missing code here.
+
+import type { Insurer } from "../../src/lib/types";
+
 export const INSURER_NAMES: Record<string, string> = {
   "8": "CSS",
   "32": "Aquilana",

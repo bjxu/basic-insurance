@@ -46,4 +46,9 @@ describe("parseMemberCounts", () => {
     const text = csv("0008;AG;2024;153225.267", "0008;AG;2023;140000");
     expect(() => parseMemberCounts(text, insurerNames)).toThrow(/Geschäftsjahr/);
   });
+
+  it("throws on a non-numeric Durchschnittsbestand value", () => {
+    const text = csv("0008;AG;2024;153225,267");
+    expect(() => parseMemberCounts(text, insurerNames)).toThrow(/non-numeric Durchschnittsbestand/);
+  });
 });

@@ -49,7 +49,13 @@ export function parseMemberCounts(
       continue;
     }
 
-    sums.set(code, (sums.get(code) ?? 0) + Number(r.Durchschnittsbestand));
+    const value = Number(r.Durchschnittsbestand);
+    if (!Number.isFinite(value)) {
+      throw new Error(
+        `parseMemberCounts: non-numeric Durchschnittsbestand "${r.Durchschnittsbestand}" for code ${code}`,
+      );
+    }
+    sums.set(code, (sums.get(code) ?? 0) + value);
   }
 
   if (years.size !== 1) {

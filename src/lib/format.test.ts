@@ -29,6 +29,12 @@ describe("formatMemberCount", () => {
   it("rounds the Tsd./Mio. cutover boundary up", () => {
     expect(formatMemberCount(999999)).toBe("1.0 Mio.");
   });
+  it("crosses over to Mio. as low as ~950'000, not a clean 1'000'000", () => {
+    expect(formatMemberCount(960000)).toBe("1.0 Mio.");
+  });
+  it("stays in Tsd. just below the effective cutover", () => {
+    expect(formatMemberCount(949999)).toBe("950 Tsd.");
+  });
 });
 
 describe("formatMemberCountDetail", () => {

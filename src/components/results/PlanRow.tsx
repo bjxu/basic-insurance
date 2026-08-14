@@ -67,11 +67,12 @@ export function PlanRow({
       </div>
       {memberCount != null && (
         <div
-          className="flex flex-col items-end gap-0.5 flex-shrink-0"
+          className="hidden sm:flex flex-col items-end gap-0.5 flex-shrink-0"
           title={formatMemberCountDetail(memberCount, memberCountAsOf)}
+          aria-label={formatMemberCountDetail(memberCount, memberCountAsOf)}
         >
           <span className="text-[11px] font-semibold px-1.5 py-px rounded bg-surface-variant text-on-surface-variant whitespace-nowrap">
-            👥 {formatMemberCount(memberCount)}
+            <span aria-hidden="true">👥</span> {formatMemberCount(memberCount)}
           </span>
         </div>
       )}

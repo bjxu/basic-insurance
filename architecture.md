@@ -30,7 +30,7 @@ shared URLs).
 
 ### 3.1 Source files
 
-Two BAG open-data datasets are ingested:
+Three BAG open-data datasets are ingested:
 
 1. **Premium file** (`praemien_YYYY.csv`) — one row per (insurer × Prämienregion ×
    Altersklasse × Franchise × Unfalldeckung × Tarifart). Published annually, typically
@@ -38,9 +38,13 @@ Two BAG open-data datasets are ingested:
 2. **Region/locality mapping** (`plz_gemeinde_region.csv`) — maps PLZ → Gemeinde →
    Prämienregion. Published by BAG alongside the premium file; supplemented with Swiss
    Post PLZ data for canonical municipality names.
+3. **Enrollment file** (`Versichertenbestand_CH.csv`) — per-insurer, per-canton OKP
+   membership counts, summed into per-insurer national totals for the results list's
+   member-count badge; published on its own slower cadence, lagging the premium year.
 
-Both files are downloaded from [opendata.swiss](https://opendata.swiss) by the ETL
-script and committed to `data/raw/` so the exact source is auditable.
+All three files are downloaded from [opendata.swiss](https://opendata.swiss) (or, for
+the enrollment file, its `bagnet.ch` mirror) by the ETL script and committed to
+`data/raw/` so the exact source is auditable.
 
 ### 3.2 ETL script (`scripts/ingest.ts`)
 
@@ -56,9 +60,13 @@ Runs via `npm run ingest`. Steps:
      (`public/data/`).
    - `plz-map.json` — map of `PLZ → { gemeinden: Gemeinde[] }`.
    - `gemeinde-region-map.json` — map of `BfsNr → PraemienregionId`.
-   - `insurers.json` — deduplicated insurer list with BAG insurer code + display name.
+   - `insurers.json` — deduplicated insurer list with BAG insurer code + display name,
+     plus an optional `memberCount` (OKP enrollment) when the insurer has a matching
+     row in the enrollment file.
    - `metadata.json` — BAG publication dates and available years (drives the year
-     toggle and the on-page publication-date display per §6.1).
+     toggle and the on-page publication-date display per §6.1), plus
+     `memberCountAsOf` (the enrollment file's own, separately-lagging publication
+     year).
 
 ### 3.3 Core TypeScript types
 
