@@ -11,6 +11,7 @@ import { Headline } from "./results/Headline";
 import { FilterBar } from "./results/FilterBar";
 import { PlanList } from "./results/PlanList";
 import { EmptyState } from "./results/EmptyState";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 import { getAltersklasse, getFranchiseTiers } from "@/lib/ageband";
 import { resolveGemeinden, needsDisambiguation } from "@/lib/location";
 import { filterPlans, cheapestPerInsurer, sortPlans, computeHeadline, standardPremiumsByInsurer } from "@/lib/lookup";
@@ -188,7 +189,10 @@ export function InsuranceComparator() {
   return (
     <main className="max-w-[860px] mx-auto my-8 px-4">
       <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-6">
-        <h1 className="text-title-large text-on-surface mb-1">{t("inputs.title")}</h1>
+        <div className="flex items-start justify-between gap-3 mb-1">
+          <h1 className="text-title-large text-on-surface">{t("inputs.title")}</h1>
+          <LanguageSwitcher />
+        </div>
         <p className="text-body-medium text-on-surface-variant mb-5">{t("inputs.tagline")}</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
