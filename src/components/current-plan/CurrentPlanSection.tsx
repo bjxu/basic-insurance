@@ -68,7 +68,7 @@ export function CurrentPlanSection({ insurers, value, onChange }: Props) {
           </div>
           {!result.valid && (
             <p id="current-premium-hint" className="text-body-small text-error mt-1">
-              {result.message}
+              {t(`validation.${result.code}`)}
             </p>
           )}
         </div>

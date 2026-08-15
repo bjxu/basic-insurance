@@ -13,10 +13,12 @@ type Props = {
 export function PlzInput({ value, onChange, notFound }: Props) {
   const t = useTranslations();
   const formatResult = value ? validatePlz(value) : { valid: true as const };
-  const result =
-    formatResult.valid && notFound
-      ? { valid: false as const, message: t("inputs.plzNotFound") }
-      : formatResult;
+  const invalid = !formatResult.valid || Boolean(notFound);
+  const message = !formatResult.valid
+    ? t(`validation.${formatResult.code}`)
+    : notFound
+      ? t("inputs.plzNotFound")
+      : null;
 
   return (
     <div>
@@ -32,14 +34,14 @@ export function PlzInput({ value, onChange, notFound }: Props) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         aria-describedby="plz-hint"
-        aria-invalid={!result.valid}
+        aria-invalid={invalid}
         className={`w-full h-10 px-3 rounded-md border text-[15px] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-primary-container ${
-          result.valid ? "border-outline-variant focus:border-primary" : "border-error focus:border-error"
+          invalid ? "border-error focus:border-error" : "border-outline-variant focus:border-primary"
         }`}
       />
-      {!result.valid && (
+      {message && (
         <p id="plz-hint" className="text-body-small text-error mt-1">
-          {result.message}
+          {message}
         </p>
       )}
     </div>

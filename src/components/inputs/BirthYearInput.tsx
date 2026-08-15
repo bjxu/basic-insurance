@@ -36,7 +36,7 @@ export function BirthYearInput({ value, onChange, calendarYear }: Props) {
       />
       <p id="by-hint" className={`text-body-small mt-1 ${result.valid ? "text-outline" : "text-error"}`}>
         {!result.valid
-          ? result.message
+          ? t(`validation.${result.code}`)
           : altersklasse && tiers
             ? t("inputs.birthYearHintResolved", {
                 altersklasse: t(`copy.altersklasse.${altersklasse}`),
