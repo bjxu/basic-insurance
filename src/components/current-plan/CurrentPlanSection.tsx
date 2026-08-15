@@ -12,6 +12,7 @@ type Props = {
 
 export function CurrentPlanSection({ insurers, value, onChange }: Props) {
   const t = useTranslations("currentPlan");
+  const tv = useTranslations("validation");
   const result = value.monthlyPremium != null ? validateCurrentPremium(value.monthlyPremium) : { valid: true as const };
 
   return (
@@ -68,7 +69,7 @@ export function CurrentPlanSection({ insurers, value, onChange }: Props) {
           </div>
           {!result.valid && (
             <p id="current-premium-hint" className="text-body-small text-error mt-1">
-              {t(`validation.${result.code}`)}
+              {tv(result.code)}
             </p>
           )}
         </div>
