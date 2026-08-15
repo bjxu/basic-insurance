@@ -18,6 +18,7 @@ import { filterPlans, cheapestPerInsurer, sortPlans, computeHeadline, standardPr
 import { encodeState, decodeState } from "@/lib/url-state";
 import { validateCurrentPremium } from "@/lib/validate";
 import type { CurrentPlan, Insurer, SelfReportedPlan, Tarifart } from "@/lib/types";
+import type { Locale } from "@/i18n/routing";
 
 import insurersData from "@/data/insurers.json";
 import metadata from "@/data/metadata.json";
@@ -30,7 +31,7 @@ const MEMBER_COUNTS: Record<string, number> = Object.fromEntries(
   INSURERS.filter((i) => i.memberCount != null).map((i) => [i.insurerCode, i.memberCount!]),
 );
 const ALT_MODELS: Tarifart[] = ["standard", "hausarzt", "telmed", "hmo", "andere"];
-const DATE_LOCALE: Record<string, string> = { de: "de-CH", fr: "fr-CH", it: "it-CH", en: "en-CH" };
+const DATE_LOCALE: Record<Locale, string> = { de: "de-CH", fr: "fr-CH", it: "it-CH", en: "en-CH" };
 
 export function InsuranceComparator() {
   const router = useRouter();
@@ -294,7 +295,7 @@ export function InsuranceComparator() {
 
       <p className="text-body-small text-outline text-center mt-6 pb-10">
         {t("footer.dataNotice", {
-          date: new Date(metadata.publicationDate).toLocaleDateString(DATE_LOCALE[locale] ?? "de-CH", {
+          date: new Date(metadata.publicationDate).toLocaleDateString(DATE_LOCALE[locale as Locale] ?? "de-CH", {
             day: "numeric",
             month: "long",
             year: "numeric",

@@ -11,7 +11,12 @@ export function formatChf(amount: number): string {
   return `CHF ${groupThousands(parts[0])}.${parts[1]}`;
 }
 
-const MEMBER_COUNT_UNITS: Record<string, { million: string; thousand: string }> = {
+// Local to this module rather than imported from @/i18n/routing: src/lib is a
+// dependency-free layer today (no imports from src/i18n or src/components), and
+// these lookup maps only need the literal set of codes, not the routing config.
+type Locale = "de" | "fr" | "it" | "en";
+
+const MEMBER_COUNT_UNITS: Record<Locale, { million: string; thousand: string }> = {
   de: { million: "Mio.", thousand: "Tsd." },
   fr: { million: "mio", thousand: "k" },
   it: { million: "mio", thousand: "mila" },
@@ -30,7 +35,7 @@ const MEMBER_COUNT_UNITS: Record<string, { million: string; thousand: string }> 
 // without re-introducing that bug — see the formatMemberCount tests around
 // 949'999/960'000/999'999 for the pinned behavior.
 export function formatMemberCount(count: number, locale: string): string {
-  const units = MEMBER_COUNT_UNITS[locale] ?? MEMBER_COUNT_UNITS.de;
+  const units = MEMBER_COUNT_UNITS[locale as Locale] ?? MEMBER_COUNT_UNITS.de;
   const rounded = Math.round(count);
   const milliFormat = (rounded / 1_000_000).toFixed(1);
   if (parseFloat(milliFormat) >= 1.0) return `${milliFormat} ${units.million}`;
@@ -38,14 +43,14 @@ export function formatMemberCount(count: number, locale: string): string {
   return String(rounded);
 }
 
-const INSURED_WORD: Record<string, string> = {
+const INSURED_WORD: Record<Locale, string> = {
   de: "Versicherte",
   fr: "assurés",
   it: "assicurati",
   en: "insured",
 };
 
-const AS_OF_WORD: Record<string, string> = {
+const AS_OF_WORD: Record<Locale, string> = {
   de: "Stand",
   fr: "en",
   it: "nel",
@@ -55,7 +60,7 @@ const AS_OF_WORD: Record<string, string> = {
 // Exact count + the enrollment data's own publication year, for the badge's tooltip
 // (the enrollment data lags the premium year — see Metadata.memberCountAsOf).
 export function formatMemberCountDetail(count: number, asOfYear: number, locale: string): string {
-  const insured = INSURED_WORD[locale] ?? INSURED_WORD.de;
-  const asOf = AS_OF_WORD[locale] ?? AS_OF_WORD.de;
+  const insured = INSURED_WORD[locale as Locale] ?? INSURED_WORD.de;
+  const asOf = AS_OF_WORD[locale as Locale] ?? AS_OF_WORD.de;
   return `${groupThousands(String(Math.round(count)))} ${insured} · ${asOf} ${asOfYear}`;
 }
