@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { PremiumRow } from "@/lib/types";
 import { formatChf, formatMemberCount, formatMemberCountDetail } from "@/lib/format";
 
@@ -33,6 +33,7 @@ export function PlanRow({
   previousYearPremium,
 }: Props) {
   const t = useTranslations();
+  const locale = useLocale();
   const yoy =
     previousYearPremium != null && previousYearPremium !== plan.monthlyPremium
       ? ((plan.monthlyPremium - previousYearPremium) / previousYearPremium) * 100
@@ -69,11 +70,11 @@ export function PlanRow({
       {memberCount != null && (
         <div
           className="hidden sm:flex flex-col items-end gap-0.5 flex-shrink-0"
-          title={formatMemberCountDetail(memberCount, memberCountAsOf)}
-          aria-label={formatMemberCountDetail(memberCount, memberCountAsOf)}
+          title={formatMemberCountDetail(memberCount, memberCountAsOf, locale)}
+          aria-label={formatMemberCountDetail(memberCount, memberCountAsOf, locale)}
         >
           <span className="text-[11px] font-semibold px-1.5 py-px rounded bg-surface-variant text-on-surface-variant whitespace-nowrap">
-            <span aria-hidden="true">👥</span> {formatMemberCount(memberCount)}
+            <span aria-hidden="true">👥</span> {formatMemberCount(memberCount, locale)}
           </span>
         </div>
       )}

@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { PlzInput } from "./inputs/PlzInput";
 import { BirthYearInput } from "./inputs/BirthYearInput";
 import { DeductibleSelect } from "./inputs/DeductibleSelect";
@@ -29,12 +29,14 @@ const MEMBER_COUNTS: Record<string, number> = Object.fromEntries(
   INSURERS.filter((i) => i.memberCount != null).map((i) => [i.insurerCode, i.memberCount!]),
 );
 const ALT_MODELS: Tarifart[] = ["standard", "hausarzt", "telmed", "hmo", "andere"];
+const DATE_LOCALE: Record<string, string> = { de: "de-CH", fr: "fr-CH", it: "it-CH", en: "en-CH" };
 
 export function InsuranceComparator() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const t = useTranslations();
+  const locale = useLocale();
   const initial = useMemo(() => decodeState(searchParams), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [plz, setPlz] = useState(initial.plz ?? "");
@@ -288,7 +290,7 @@ export function InsuranceComparator() {
 
       <p className="text-body-small text-outline text-center mt-6 pb-10">
         {t("footer.dataNotice", {
-          date: new Date(metadata.publicationDate).toLocaleDateString("de-CH", {
+          date: new Date(metadata.publicationDate).toLocaleDateString(DATE_LOCALE[locale] ?? "de-CH", {
             day: "numeric",
             month: "long",
             year: "numeric",
