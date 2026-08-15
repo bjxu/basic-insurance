@@ -18,6 +18,9 @@ describe("validateBirthYear", () => {
   it("accepts a realistic birth year", () => {
     expect(validateBirthYear(1988)).toEqual({ valid: true });
   });
+  it("rejects a non-integer birth year with invalidBirthYear", () => {
+    expect(validateBirthYear(1985.5)).toEqual({ valid: false, code: "invalidBirthYear" });
+  });
   it("rejects a future birth year with futureBirthYear", () => {
     expect(validateBirthYear(currentYear + 1)).toEqual({ valid: false, code: "futureBirthYear" });
   });

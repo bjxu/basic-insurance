@@ -31,20 +31,17 @@ export function LanguageSwitcher() {
   };
 
   return (
-    <label className="inline-flex items-center gap-1.5 text-sm text-on-surface-variant">
-      <span className="sr-only">{t("menuLabel")}</span>
-      <select
-        aria-label={t("menuLabel")}
-        value={locale}
-        onChange={(e) => handleChange(e.target.value)}
-        className="h-8 rounded-md border border-outline-variant bg-surface px-2 text-sm outline-none focus:border-primary"
-      >
-        {routing.locales.map((code) => (
-          <option key={code} value={code}>
-            {LANGUAGE_NAMES[code]}
-          </option>
-        ))}
-      </select>
-    </label>
+    <select
+      aria-label={t("menuLabel")}
+      value={locale}
+      onChange={(e) => handleChange(e.target.value)}
+      className="h-8 rounded-md border border-outline-variant bg-surface px-2 text-sm text-on-surface-variant outline-none focus:border-primary"
+    >
+      {routing.locales.map((code) => (
+        <option key={code} value={code}>
+          {LANGUAGE_NAMES[code]}
+        </option>
+      ))}
+    </select>
   );
 }
