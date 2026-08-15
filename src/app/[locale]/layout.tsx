@@ -3,6 +3,7 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import { getSiteUrl } from "@/lib/site-url";
 import { RootShell, viewport } from "@/app/root-shell";
 
 export { viewport };
@@ -18,7 +19,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "meta" });
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://example.com";
+  const baseUrl = getSiteUrl();
 
   return {
     title: t("title"),
