@@ -1,0 +1,93 @@
+{
+  "meta": {
+    "title": "Confronto assicurazione malattia – Assicurazione di base Svizzera",
+    "description": "Confronta i premi dell'assicurazione di base svizzera – tutte le casse, tutti i modelli, dati ufficiali dell'UFSP.",
+    "ogTitle": "Confronto assicurazione malattia – Assicurazione di base Svizzera",
+    "ogDescription": "Confronta i premi dell'assicurazione di base svizzera – tutte le casse, tutti i modelli, dati ufficiali dell'UFSP.",
+    "twitterTitle": "Confronto assicurazione malattia – Assicurazione di base Svizzera",
+    "twitterDescription": "Confronta i premi dell'assicurazione di base svizzera – dati ufficiali dell'UFSP."
+  },
+  "inputs": {
+    "title": "Confronto dei premi",
+    "tagline": "Inserisci i tuoi dati — le casse più convenienti appaiono subito.",
+    "plzLabel": "Numero postale di avviamento (NPA)",
+    "plzPlaceholder": "p. es. 3001",
+    "plzNotFound": "NPA non trovato — verifica il dato inserito.",
+    "birthYearLabel": "Anno di nascita",
+    "birthYearPlaceholder": "p. es. 1985",
+    "birthYearHintDefault": "Determina la fascia d'età e le franchigie disponibili",
+    "birthYearHintResolved": "→ {altersklasse}, franchigia CHF {min}–{max}",
+    "deductibleLabel": "Franchigia",
+    "deductibleChoose": "Scegli…",
+    "deductibleNeedsBirthYear": "Inserisci prima l'anno di nascita",
+    "gemeindeAmbiguous": "L'NPA {plz} copre più regioni di premio. Scegli il tuo comune:",
+    "gemeindeConfirmed": "✓ Comune: {name}",
+    "premiumsLoading": "Caricamento dei dati sui premi…",
+    "premiumsError": "Impossibile caricare i dati sui premi. Riprova.",
+    "retry": "Riprova"
+  },
+  "validation": {
+    "invalidPlzFormat": "NPA non valido — inserisci un NPA svizzero a 4 cifre.",
+    "invalidPremium": "Inserisci un premio mensile valido.",
+    "nonPositivePremium": "Il premio mensile deve essere superiore a CHF 0.",
+    "invalidBirthYear": "Inserisci un anno di nascita valido.",
+    "futureBirthYear": "L'anno di nascita è nel futuro.",
+    "unrealisticBirthYear": "Inserisci un anno di nascita realistico (max. ~120 anni)."
+  },
+  "currentPlan": {
+    "summaryTitle": "Quanto paghi oggi?",
+    "summaryHint": "(facoltativo — mostra il tuo risparmio)",
+    "insurerLabel": "Cassa attuale",
+    "premiumLabel": "Premio mensile",
+    "premiumPlaceholder": "p. es. 350"
+  },
+  "filterBar": {
+    "yearLabel": "Anno:",
+    "altModelsLabel": "Modelli alternativi: {state}",
+    "accidentLabel": "Copertura infortuni: {state}",
+    "stateOn": "attiva",
+    "stateOff": "disattiva",
+    "included": "inclusa",
+    "excluded": "esclusa"
+  },
+  "results": {
+    "summary": "{count} casse · {model} · Copertura infortuni {coverage} · {year}",
+    "modelAlt": "modello più conveniente per cassa",
+    "modelStandard": "offerta standard più conveniente per cassa",
+    "emptyTitle": "Nessuna offerta trovata",
+    "emptyMessage": "Per questa combinazione non esistono premi nei dati dell'UFSP. Verifica i tuoi dati o modifica i filtri.",
+    "discountBadge": "fino a −{pct}% rispetto allo standard",
+    "yourInsurerBadge": "La tua cassa",
+    "perMonth": "/mese"
+  },
+  "headline": {
+    "savingsCurrent": "Se non fai nulla: {amount}/mese con {insurer}.",
+    "savingsCheapest": "Offerta più conveniente per il tuo profilo nel {year}: {amount}/mese con {insurer} —",
+    "savingsAmount": "risparmia {amount}/anno cambiando cassa.",
+    "alreadyCheapestExact": "Hai già l'offerta più conveniente per il tuo profilo.",
+    "alreadyCheapestBelow": "Il tuo premio è inferiore a tutte le offerte per questo profilo — verifica che franchigia e modello siano comparabili.",
+    "alreadyCheapestDetail": "{insurer} · {amount}/mese.",
+    "cheapestOnlyTitle": "Offerta più conveniente: {amount}/mese con {insurer}.",
+    "cheapestOnlyCta": "Indica la tua cassa attuale per vedere quanto potresti risparmiare. ↓"
+  },
+  "footer": {
+    "dataNotice": "Dati: Open Data UFSP · Pubblicazione {date} · Solo prestazioni obbligatorie (AOMS) · Nessuno sponsor, nessun link di intermediazione"
+  },
+  "copy": {
+    "tarifart": {
+      "standard": { "label": "Standard", "description": "Libera scelta del medico" },
+      "hausarzt": { "label": "Medico di famiglia", "description": "Primo punto di contatto sempre presso il medico di famiglia scelto" },
+      "telmed": { "label": "Telmed", "description": "Chiamata a una hotline obbligatoria prima di ogni visita medica" },
+      "hmo": { "label": "HMO", "description": "Primo punto di contatto sempre presso il centro HMO" },
+      "andere": { "label": "Modello alternativo", "description": "Scelta limitata del primo punto di contatto" }
+    },
+    "altersklasse": {
+      "kind": "Bambino (0–18)",
+      "jung": "Giovane adulto (19–25)",
+      "erwachsen": "Adulto (26+)"
+    }
+  },
+  "languageSwitcher": {
+    "menuLabel": "Scegli la lingua"
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "meta": {
+    "title": "Comparateur d'assurance maladie – Assurance de base Suisse",
+    "description": "Comparez les primes de l'assurance de base suisse – toutes les caisses, tous les modèles, données officielles de l'OFSP.",
+    "ogTitle": "Comparateur d'assurance maladie – Assurance de base Suisse",
+    "ogDescription": "Comparez les primes de l'assurance de base suisse – toutes les caisses, tous les modèles, données officielles de l'OFSP.",
+    "twitterTitle": "Comparateur d'assurance maladie – Assurance de base Suisse",
+    "twitterDescription": "Comparez les primes de l'assurance de base suisse – données officielles de l'OFSP."
+  },
+  "inputs": {
+    "title": "Comparaison des primes",
+    "tagline": "Indiquez vos données — les caisses les plus avantageuses s'affichent aussitôt.",
+    "plzLabel": "Code postal (NPA)",
+    "plzPlaceholder": "p. ex. 3001",
+    "plzNotFound": "Code postal introuvable — veuillez le vérifier.",
+    "birthYearLabel": "Année de naissance",
+    "birthYearPlaceholder": "p. ex. 1985",
+    "birthYearHintDefault": "Détermine la classe d'âge et les franchises disponibles",
+    "birthYearHintResolved": "→ {altersklasse}, franchise CHF {min}–{max}",
+    "deductibleLabel": "Franchise",
+    "deductibleChoose": "Choisir…",
+    "deductibleNeedsBirthYear": "Indiquez d'abord l'année de naissance",
+    "gemeindeAmbiguous": "Le NPA {plz} couvre plusieurs régions de primes. Veuillez choisir votre commune :",
+    "gemeindeConfirmed": "✓ Commune : {name}",
+    "premiumsLoading": "Chargement des données de primes…",
+    "premiumsError": "Impossible de charger les données de primes. Veuillez réessayer.",
+    "retry": "Réessayer"
+  },
+  "validation": {
+    "invalidPlzFormat": "Code postal invalide — veuillez indiquer un NPA suisse à 4 chiffres.",
+    "invalidPremium": "Veuillez indiquer une prime mensuelle valide.",
+    "nonPositivePremium": "La prime mensuelle doit être supérieure à CHF 0.",
+    "invalidBirthYear": "Veuillez indiquer une année de naissance valide.",
+    "futureBirthYear": "L'année de naissance se situe dans le futur.",
+    "unrealisticBirthYear": "Veuillez indiquer une année de naissance réaliste (max. ~120 ans)."
+  },
+  "currentPlan": {
+    "summaryTitle": "Que payez-vous aujourd'hui ?",
+    "summaryHint": "(facultatif — affiche votre économie)",
+    "insurerLabel": "Caisse actuelle",
+    "premiumLabel": "Prime mensuelle",
+    "premiumPlaceholder": "p. ex. 350"
+  },
+  "filterBar": {
+    "yearLabel": "Année :",
+    "altModelsLabel": "Modèles alternatifs : {state}",
+    "accidentLabel": "Accident : {state}",
+    "stateOn": "activé",
+    "stateOff": "désactivé",
+    "included": "inclus",
+    "excluded": "exclu"
+  },
+  "results": {
+    "summary": "{count} caisses · {model} · Couverture accident {coverage} · {year}",
+    "modelAlt": "modèle le plus avantageux par caisse",
+    "modelStandard": "offre standard la plus avantageuse par caisse",
+    "emptyTitle": "Aucune offre trouvée",
+    "emptyMessage": "Aucune prime n'existe dans les données de l'OFSP pour cette combinaison. Veuillez vérifier vos données ou ajuster les filtres.",
+    "discountBadge": "jusqu'à −{pct}% par rapport au standard",
+    "yourInsurerBadge": "Votre caisse",
+    "perMonth": "/mois"
+  },
+  "headline": {
+    "savingsCurrent": "Si vous ne faites rien : {amount}/mois chez {insurer}.",
+    "savingsCheapest": "Offre la plus avantageuse pour votre profil en {year} : {amount}/mois chez {insurer} —",
+    "savingsAmount": "économisez {amount}/an en changeant de caisse.",
+    "alreadyCheapestExact": "Vous avez déjà l'offre la plus avantageuse pour votre profil.",
+    "alreadyCheapestBelow": "Votre prime est inférieure à toutes les offres pour ce profil — vérifiez que la franchise et le modèle sont comparables.",
+    "alreadyCheapestDetail": "{insurer} · {amount}/mois.",
+    "cheapestOnlyTitle": "Offre la plus avantageuse : {amount}/mois chez {insurer}.",
+    "cheapestOnlyCta": "Indiquez votre caisse actuelle pour voir combien vous pourriez économiser. ↓"
+  },
+  "footer": {
+    "dataNotice": "Données : Open Data OFSP · Publication {date} · Prestations obligatoires uniquement (AOS) · Aucun sponsoring, aucun lien d'intermédiation"
+  },
+  "copy": {
+    "tarifart": {
+      "standard": { "label": "Standard", "description": "Libre choix du médecin" },
+      "hausarzt": { "label": "Médecin de famille", "description": "Premier contact toujours auprès du médecin de famille choisi" },
+      "telmed": { "label": "Telmed", "description": "Appel à une hotline obligatoire avant chaque consultation" },
+      "hmo": { "label": "HMO", "description": "Premier contact toujours auprès du centre HMO" },
+      "andere": { "label": "Modèle alternatif", "description": "Choix restreint du premier point de contact" }
+    },
+    "altersklasse": {
+      "kind": "Enfant (0–18)",
+      "jung": "Jeune adulte (19–25)",
+      "erwachsen": "Adulte (26+)"
+    }
+  },
+  "languageSwitcher": {
+    "menuLabel": "Choisir la langue"
+  }
+}

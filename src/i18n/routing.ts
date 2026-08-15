@@ -3,7 +3,7 @@ import { defineRouting } from "next-intl/routing";
 // Locale set starts with German only — Task 3 expands this to ["de", "fr", "it", "en"]
 // once translated message files exist for the other three.
 export const routing = defineRouting({
-  locales: ["de"],
+  locales: ["de", "fr", "it", "en"],
   defaultLocale: "de",
   localePrefix: "always",
 });
