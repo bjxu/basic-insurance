@@ -18,9 +18,17 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "meta" });
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://example.com";
+
   return {
     title: t("title"),
     description: t("description"),
+    alternates: {
+      languages: {
+        ...Object.fromEntries(routing.locales.map((l) => [l, `${baseUrl}/${l}`])),
+        "x-default": `${baseUrl}/${routing.defaultLocale}`,
+      },
+    },
     openGraph: { title: t("ogTitle"), description: t("ogDescription"), type: "website" },
     twitter: { card: "summary", title: t("twitterTitle"), description: t("twitterDescription") },
   };
