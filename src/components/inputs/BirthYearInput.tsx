@@ -1,8 +1,8 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { validateBirthYear } from "@/lib/validate";
 import { getAltersklasse, getFranchiseTiers } from "@/lib/ageband";
-import { ALTERSKLASSE_LABELS } from "@/lib/copy";
 
 type Props = {
   value: string;
@@ -11,6 +11,7 @@ type Props = {
 };
 
 export function BirthYearInput({ value, onChange, calendarYear }: Props) {
+  const t = useTranslations();
   const parsed = value ? Number(value) : null;
   const result = parsed != null ? validateBirthYear(parsed) : { valid: true as const };
   const altersklasse = parsed != null && result.valid ? getAltersklasse(parsed, calendarYear) : null;
@@ -19,12 +20,12 @@ export function BirthYearInput({ value, onChange, calendarYear }: Props) {
   return (
     <div>
       <label htmlFor="by" className="block text-label-large text-on-surface-variant mb-1.5">
-        Jahrgang
+        {t("inputs.birthYearLabel")}
       </label>
       <input
         id="by"
         type="number"
-        placeholder="z.B. 1985"
+        placeholder={t("inputs.birthYearPlaceholder")}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         aria-describedby="by-hint"
@@ -35,10 +36,14 @@ export function BirthYearInput({ value, onChange, calendarYear }: Props) {
       />
       <p id="by-hint" className={`text-body-small mt-1 ${result.valid ? "text-outline" : "text-error"}`}>
         {!result.valid
-          ? result.message
+          ? t(`validation.${result.code}`)
           : altersklasse && tiers
-            ? `→ ${ALTERSKLASSE_LABELS[altersklasse]}, Franchise CHF ${tiers[0]}–${tiers[tiers.length - 1]}`
-            : "Bestimmt Altersklasse und verfügbare Franchise-Stufen"}
+            ? t("inputs.birthYearHintResolved", {
+                altersklasse: t(`copy.altersklasse.${altersklasse}`),
+                min: tiers[0],
+                max: tiers[tiers.length - 1],
+              })
+            : t("inputs.birthYearHintDefault")}
       </p>
     </div>
   );

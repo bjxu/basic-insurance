@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 type Props = {
   year: number;
   availableYears: number[];
@@ -19,9 +21,10 @@ export function FilterBar({
   unfalldeckung,
   onToggleUnfalldeckung,
 }: Props) {
+  const t = useTranslations("filterBar");
   return (
     <div className="mt-4 flex items-center gap-2 flex-wrap">
-      <span className="text-sm text-on-surface-variant mr-1">Jahr:</span>
+      <span className="text-sm text-on-surface-variant mr-1">{t("yearLabel")}</span>
       <div className="flex rounded-md border border-outline-variant overflow-hidden">
         {availableYears.map((y, i) => (
           <button
@@ -48,7 +51,7 @@ export function FilterBar({
         }`}
       >
         <span className={`w-2 h-2 rounded-full ${altModelsActive ? "bg-primary" : "bg-outline"}`} />
-        Alternative Modelle: {altModelsActive ? "ein" : "aus"}
+        {t("altModelsLabel", { state: altModelsActive ? t("stateOn") : t("stateOff") })}
       </button>
       <button
         type="button"
@@ -60,7 +63,7 @@ export function FilterBar({
         }`}
       >
         <span className={`w-2 h-2 rounded-full ${unfalldeckung ? "bg-primary" : "bg-outline"}`} />
-        Unfall: {unfalldeckung ? "eingeschlossen" : "ausgeschlossen"}
+        {t("accidentLabel", { state: unfalldeckung ? t("included") : t("excluded") })}
       </button>
     </div>
   );

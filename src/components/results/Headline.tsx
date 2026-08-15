@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import type { HeadlineState, PremiumRow } from "@/lib/types";
 import { formatChf } from "@/lib/format";
 
@@ -7,19 +8,26 @@ type Props = {
 };
 
 export function Headline({ headline, year }: Props) {
+  const t = useTranslations("headline");
+
   if (headline.kind === "savings") {
     return (
       <div role="status" className="mt-6 rounded-lg p-5 flex gap-3.5 bg-success-container border border-success-container">
         <span className="text-xl" aria-hidden>💡</span>
         <p className="text-sm text-on-success-container">
           <strong className="block text-base font-bold text-on-surface mb-0.5">
-            Wenn du nichts tust: {formatChf(headline.current.monthlyPremium)}/Monat bei{" "}
-            {headline.current.insurerName}.
+            {t("savingsCurrent", {
+              amount: formatChf(headline.current.monthlyPremium),
+              insurer: headline.current.insurerName,
+            })}
           </strong>
-          Günstigstes Angebot für dein Profil {year}: {formatChf(headline.cheapest.monthlyPremium)}/Monat bei{" "}
-          {headline.cheapest.insurerName} —{" "}
+          {t("savingsCheapest", {
+            year,
+            amount: formatChf(headline.cheapest.monthlyPremium),
+            insurer: headline.cheapest.insurerName,
+          })}{" "}
           <span className="text-success font-bold">
-            spare {formatChf(headline.savingsPerYear)}/Jahr durch einen Wechsel.
+            {t("savingsAmount", { amount: formatChf(headline.savingsPerYear) })}
           </span>
         </p>
       </div>
@@ -34,11 +42,12 @@ export function Headline({ headline, year }: Props) {
         <span className="text-xl" aria-hidden>✅</span>
         <p className="text-sm text-on-success-container">
           <strong className="block text-base font-bold text-on-surface mb-0.5">
-            {isExactMatch
-              ? "Du hast bereits das günstigste Angebot für dein Profil."
-              : "Dein Beitrag liegt unter allen Angeboten für dieses Profil — prüfe, ob Franchise und Modell vergleichbar sind."}
+            {isExactMatch ? t("alreadyCheapestExact") : t("alreadyCheapestBelow")}
           </strong>
-          {headline.current.insurerName} · {formatChf(headline.current.monthlyPremium)}/Monat.
+          {t("alreadyCheapestDetail", {
+            insurer: headline.current.insurerName,
+            amount: formatChf(headline.current.monthlyPremium),
+          })}
         </p>
       </div>
     );
@@ -48,14 +57,15 @@ export function Headline({ headline, year }: Props) {
 }
 
 function CheapestOnly({ cheapest }: { cheapest: PremiumRow }) {
+  const t = useTranslations("headline");
   return (
     <div role="status" className="mt-6 rounded-lg p-5 flex gap-3.5 bg-primary-container border border-primary-container">
       <span className="text-xl" aria-hidden>🔍</span>
       <p className="text-sm text-on-primary-container">
         <strong className="block text-base font-bold text-on-surface mb-0.5">
-          Günstigstes Angebot: {formatChf(cheapest.monthlyPremium)}/Monat bei {cheapest.insurerName}.
+          {t("cheapestOnlyTitle", { amount: formatChf(cheapest.monthlyPremium), insurer: cheapest.insurerName })}
         </strong>
-        Gib deine aktuelle Kasse an, um zu sehen, wie viel du sparen könntest. ↓
+        {t("cheapestOnlyCta")}
       </p>
     </div>
   );

@@ -14,34 +14,47 @@ describe("formatChf", () => {
 });
 
 describe("formatMemberCount", () => {
-  it("formats sub-1000 counts as an exact integer", () => {
-    expect(formatMemberCount(999)).toBe("999");
+  it("formats sub-1000 counts as an exact integer regardless of locale", () => {
+    expect(formatMemberCount(999, "de")).toBe("999");
+    expect(formatMemberCount(999, "en")).toBe("999");
   });
-  it("formats thousands rounded to the nearest whole Tsd.", () => {
-    expect(formatMemberCount(1000)).toBe("1 Tsd.");
-    expect(formatMemberCount(2792)).toBe("3 Tsd."); // real: Krankenkasse Birchmeier
-    expect(formatMemberCount(813080)).toBe("813 Tsd."); // real: Swica
+  it("formats thousands rounded to the nearest whole unit, per locale", () => {
+    expect(formatMemberCount(1000, "de")).toBe("1 Tsd.");
+    expect(formatMemberCount(2792, "de")).toBe("3 Tsd."); // real: Krankenkasse Birchmeier
+    expect(formatMemberCount(813080, "de")).toBe("813 Tsd."); // real: Swica
+    expect(formatMemberCount(813080, "en")).toBe("813 k");
+    expect(formatMemberCount(813080, "fr")).toBe("813 k");
+    expect(formatMemberCount(813080, "it")).toBe("813 mila");
   });
-  it("formats millions with one decimal", () => {
-    expect(formatMemberCount(1537730)).toBe("1.5 Mio."); // real: CSS
-    expect(formatMemberCount(1290207)).toBe("1.3 Mio."); // real: Helsana
+  it("formats millions with one decimal, per locale", () => {
+    expect(formatMemberCount(1537730, "de")).toBe("1.5 Mio."); // real: CSS
+    expect(formatMemberCount(1290207, "de")).toBe("1.3 Mio."); // real: Helsana
+    expect(formatMemberCount(1537730, "en")).toBe("1.5 M");
+    expect(formatMemberCount(1537730, "fr")).toBe("1.5 mio");
+    expect(formatMemberCount(1537730, "it")).toBe("1.5 mio");
   });
-  it("rounds the Tsd./Mio. cutover boundary up", () => {
-    expect(formatMemberCount(999999)).toBe("1.0 Mio.");
+  it("rounds the thousand/million cutover boundary up", () => {
+    expect(formatMemberCount(999999, "de")).toBe("1.0 Mio.");
   });
-  it("crosses over to Mio. as low as ~950'000, not a clean 1'000'000", () => {
-    expect(formatMemberCount(960000)).toBe("1.0 Mio.");
+  it("crosses over to million as low as ~950'000, not a clean 1'000'000", () => {
+    expect(formatMemberCount(960000, "de")).toBe("1.0 Mio.");
   });
-  it("stays in Tsd. just below the effective cutover", () => {
-    expect(formatMemberCount(949999)).toBe("950 Tsd.");
+  it("stays in thousands just below the effective cutover", () => {
+    expect(formatMemberCount(949999, "de")).toBe("950 Tsd.");
+  });
+  it("falls back to German units for an unrecognized locale", () => {
+    expect(formatMemberCount(2792, "xx")).toBe("3 Tsd.");
   });
 });
 
 describe("formatMemberCountDetail", () => {
-  it("formats the exact grouped count with the data-as-of year", () => {
-    expect(formatMemberCountDetail(1537730, 2024)).toBe("1'537'730 Versicherte · Stand 2024");
+  it("formats the exact grouped count with the data-as-of year, per locale", () => {
+    expect(formatMemberCountDetail(1537730, 2024, "de")).toBe("1'537'730 Versicherte · Stand 2024");
+    expect(formatMemberCountDetail(1537730, 2024, "en")).toBe("1'537'730 insured · as of 2024");
+    expect(formatMemberCountDetail(1537730, 2024, "fr")).toBe("1'537'730 assurés · en 2024");
+    expect(formatMemberCountDetail(1537730, 2024, "it")).toBe("1'537'730 assicurati · nel 2024");
   });
   it("rounds a fractional count before grouping", () => {
-    expect(formatMemberCountDetail(2791.6, 2024)).toBe("2'792 Versicherte · Stand 2024");
+    expect(formatMemberCountDetail(2791.6, 2024, "de")).toBe("2'792 Versicherte · Stand 2024");
   });
 });

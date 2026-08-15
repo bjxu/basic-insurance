@@ -1,0 +1,93 @@
+{
+  "meta": {
+    "title": "Health Insurance Comparison – Basic Insurance Switzerland",
+    "description": "Compare Swiss basic health insurance premiums – every insurer, every model, official FOPH data.",
+    "ogTitle": "Health Insurance Comparison – Basic Insurance Switzerland",
+    "ogDescription": "Compare Swiss basic health insurance premiums – every insurer, every model, official FOPH data.",
+    "twitterTitle": "Health Insurance Comparison – Basic Insurance Switzerland",
+    "twitterDescription": "Compare Swiss basic health insurance premiums – official FOPH data."
+  },
+  "inputs": {
+    "title": "Premium Comparison",
+    "tagline": "Enter your details — the cheapest insurers appear instantly.",
+    "plzLabel": "Postcode (PLZ)",
+    "plzPlaceholder": "e.g. 3001",
+    "plzNotFound": "Postcode not found — please check it.",
+    "birthYearLabel": "Birth year",
+    "birthYearPlaceholder": "e.g. 1985",
+    "birthYearHintDefault": "Determines age group and available deductible tiers",
+    "birthYearHintResolved": "→ {altersklasse}, deductible CHF {min}–{max}",
+    "deductibleLabel": "Deductible",
+    "deductibleChoose": "Choose…",
+    "deductibleNeedsBirthYear": "Enter birth year first",
+    "gemeindeAmbiguous": "Postcode {plz} covers several premium regions. Please choose your municipality:",
+    "gemeindeConfirmed": "✓ Municipality: {name}",
+    "premiumsLoading": "Loading premium data…",
+    "premiumsError": "Couldn't load premium data. Please try again.",
+    "retry": "Try again"
+  },
+  "validation": {
+    "invalidPlzFormat": "Invalid postcode — please enter a 4-digit Swiss postcode.",
+    "invalidPremium": "Please enter a valid monthly premium.",
+    "nonPositivePremium": "The monthly premium must be greater than CHF 0.",
+    "invalidBirthYear": "Please enter a valid birth year.",
+    "futureBirthYear": "Birth year is in the future.",
+    "unrealisticBirthYear": "Please enter a realistic birth year (max. ~120 years)."
+  },
+  "currentPlan": {
+    "summaryTitle": "What are you paying today?",
+    "summaryHint": "(optional — shows your savings)",
+    "insurerLabel": "Current insurer",
+    "premiumLabel": "Monthly premium",
+    "premiumPlaceholder": "e.g. 350"
+  },
+  "filterBar": {
+    "yearLabel": "Year:",
+    "altModelsLabel": "Alternative models: {state}",
+    "accidentLabel": "Accident cover: {state}",
+    "stateOn": "on",
+    "stateOff": "off",
+    "included": "included",
+    "excluded": "excluded"
+  },
+  "results": {
+    "summary": "{count} insurers · {model} · Accident cover {coverage} · {year}",
+    "modelAlt": "cheapest model per insurer",
+    "modelStandard": "cheapest standard offer per insurer",
+    "emptyTitle": "No offers found",
+    "emptyMessage": "No premiums exist in the FOPH data for this combination. Please check your details or adjust the filters.",
+    "discountBadge": "up to −{pct}% vs. standard",
+    "yourInsurerBadge": "Your insurer",
+    "perMonth": "/month"
+  },
+  "headline": {
+    "savingsCurrent": "If you do nothing: {amount}/month with {insurer}.",
+    "savingsCheapest": "Cheapest offer for your profile in {year}: {amount}/month with {insurer} —",
+    "savingsAmount": "save {amount}/year by switching.",
+    "alreadyCheapestExact": "You already have the cheapest offer for your profile.",
+    "alreadyCheapestBelow": "Your premium is below every offer for this profile — check whether the deductible and model are comparable.",
+    "alreadyCheapestDetail": "{insurer} · {amount}/month.",
+    "cheapestOnlyTitle": "Cheapest offer: {amount}/month with {insurer}.",
+    "cheapestOnlyCta": "Enter your current insurer to see how much you could save. ↓"
+  },
+  "footer": {
+    "dataNotice": "Data: FOPH open data · Published {date} · Mandatory benefits only · No sponsoring, no referral links"
+  },
+  "copy": {
+    "tarifart": {
+      "standard": { "label": "Standard", "description": "Free choice of doctor" },
+      "hausarzt": { "label": "Family doctor", "description": "First point of contact is always your chosen family doctor" },
+      "telmed": { "label": "Telmed", "description": "Must call a hotline before every doctor's visit" },
+      "hmo": { "label": "HMO", "description": "First point of contact is always the HMO centre" },
+      "andere": { "label": "Alternative model", "description": "Restricted choice of first point of contact" }
+    },
+    "altersklasse": {
+      "kind": "Child (0–18)",
+      "jung": "Young adult (19–25)",
+      "erwachsen": "Adult (26+)"
+    }
+  },
+  "languageSwitcher": {
+    "menuLabel": "Choose language"
+  }
+}

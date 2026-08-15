@@ -1,5 +1,5 @@
+import { useLocale, useTranslations } from "next-intl";
 import type { PremiumRow } from "@/lib/types";
-import { TARIFART_LABELS, TARIFART_DESCRIPTIONS } from "@/lib/copy";
 import { formatChf, formatMemberCount, formatMemberCountDetail } from "@/lib/format";
 
 type Props = {
@@ -32,6 +32,8 @@ export function PlanRow({
   memberCountAsOf,
   previousYearPremium,
 }: Props) {
+  const t = useTranslations();
+  const locale = useLocale();
   const yoy =
     previousYearPremium != null && previousYearPremium !== plan.monthlyPremium
       ? ((plan.monthlyPremium - previousYearPremium) / previousYearPremium) * 100
@@ -55,30 +57,30 @@ export function PlanRow({
               MODEL_TAG_CLASSES[plan.tarifart] ?? DEFAULT_MODEL_TAG_CLASSES
             }`}
           >
-            {TARIFART_LABELS[plan.tarifart]}
+            {t(`copy.tarifart.${plan.tarifart}.label`)}
           </span>
           {discountPct != null && (
             <span className="inline-block px-1.5 py-px rounded text-[11px] font-bold bg-primary-container text-on-primary-container whitespace-nowrap">
-              bis zu −{discountPct.toFixed(1)}% ggü. Standard
+              {t("results.discountBadge", { pct: discountPct.toFixed(1) })}
             </span>
           )}
-          <span>· {TARIFART_DESCRIPTIONS[plan.tarifart]}</span>
+          <span>· {t(`copy.tarifart.${plan.tarifart}.description`)}</span>
         </div>
       </div>
       {memberCount != null && (
         <div
           className="hidden sm:flex flex-col items-end gap-0.5 flex-shrink-0"
-          title={formatMemberCountDetail(memberCount, memberCountAsOf)}
-          aria-label={formatMemberCountDetail(memberCount, memberCountAsOf)}
+          title={formatMemberCountDetail(memberCount, memberCountAsOf, locale)}
+          aria-label={formatMemberCountDetail(memberCount, memberCountAsOf, locale)}
         >
           <span className="text-[11px] font-semibold px-1.5 py-px rounded bg-surface-variant text-on-surface-variant whitespace-nowrap">
-            <span aria-hidden="true">👥</span> {formatMemberCount(memberCount)}
+            <span aria-hidden="true">👥</span> {formatMemberCount(memberCount, locale)}
           </span>
         </div>
       )}
       {isCurrentPlan && (
         <span className="text-[11px] font-semibold px-1.5 py-px rounded bg-error-container text-error">
-          Deine Kasse
+          {t("results.yourInsurerBadge")}
         </span>
       )}
       {yoy != null && (
@@ -95,7 +97,7 @@ export function PlanRow({
         <div className={`text-headline-small ${isCheapest ? "text-primary" : "text-on-surface"}`}>
           {formatChf(plan.monthlyPremium)}
         </div>
-        <div className="text-body-small text-outline">/Monat</div>
+        <div className="text-body-small text-outline">{t("results.perMonth")}</div>
       </div>
     </div>
   );
