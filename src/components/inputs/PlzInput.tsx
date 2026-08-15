@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { validatePlz } from "@/lib/validate";
 
 type Props = {
@@ -10,23 +11,24 @@ type Props = {
 };
 
 export function PlzInput({ value, onChange, notFound }: Props) {
+  const t = useTranslations();
   const formatResult = value ? validatePlz(value) : { valid: true as const };
   const result =
     formatResult.valid && notFound
-      ? { valid: false as const, message: "PLZ nicht gefunden — bitte überprüfen." }
+      ? { valid: false as const, message: t("inputs.plzNotFound") }
       : formatResult;
 
   return (
     <div>
       <label htmlFor="plz" className="block text-label-large text-on-surface-variant mb-1.5">
-        Postleitzahl (PLZ)
+        {t("inputs.plzLabel")}
       </label>
       <input
         id="plz"
         type="text"
         inputMode="numeric"
         maxLength={4}
-        placeholder="z.B. 3001"
+        placeholder={t("inputs.plzPlaceholder")}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         aria-describedby="plz-hint"

@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { PlzInput } from "./inputs/PlzInput";
 import { BirthYearInput } from "./inputs/BirthYearInput";
 import { DeductibleSelect } from "./inputs/DeductibleSelect";
@@ -33,6 +34,7 @@ export function InsuranceComparator() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const t = useTranslations();
   const initial = useMemo(() => decodeState(searchParams), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [plz, setPlz] = useState(initial.plz ?? "");
@@ -184,10 +186,8 @@ export function InsuranceComparator() {
   return (
     <main className="max-w-[860px] mx-auto my-8 px-4">
       <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-6">
-        <h1 className="text-title-large text-on-surface mb-1">Prämienvergleich</h1>
-        <p className="text-body-medium text-on-surface-variant mb-5">
-          Gib deine Angaben ein — die günstigsten Kassen erscheinen sofort.
-        </p>
+        <h1 className="text-title-large text-on-surface mb-1">{t("inputs.title")}</h1>
+        <p className="text-body-medium text-on-surface-variant mb-5">{t("inputs.tagline")}</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <PlzInput value={plz} onChange={handlePlzChange} notFound={plzNotFound} />
@@ -197,9 +197,7 @@ export function InsuranceComparator() {
 
         {ambiguous && (
           <div className="mt-3 bg-primary-container border border-primary-container rounded-md p-3.5">
-            <p className="text-sm text-on-surface-variant mb-2">
-              PLZ {plz} liegt in mehreren Prämienregionen. Bitte wähle deine Gemeinde:
-            </p>
+            <p className="text-sm text-on-surface-variant mb-2">{t("inputs.gemeindeAmbiguous", { plz })}</p>
             <div className="flex gap-2 flex-wrap">
               {gemeinden.map((g) => (
                 <button
@@ -219,7 +217,7 @@ export function InsuranceComparator() {
           </div>
         )}
         {!ambiguous && resolvedGemeinde && (
-          <p className="text-xs text-primary mt-2">&#10003; Gemeinde: {resolvedGemeinde.name}</p>
+          <p className="text-xs text-primary mt-2">{t("inputs.gemeindeConfirmed", { name: resolvedGemeinde.name })}</p>
         )}
 
         <CurrentPlanSection insurers={INSURERS} value={currentPlan} onChange={setCurrentPlan} />
@@ -227,15 +225,13 @@ export function InsuranceComparator() {
 
       {premiumsLoading && !results && (
         <p className="text-sm text-on-surface-variant mt-4" role="status">
-          Prämiendaten werden geladen…
+          {t("inputs.premiumsLoading")}
         </p>
       )}
 
       {premiumsError && !premiumsLoading && !results && (
         <div className="mt-4 bg-error-container border border-error-container rounded-md p-3.5" role="alert">
-          <p className="text-sm text-on-error-container mb-2">
-            Prämiendaten konnten nicht geladen werden. Bitte versuche es erneut.
-          </p>
+          <p className="text-sm text-on-error-container mb-2">{t("inputs.premiumsError")}</p>
           <button
             type="button"
             onClick={() => {
@@ -248,7 +244,7 @@ export function InsuranceComparator() {
             }}
             className="px-3 py-1.5 rounded-md border border-error text-sm text-error bg-surface hover:bg-error-container"
           >
-            Erneut versuchen
+            {t("inputs.retry")}
           </button>
         </div>
       )}
@@ -268,8 +264,12 @@ export function InsuranceComparator() {
           />
 
           <p className="text-sm text-on-surface-variant mt-4 mb-2">
-            {results.plans.length} Kassen · {altModelsActive ? "günstiges Modell je Kasse" : "günstigstes Standard-Angebot je Kasse"} ·{" "}
-            Unfalldeckung {unfalldeckung ? "eingeschlossen" : "ausgeschlossen"} · {year}
+            {t("results.summary", {
+              count: results.plans.length,
+              model: altModelsActive ? t("results.modelAlt") : t("results.modelStandard"),
+              coverage: unfalldeckung ? t("filterBar.included") : t("filterBar.excluded"),
+              year,
+            })}
           </p>
 
           {results.plans.length > 0 ? (
@@ -281,15 +281,19 @@ export function InsuranceComparator() {
               memberCountAsOf={metadata.memberCountAsOf}
             />
           ) : (
-            <EmptyState message="Für die aktuelle Kombination sind keine Prämien in den BAG-Daten vorhanden. Bitte überprüfe deine Eingaben oder passe die Filter an." />
+            <EmptyState message={t("results.emptyMessage")} />
           )}
         </div>
       )}
 
       <p className="text-body-small text-outline text-center mt-6 pb-10">
-        Daten: BAG Opendata · Publikation{" "}
-        {new Date(metadata.publicationDate).toLocaleDateString("de-CH", { day: "numeric", month: "long", year: "numeric" })} ·
-        Nur Pflichtleistungen (OKP) · Kein Sponsoring, keine Vermittlungslinks
+        {t("footer.dataNotice", {
+          date: new Date(metadata.publicationDate).toLocaleDateString("de-CH", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          }),
+        })}
       </p>
     </main>
   );
