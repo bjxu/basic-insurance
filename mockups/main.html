@@ -131,7 +131,23 @@
     }
     .input-section h1 {
       font: var(--md-sys-typescale-title-large-weight) var(--md-sys-typescale-title-large-size)/var(--md-sys-typescale-title-large-line-height) var(--md-sys-typescale-title-large-font);
+    }
+    /* ── Header row: title + language switcher (src/components/LanguageSwitcher.tsx) ── */
+    .input-section .header-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
       margin-bottom: 4px;
+    }
+    .lang-select {
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid var(--md-sys-color-outline-variant);
+      background: var(--md-sys-color-surface);
+      padding: 0 8px;
+      font-size: 13px;
+      color: var(--md-sys-color-on-surface-variant);
     }
     .input-section .tagline {
       font: var(--md-sys-typescale-body-medium-weight) var(--md-sys-typescale-body-medium-size)/var(--md-sys-typescale-body-medium-line-height) var(--md-sys-typescale-body-medium-font);
@@ -506,6 +522,21 @@
     }
     .plan-price.cheapest .amount { color: var(--md-sys-color-primary); }
 
+    /* ── Member-count badge (src/components/results/PlanRow.tsx — OKP-Versichertenbestand) ── */
+    .member-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: var(--md-sys-color-surface-variant);
+      color: var(--md-sys-color-on-surface-variant);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    @media (max-width: 640px) {
+      .member-badge { display: none; }
+    }
+
     .plan-row.current-plan {
       border-color: var(--md-sys-color-error);
       background: var(--md-sys-color-error-container);
@@ -630,7 +661,16 @@
 
   <!-- ── Input card ── -->
   <div class="card input-section">
-    <h1>Prämienvergleich</h1>
+    <div class="header-row">
+      <h1>Prämienvergleich</h1>
+      <!-- src/components/LanguageSwitcher.tsx — native <select>, preserves query params on change -->
+      <select class="lang-select" aria-label="Sprache wählen">
+        <option selected>Deutsch</option>
+        <option>Français</option>
+        <option>Italiano</option>
+        <option>English</option>
+      </select>
+    </div>
     <p class="tagline">Gib deine Angaben ein — die günstigsten Kassen erscheinen sofort.</p>
 
     <div class="fields-row">
@@ -789,6 +829,7 @@
         <div class="name">Assura</div>
         <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
       </div>
+      <div class="member-badge" title="682'061 Versicherte · Stand 2024" aria-label="682'061 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 682 Tsd.</div>
       <div class="plan-yoy up">+4.2%</div>
       <div class="plan-price cheapest">
         <div class="amount">CHF 301.10</div>
@@ -802,6 +843,7 @@
         <div class="name">KPT</div>
         <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
       </div>
+      <div class="member-badge" title="546'009 Versicherte · Stand 2024" aria-label="546'009 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 546 Tsd.</div>
       <div class="plan-yoy down">−1.1%</div>
       <div class="plan-price">
         <div class="amount">CHF 318.50</div>
@@ -815,6 +857,7 @@
         <div class="name">EGK-Gesundheitskasse</div>
         <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
       </div>
+      <div class="member-badge" title="120'968 Versicherte · Stand 2024" aria-label="120'968 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 121 Tsd.</div>
       <div class="plan-yoy flat">±0%</div>
       <div class="plan-price">
         <div class="amount">CHF 334.80</div>
@@ -828,6 +871,7 @@
         <div class="name">Concordia</div>
         <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
       </div>
+      <div class="member-badge" title="672'886 Versicherte · Stand 2024" aria-label="672'886 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 673 Tsd.</div>
       <div class="plan-yoy up">+2.8%</div>
       <div class="plan-price">
         <div class="amount">CHF 347.20</div>
@@ -841,6 +885,7 @@
         <div class="name">Visana</div>
         <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
       </div>
+      <div class="member-badge" title="509'645 Versicherte · Stand 2024" aria-label="509'645 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 510 Tsd.</div>
       <div class="plan-yoy up">+3.5%</div>
       <div class="plan-price">
         <div class="amount">CHF 358.90</div>
@@ -855,6 +900,7 @@
         <div class="name">Helsana</div>
         <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
       </div>
+      <div class="member-badge" title="1'290'207 Versicherte · Stand 2024" aria-label="1'290'207 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 1.3 Mio.</div>
       <span class="current-plan-tag">Deine Kasse</span>
       <div class="plan-yoy up">+5.1%</div>
       <div class="plan-price">
@@ -890,6 +936,7 @@
         <div class="name">Sanitas</div>
         <div class="model-badge"><span class="model-tag telmed">Telmed</span> <span class="discount-badge">bis zu −18% ggü. Standard</span> · Anruf bei Hotline erforderlich vor jedem Arztbesuch</div>
       </div>
+      <div class="member-badge" title="639'302 Versicherte · Stand 2024" aria-label="639'302 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 639 Tsd.</div>
       <div class="plan-yoy up">+2.1%</div>
       <div class="plan-price cheapest">
         <div class="amount">CHF 221.80</div>
@@ -903,6 +950,7 @@
         <div class="name">CSS</div>
         <div class="model-badge"><span class="model-tag haus">Hausarzt</span> <span class="discount-badge">bis zu −12% ggü. Standard</span> · Erstbehandlung immer beim gewählten Hausarzt</div>
       </div>
+      <div class="member-badge" title="1'537'730 Versicherte · Stand 2024" aria-label="1'537'730 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 1.5 Mio.</div>
       <div class="plan-yoy down">−0.8%</div>
       <div class="plan-price">
         <div class="amount">CHF 238.50</div>
@@ -916,6 +964,7 @@
         <div class="name">Assura</div>
         <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
       </div>
+      <div class="member-badge" title="682'061 Versicherte · Stand 2024" aria-label="682'061 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 682 Tsd.</div>
       <div class="plan-yoy up">+4.2%</div>
       <div class="plan-price">
         <div class="amount">CHF 301.10</div>
@@ -929,6 +978,7 @@
         <div class="name">KPT</div>
         <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
       </div>
+      <div class="member-badge" title="546'009 Versicherte · Stand 2024" aria-label="546'009 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 546 Tsd.</div>
       <div class="plan-yoy down">−1.1%</div>
       <div class="plan-price">
         <div class="amount">CHF 318.50</div>
@@ -943,6 +993,7 @@
         <div class="name">Helsana</div>
         <div class="model-badge"><span class="model-tag hmo">HMO</span> <span class="discount-badge">bis zu −14% ggü. Standard</span> · Erstanlaufstelle immer beim HMO-Zentrum</div>
       </div>
+      <div class="member-badge" title="1'290'207 Versicherte · Stand 2024" aria-label="1'290'207 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 1.3 Mio.</div>
       <span class="current-plan-tag">Deine Kasse*</span>
       <div class="plan-yoy up">+3.4%</div>
       <div class="plan-price">
@@ -968,6 +1019,7 @@
           <div class="name">Sanitas</div>
           <div class="model-badge"><span class="model-tag telmed">Telmed</span> <span class="discount-badge">bis zu −18% ggü. Standard</span> · Anruf bei Hotline erforderlich vor jedem Arztbesuch</div>
         </div>
+        <div class="member-badge" title="639'302 Versicherte · Stand 2024" aria-label="639'302 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 639 Tsd.</div>
         <div class="plan-yoy up">+2.1%</div>
         <div class="plan-price cheapest">
           <div class="amount">CHF 221.80</div>
@@ -1031,6 +1083,7 @@
           <div class="name">Assura</div>
           <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
         </div>
+        <div class="member-badge" title="682'061 Versicherte · Stand 2024" aria-label="682'061 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 682 Tsd.</div>
         <div class="plan-yoy up">+4.2%</div>
         <div class="plan-price">
           <div class="amount">CHF 301.10</div>
@@ -1059,7 +1112,7 @@
   </div>
 
   <p class="data-notice">
-    Daten: <a href="#">BAG Opendata</a> · Publikation 15. Oktober 2025 ·
+    Daten: <a href="#">BAG Opendata</a> · Publikation 23. September 2025 ·
     Nur Pflichtleistungen (OKP) · Kein Sponsoring, keine Vermittlungslinks
   </p>
 
