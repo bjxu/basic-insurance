@@ -33,33 +33,38 @@ export function ProductList({ products, standardPremium, shownTarifCode }: Props
               return (
                 <div
                   key={product.tarifCode}
-                  className={`flex items-center gap-2 rounded-md px-1.5 py-1 border-l-[3px] ${
+                  className={`rounded-md px-1.5 py-1 border-l-[3px] ${
                     isShown ? "border-primary" : "border-transparent"
                   }`}
                 >
-                  <span
-                    className={`inline-block px-1.5 py-px rounded text-[11px] font-semibold ${
-                      MODEL_TAG_CLASSES[product.tarifart] ?? DEFAULT_MODEL_TAG_CLASSES
-                    }`}
-                  >
-                    {t(`copy.tarifart.${product.tarifart}.label`)}
-                  </span>
-                  <span className="flex-1 min-w-0 text-[13px] truncate">
-                    {product.productName}
-                    {isShown && (
-                      <span className="ml-1.5 inline-block px-1.5 py-px rounded text-[10px] font-semibold border border-primary text-primary bg-surface whitespace-nowrap">
-                        {t("results.shownAboveTag")}
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`inline-block px-1.5 py-px rounded text-[11px] font-semibold ${
+                        MODEL_TAG_CLASSES[product.tarifart] ?? DEFAULT_MODEL_TAG_CLASSES
+                      }`}
+                    >
+                      {t(`copy.tarifart.${product.tarifart}.label`)}
+                    </span>
+                    <span className="flex-1 min-w-0 text-[13px] truncate">
+                      {product.productName}
+                      {isShown && (
+                        <span className="ml-1.5 inline-block px-1.5 py-px rounded text-[10px] font-semibold border border-primary text-primary bg-surface whitespace-nowrap">
+                          {t("results.shownAboveTag")}
+                        </span>
+                      )}
+                    </span>
+                    {discountPct != null && discountPct > 0 && (
+                      <span className="inline-block px-1.5 py-px rounded text-[11px] font-bold bg-primary-container text-on-primary-container whitespace-nowrap">
+                        {t("results.discountBadgeExact", { pct: discountPct.toFixed(1) })}
                       </span>
                     )}
-                  </span>
-                  {discountPct != null && (
-                    <span className="inline-block px-1.5 py-px rounded text-[11px] font-bold bg-primary-container text-on-primary-container whitespace-nowrap">
-                      {t("results.discountBadgeExact", { pct: discountPct.toFixed(1) })}
+                    <span className="text-[13px] font-semibold w-20 text-right flex-shrink-0">
+                      {formatChf(product.monthlyPremium)}
                     </span>
-                  )}
-                  <span className="text-[13px] font-semibold w-20 text-right flex-shrink-0">
-                    {formatChf(product.monthlyPremium)}
-                  </span>
+                  </div>
+                  <p className="text-[11px] text-on-surface-variant mt-0.5">
+                    {t(`copy.tarifart.${product.tarifart}.description`)}
+                  </p>
                 </div>
               );
             })}

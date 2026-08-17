@@ -60,7 +60,7 @@ export function PlanRow({
             >
               {t(`copy.tarifart.${plan.tarifart}.label`)}
             </span>
-            {discountPct != null && (
+            {discountPct != null && discountPct > 0 && (
               <span className="inline-block px-1.5 py-px rounded text-[11px] font-bold bg-primary-container text-on-primary-container whitespace-nowrap">
                 {t("results.discountBadge", { pct: discountPct.toFixed(1) })}
               </span>
