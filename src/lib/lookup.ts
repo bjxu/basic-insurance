@@ -32,6 +32,12 @@ const TARIFART_PRIORITY: Record<Tarifart, number> = {
   andere: 4,
 };
 
+// All five Tarifart values, in the same priority order as TARIFART_PRIORITY above — the
+// filter used when the provider-product-detail accordion needs every model type for an
+// insurer, independent of whichever models are currently toggled into the main list
+// (docs/superpowers/specs/2026-08-16-provider-product-detail-design.md).
+export const ALL_TARIFARTS: Tarifart[] = ["standard", "hausarzt", "telmed", "hmo", "andere"];
+
 /** For each insurer, keep only the row with the lowest monthlyPremium. */
 export function cheapestPerInsurer(rows: PremiumRow[]): PremiumRow[] {
   const byInsurer = new Map<string, PremiumRow>();
@@ -101,4 +107,40 @@ export function standardPremiumsByInsurer(
 export function discountVsStandardPct(standardPremium: number | undefined, premium: number): number | null {
   if (standardPremium == null || standardPremium <= 0) return null;
   return ((standardPremium - premium) / standardPremium) * 100;
+}
+
+/** Groups rows by insurerCode, preserving each row's original relative order — used to
+ *  look up "all of this insurer's products at the current filter context" for the
+ *  provider-product-detail accordion. */
+export function groupByInsurer(rows: PremiumRow[]): Map<string, PremiumRow[]> {
+  const byInsurer = new Map<string, PremiumRow[]>();
+  for (const row of rows) {
+    if (!byInsurer.has(row.insurerCode)) byInsurer.set(row.insurerCode, []);
+    byInsurer.get(row.insurerCode)!.push(row);
+  }
+  return byInsurer;
+}
+
+export type TarifartGroup = { tarifart: Tarifart; products: PremiumRow[] };
+
+/** Groups one insurer's products by tarifart, in TARIFART_PRIORITY order (Standard →
+ *  Hausarzt → Telmed → HMO → Andere), sorted by price ascending within each group, ties
+ *  broken alphabetically by productName ("de-CH") — the provider-product-detail
+ *  accordion's row order. */
+export function groupProductsByTarifart(products: PremiumRow[]): TarifartGroup[] {
+  const byTarifart = new Map<Tarifart, PremiumRow[]>();
+  for (const p of products) {
+    if (!byTarifart.has(p.tarifart)) byTarifart.set(p.tarifart, []);
+    byTarifart.get(p.tarifart)!.push(p);
+  }
+  return Array.from(byTarifart.entries())
+    .sort(([a], [b]) => TARIFART_PRIORITY[a] - TARIFART_PRIORITY[b])
+    .map(([tarifart, group]) => ({
+      tarifart,
+      products: [...group].sort((a, b) =>
+        a.monthlyPremium !== b.monthlyPremium
+          ? a.monthlyPremium - b.monthlyPremium
+          : a.productName.localeCompare(b.productName, "de-CH"),
+      ),
+    }));
 }

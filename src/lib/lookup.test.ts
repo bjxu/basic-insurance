@@ -1,5 +1,14 @@
 import { describe, it, expect } from "vitest";
-import { filterPlans, cheapestPerInsurer, sortPlans, computeHeadline, standardPremiumsByInsurer, discountVsStandardPct } from "@/lib/lookup";
+import {
+  filterPlans,
+  cheapestPerInsurer,
+  sortPlans,
+  computeHeadline,
+  standardPremiumsByInsurer,
+  discountVsStandardPct,
+  groupByInsurer,
+  groupProductsByTarifart,
+} from "@/lib/lookup";
 import type { PremiumRow, SelfReportedPlan } from "@/lib/types";
 
 const ROWS: PremiumRow[] = [
@@ -145,5 +154,52 @@ describe("computeHeadline", () => {
     if (result.kind === "already-cheapest") {
       expect(result.cheapest).toBe(cheapest);
     }
+  });
+});
+
+describe("groupByInsurer", () => {
+  it("groups rows by insurerCode, preserving row order within each group", () => {
+    const result = groupByInsurer(ROWS);
+    expect(result.get("A")).toEqual([ROWS[0]]);
+    expect(result.get("B")).toEqual([ROWS[1], ROWS[2]]);
+    expect(result.get("C")).toEqual([ROWS[3], ROWS[4]]);
+  });
+
+  it("returns an empty map for empty input", () => {
+    expect(groupByInsurer([]).size).toBe(0);
+  });
+});
+
+describe("groupProductsByTarifart", () => {
+  const products: PremiumRow[] = [
+    { ...ROWS[0], tarifart: "hmo", tarifCode: "HMO-B", productName: "Bonus Care", monthlyPremium: 233.6 },
+    { ...ROWS[0], tarifart: "standard", tarifCode: "STD", productName: "Grundversicherung", monthlyPremium: 270.5 },
+    { ...ROWS[0], tarifart: "telmed", tarifCode: "TEL-A", productName: "Callmed", monthlyPremium: 221.8 },
+    { ...ROWS[0], tarifart: "telmed", tarifCode: "TEL-B", productName: "Sana24", monthlyPremium: 229.4 },
+    { ...ROWS[0], tarifart: "hausarzt", tarifCode: "HAM", productName: "Casamed", monthlyPremium: 238.9 },
+  ];
+
+  it("groups by tarifart in Standard → Hausarzt → Telmed → HMO → Andere order", () => {
+    const result = groupProductsByTarifart(products);
+    expect(result.map((g) => g.tarifart)).toEqual(["standard", "hausarzt", "telmed", "hmo"]);
+  });
+
+  it("sorts each group's products by price ascending", () => {
+    const result = groupProductsByTarifart(products);
+    const telmedGroup = result.find((g) => g.tarifart === "telmed")!;
+    expect(telmedGroup.products.map((p) => p.productName)).toEqual(["Callmed", "Sana24"]);
+  });
+
+  it("breaks price ties alphabetically by productName (de-CH)", () => {
+    const tiedProducts: PremiumRow[] = [
+      { ...ROWS[0], tarifart: "hmo", tarifCode: "HMO-Z", productName: "Zeta HMO", monthlyPremium: 200 },
+      { ...ROWS[0], tarifart: "hmo", tarifCode: "HMO-A", productName: "Alpha HMO", monthlyPremium: 200 },
+    ];
+    const result = groupProductsByTarifart(tiedProducts);
+    expect(result[0].products.map((p) => p.productName)).toEqual(["Alpha HMO", "Zeta HMO"]);
+  });
+
+  it("returns an empty array for empty input", () => {
+    expect(groupProductsByTarifart([])).toEqual([]);
   });
 });
