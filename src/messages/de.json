@@ -58,7 +58,9 @@
     "emptyMessage": "Für die aktuelle Kombination sind keine Prämien in den BAG-Daten vorhanden. Bitte überprüfe deine Eingaben oder passe die Filter an.",
     "discountBadge": "bis zu −{pct}% ggü. Standard",
     "yourInsurerBadge": "Deine Kasse",
-    "perMonth": "/Monat"
+    "perMonth": "/Monat",
+    "discountBadgeExact": "−{pct}% ggü. Standard",
+    "shownAboveTag": "oben angezeigt"
   },
   "headline": {
     "savingsCurrent": "Wenn du nichts tust: {amount}/Monat bei {insurer}.",

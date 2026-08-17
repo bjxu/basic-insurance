@@ -58,7 +58,9 @@
     "emptyMessage": "No premiums exist in the FOPH data for this combination. Please check your details or adjust the filters.",
     "discountBadge": "up to −{pct}% vs. standard",
     "yourInsurerBadge": "Your insurer",
-    "perMonth": "/month"
+    "perMonth": "/month",
+    "discountBadgeExact": "−{pct}% vs. standard",
+    "shownAboveTag": "shown above"
   },
   "headline": {
     "savingsCurrent": "If you do nothing: {amount}/month with {insurer}.",
