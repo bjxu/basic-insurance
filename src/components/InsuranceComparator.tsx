@@ -14,10 +14,18 @@ import { EmptyState } from "./results/EmptyState";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { getAltersklasse, getFranchiseTiers } from "@/lib/ageband";
 import { resolveGemeinden, needsDisambiguation } from "@/lib/location";
-import { filterPlans, cheapestPerInsurer, sortPlans, computeHeadline, standardPremiumsByInsurer } from "@/lib/lookup";
+import {
+  filterPlans,
+  cheapestPerInsurer,
+  sortPlans,
+  computeHeadline,
+  standardPremiumsByInsurer,
+  groupByInsurer,
+  ALL_TARIFARTS,
+} from "@/lib/lookup";
 import { encodeState, decodeState } from "@/lib/url-state";
 import { validateCurrentPremium } from "@/lib/validate";
-import type { CurrentPlan, Insurer, SelfReportedPlan, Tarifart } from "@/lib/types";
+import type { CurrentPlan, Insurer, SelfReportedPlan } from "@/lib/types";
 import type { Locale } from "@/i18n/routing";
 
 import insurersData from "@/data/insurers.json";
@@ -30,7 +38,6 @@ const INSURERS = insurersData as Insurer[];
 const MEMBER_COUNTS: Record<string, number> = Object.fromEntries(
   INSURERS.filter((i) => i.memberCount != null).map((i) => [i.insurerCode, i.memberCount!]),
 );
-const ALT_MODELS: Tarifart[] = ["standard", "hausarzt", "telmed", "hmo", "andere"];
 const DATE_LOCALE: Record<Locale, string> = { de: "de-CH", fr: "fr-CH", it: "it-CH", en: "en-CH" };
 
 export function InsuranceComparator() {
@@ -122,7 +129,7 @@ export function InsuranceComparator() {
       franchise,
       year,
       unfalldeckung,
-      models: altModelsActive ? ALT_MODELS : ["standard"],
+      models: altModelsActive ? ALL_TARIFARTS : ["standard"],
       currentInsurerCode: currentPlan.insurerCode ?? null,
       currentMonthlyPremium: currentPlan.monthlyPremium ?? null,
     });
@@ -147,7 +154,7 @@ export function InsuranceComparator() {
       praemienregionId,
       altersklasse,
       franchise,
-      models: altModelsActive ? ALT_MODELS : ["standard"],
+      models: altModelsActive ? ALL_TARIFARTS : ["standard"],
       unfalldeckung,
       year,
     });
@@ -161,6 +168,19 @@ export function InsuranceComparator() {
       year,
     });
 
+    // Every one of each insurer's products at this context, independent of altModelsActive
+    // — the provider-product-detail accordion always shows all model types, even when the
+    // main list is currently filtered to Standard-only (design spec: "Data & filtering").
+    const allProducts = filterPlans(ALL_PREMIUMS, {
+      praemienregionId,
+      altersklasse,
+      franchise,
+      models: ALL_TARIFARTS,
+      unfalldeckung,
+      year,
+    });
+    const productsByInsurer = groupByInsurer(allProducts);
+
     const current: SelfReportedPlan | null = currentPlanProvided
       ? {
           insurerCode: currentPlan.insurerCode!,
@@ -171,7 +191,7 @@ export function InsuranceComparator() {
 
     const headline = computeHeadline(current, cheapestRows[0] ?? null);
 
-    return { plans: cheapestRows, headline, standardBaseline };
+    return { plans: cheapestRows, headline, standardBaseline, productsByInsurer };
   }, [
     inputsValid,
     praemienregionId,
@@ -284,6 +304,7 @@ export function InsuranceComparator() {
               plans={results.plans}
               currentInsurerCode={currentPlan.insurerCode ?? null}
               standardBaseline={results.standardBaseline}
+              productsByInsurer={results.productsByInsurer}
               memberCounts={MEMBER_COUNTS}
               memberCountAsOf={metadata.memberCountAsOf}
             />

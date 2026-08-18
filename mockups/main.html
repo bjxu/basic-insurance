@@ -131,7 +131,23 @@
     }
     .input-section h1 {
       font: var(--md-sys-typescale-title-large-weight) var(--md-sys-typescale-title-large-size)/var(--md-sys-typescale-title-large-line-height) var(--md-sys-typescale-title-large-font);
+    }
+    /* ── Header row: title + language switcher (src/components/LanguageSwitcher.tsx) ── */
+    .input-section .header-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
       margin-bottom: 4px;
+    }
+    .lang-select {
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid var(--md-sys-color-outline-variant);
+      background: var(--md-sys-color-surface);
+      padding: 0 8px;
+      font-size: 13px;
+      color: var(--md-sys-color-on-surface-variant);
     }
     .input-section .tagline {
       font: var(--md-sys-typescale-body-medium-weight) var(--md-sys-typescale-body-medium-size)/var(--md-sys-typescale-body-medium-line-height) var(--md-sys-typescale-body-medium-font);
@@ -506,6 +522,21 @@
     }
     .plan-price.cheapest .amount { color: var(--md-sys-color-primary); }
 
+    /* ── Member-count badge (src/components/results/PlanRow.tsx — OKP-Versichertenbestand) ── */
+    .member-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: var(--md-sys-color-surface-variant);
+      color: var(--md-sys-color-on-surface-variant);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    @media (max-width: 640px) {
+      .member-badge { display: none; }
+    }
+
     .plan-row.current-plan {
       border-color: var(--md-sys-color-error);
       background: var(--md-sys-color-error-container);
@@ -518,6 +549,93 @@
       background: var(--md-sys-color-error-container);
       color: var(--md-sys-color-error);
       flex-shrink: 0;
+    }
+
+    /* ── Expandable plan row — provider product detail (docs/superpowers/specs/2026-08-16-provider-product-detail-design.md) ── */
+    .plan-row-expandable {
+      background: var(--md-sys-color-surface);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    /* summary carries the same visual layout as .plan-row, reset back from the generic
+       details>summary rule (primary color, title-medium font) used by the current-plan
+       accordion above — this summary should look like a normal row, not a link. */
+    .plan-row-expandable > summary {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      cursor: pointer;
+      list-style: none;
+      font: inherit;
+      color: inherit;
+      letter-spacing: normal;
+      user-select: none;
+    }
+    .plan-row-expandable > summary::-webkit-details-marker { display: none; }
+    .plan-row-expandable > summary::before { content: none; } /* chevron sits after the price instead of leading */
+    .plan-expand-icon {
+      font-size: 12px;
+      color: var(--md-sys-color-outline);
+      flex-shrink: 0;
+      width: 12px;
+      text-align: center;
+    }
+    .plan-expand-icon::before { content: "▸"; }
+    .plan-row-expandable[open] > summary .plan-expand-icon::before { content: "▾"; }
+
+    .plan-detail {
+      padding: 10px 16px 14px 48px;
+      border-top: 1px solid var(--md-sys-color-outline-variant);
+      background: var(--md-sys-color-surface-variant);
+    }
+    .plan-detail-group + .plan-detail-group { margin-top: 10px; }
+    .plan-detail-group-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--md-sys-color-outline);
+      margin-bottom: 4px;
+    }
+    .plan-detail-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 6px 4px 3px;
+      border-radius: 6px;
+      border-left: 3px solid transparent;
+    }
+    /* Left-border accent rather than a fill — a fill in this insurer's accent color would
+       collide with the discount badge, which already uses primary-container. */
+    .plan-detail-row.shown-above { border-left-color: var(--md-sys-color-primary); }
+    .plan-detail-name {
+      flex: 1;
+      min-width: 0;
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .shown-above-tag {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--md-sys-color-primary);
+      background: var(--md-sys-color-surface);
+      border: 1px solid var(--md-sys-color-primary);
+      padding: 0 5px;
+      border-radius: 4px;
+      margin-left: 4px;
+      white-space: nowrap;
+    }
+    .plan-detail-price {
+      font-size: 14px;
+      font-weight: 600;
+      flex-shrink: 0;
+      width: 88px;
+      text-align: right;
     }
 
     /* ── Data notice ── */
@@ -543,7 +661,16 @@
 
   <!-- ── Input card ── -->
   <div class="card input-section">
-    <h1>Prämienvergleich</h1>
+    <div class="header-row">
+      <h1>Prämienvergleich</h1>
+      <!-- src/components/LanguageSwitcher.tsx — native <select>, preserves query params on change -->
+      <select class="lang-select" aria-label="Sprache wählen">
+        <option selected>Deutsch</option>
+        <option>Français</option>
+        <option>Italiano</option>
+        <option>English</option>
+      </select>
+    </div>
     <p class="tagline">Gib deine Angaben ein — die günstigsten Kassen erscheinen sofort.</p>
 
     <div class="fields-row">
@@ -702,6 +829,7 @@
         <div class="name">Assura</div>
         <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
       </div>
+      <div class="member-badge" title="682'061 Versicherte · Stand 2024" aria-label="682'061 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 682 Tsd.</div>
       <div class="plan-yoy up">+4.2%</div>
       <div class="plan-price cheapest">
         <div class="amount">CHF 301.10</div>
@@ -715,6 +843,7 @@
         <div class="name">KPT</div>
         <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
       </div>
+      <div class="member-badge" title="546'009 Versicherte · Stand 2024" aria-label="546'009 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 546 Tsd.</div>
       <div class="plan-yoy down">−1.1%</div>
       <div class="plan-price">
         <div class="amount">CHF 318.50</div>
@@ -728,6 +857,7 @@
         <div class="name">EGK-Gesundheitskasse</div>
         <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
       </div>
+      <div class="member-badge" title="120'968 Versicherte · Stand 2024" aria-label="120'968 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 121 Tsd.</div>
       <div class="plan-yoy flat">±0%</div>
       <div class="plan-price">
         <div class="amount">CHF 334.80</div>
@@ -741,6 +871,7 @@
         <div class="name">Concordia</div>
         <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
       </div>
+      <div class="member-badge" title="672'886 Versicherte · Stand 2024" aria-label="672'886 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 673 Tsd.</div>
       <div class="plan-yoy up">+2.8%</div>
       <div class="plan-price">
         <div class="amount">CHF 347.20</div>
@@ -754,6 +885,7 @@
         <div class="name">Visana</div>
         <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
       </div>
+      <div class="member-badge" title="509'645 Versicherte · Stand 2024" aria-label="509'645 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 510 Tsd.</div>
       <div class="plan-yoy up">+3.5%</div>
       <div class="plan-price">
         <div class="amount">CHF 358.90</div>
@@ -768,6 +900,7 @@
         <div class="name">Helsana</div>
         <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
       </div>
+      <div class="member-badge" title="1'290'207 Versicherte · Stand 2024" aria-label="1'290'207 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 1.3 Mio.</div>
       <span class="current-plan-tag">Deine Kasse</span>
       <div class="plan-yoy up">+5.1%</div>
       <div class="plan-price">
@@ -803,6 +936,7 @@
         <div class="name">Sanitas</div>
         <div class="model-badge"><span class="model-tag telmed">Telmed</span> <span class="discount-badge">bis zu −18% ggü. Standard</span> · Anruf bei Hotline erforderlich vor jedem Arztbesuch</div>
       </div>
+      <div class="member-badge" title="639'302 Versicherte · Stand 2024" aria-label="639'302 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 639 Tsd.</div>
       <div class="plan-yoy up">+2.1%</div>
       <div class="plan-price cheapest">
         <div class="amount">CHF 221.80</div>
@@ -816,6 +950,7 @@
         <div class="name">CSS</div>
         <div class="model-badge"><span class="model-tag haus">Hausarzt</span> <span class="discount-badge">bis zu −12% ggü. Standard</span> · Erstbehandlung immer beim gewählten Hausarzt</div>
       </div>
+      <div class="member-badge" title="1'537'730 Versicherte · Stand 2024" aria-label="1'537'730 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 1.5 Mio.</div>
       <div class="plan-yoy down">−0.8%</div>
       <div class="plan-price">
         <div class="amount">CHF 238.50</div>
@@ -829,6 +964,7 @@
         <div class="name">Assura</div>
         <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
       </div>
+      <div class="member-badge" title="682'061 Versicherte · Stand 2024" aria-label="682'061 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 682 Tsd.</div>
       <div class="plan-yoy up">+4.2%</div>
       <div class="plan-price">
         <div class="amount">CHF 301.10</div>
@@ -842,6 +978,7 @@
         <div class="name">KPT</div>
         <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
       </div>
+      <div class="member-badge" title="546'009 Versicherte · Stand 2024" aria-label="546'009 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 546 Tsd.</div>
       <div class="plan-yoy down">−1.1%</div>
       <div class="plan-price">
         <div class="amount">CHF 318.50</div>
@@ -856,6 +993,7 @@
         <div class="name">Helsana</div>
         <div class="model-badge"><span class="model-tag hmo">HMO</span> <span class="discount-badge">bis zu −14% ggü. Standard</span> · Erstanlaufstelle immer beim HMO-Zentrum</div>
       </div>
+      <div class="member-badge" title="1'290'207 Versicherte · Stand 2024" aria-label="1'290'207 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 1.3 Mio.</div>
       <span class="current-plan-tag">Deine Kasse*</span>
       <div class="plan-yoy up">+3.4%</div>
       <div class="plan-price">
@@ -866,6 +1004,106 @@
   </div>
   <p style="font-size:12px;color:var(--md-sys-color-outline);margin-top:6px;">* Deine aktuelle Kasse ist Helsana Standard (CHF 412.40/Monat). Helsanas günstigstes Angebot bei CHF 500 Franchise ist das HMO-Modell (CHF 362.10/Monat).</p>
 
+
+  <!-- ══ Provider product detail — click a row to see all of that insurer's products (docs/superpowers/specs/2026-08-16-provider-product-detail-design.md) ══ -->
+  <p class="mockup-label">Kassenzeile aufklappen — alle Produkte einer Kasse (Design: provider-product-detail)</p>
+
+  <div class="plan-list" role="list">
+    <!-- Sanitas: multiple products across several Tarifarten — shown open by default so the
+         detail is visible without interaction; the <details> element is still fully clickable
+         to collapse/re-expand like the rest of this static mockup. -->
+    <details class="plan-row-expandable" role="listitem" open>
+      <summary>
+        <div class="plan-rank first">1</div>
+        <div class="plan-insurer">
+          <div class="name">Sanitas</div>
+          <div class="model-badge"><span class="model-tag telmed">Telmed</span> <span class="discount-badge">bis zu −18% ggü. Standard</span> · Anruf bei Hotline erforderlich vor jedem Arztbesuch</div>
+        </div>
+        <div class="member-badge" title="639'302 Versicherte · Stand 2024" aria-label="639'302 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 639 Tsd.</div>
+        <div class="plan-yoy up">+2.1%</div>
+        <div class="plan-price cheapest">
+          <div class="amount">CHF 221.80</div>
+          <div class="per">/Monat</div>
+        </div>
+        <span class="plan-expand-icon" aria-hidden="true"></span>
+      </summary>
+
+      <div class="plan-detail">
+        <div class="plan-detail-group">
+          <p class="plan-detail-group-label">Standard</p>
+          <div class="plan-detail-row">
+            <span class="model-tag">Standard</span>
+            <span class="plan-detail-name">Grundversicherung</span>
+            <span class="plan-detail-price">CHF 270.50</span>
+          </div>
+        </div>
+        <div class="plan-detail-group">
+          <p class="plan-detail-group-label">Hausarzt</p>
+          <div class="plan-detail-row">
+            <span class="model-tag haus">Hausarzt</span>
+            <span class="plan-detail-name">Casamed</span>
+            <span class="discount-badge">−11.7% ggü. Standard</span>
+            <span class="plan-detail-price">CHF 238.90</span>
+          </div>
+        </div>
+        <div class="plan-detail-group">
+          <p class="plan-detail-group-label">Telmed</p>
+          <div class="plan-detail-row shown-above">
+            <span class="model-tag telmed">Telmed</span>
+            <span class="plan-detail-name">Callmed <span class="shown-above-tag">oben angezeigt</span></span>
+            <span class="discount-badge">−18.0% ggü. Standard</span>
+            <span class="plan-detail-price">CHF 221.80</span>
+          </div>
+          <div class="plan-detail-row">
+            <span class="model-tag telmed">Telmed</span>
+            <span class="plan-detail-name">Sana24</span>
+            <span class="discount-badge">−15.2% ggü. Standard</span>
+            <span class="plan-detail-price">CHF 229.40</span>
+          </div>
+        </div>
+        <div class="plan-detail-group">
+          <p class="plan-detail-group-label">HMO</p>
+          <div class="plan-detail-row">
+            <span class="model-tag hmo">HMO</span>
+            <span class="plan-detail-name">Bonus Care</span>
+            <span class="discount-badge">−13.6% ggü. Standard</span>
+            <span class="plan-detail-price">CHF 233.60</span>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- Assura: only one matching product — the accordion still renders (no conditional
+         hiding), it just contains a single detail row identical to the summary. Closed by
+         default, unlike the row above, to show both states side by side. -->
+    <details class="plan-row-expandable" role="listitem">
+      <summary>
+        <div class="plan-rank">3</div>
+        <div class="plan-insurer">
+          <div class="name">Assura</div>
+          <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
+        </div>
+        <div class="member-badge" title="682'061 Versicherte · Stand 2024" aria-label="682'061 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 682 Tsd.</div>
+        <div class="plan-yoy up">+4.2%</div>
+        <div class="plan-price">
+          <div class="amount">CHF 301.10</div>
+          <div class="per">/Monat</div>
+        </div>
+        <span class="plan-expand-icon" aria-hidden="true"></span>
+      </summary>
+
+      <div class="plan-detail">
+        <div class="plan-detail-group">
+          <p class="plan-detail-group-label">Standard</p>
+          <div class="plan-detail-row shown-above">
+            <span class="model-tag">Standard</span>
+            <span class="plan-detail-name">Grundversicherung <span class="shown-above-tag">oben angezeigt</span></span>
+            <span class="plan-detail-price">CHF 301.10</span>
+          </div>
+        </div>
+      </div>
+    </details>
+  </div>
   <!-- ══ Empty state (REQ-15) ══ -->
   <p class="mockup-label">Leere Ergebnisliste (REQ-15)</p>
   <div class="empty-state">
@@ -874,7 +1112,7 @@
   </div>
 
   <p class="data-notice">
-    Daten: <a href="#">BAG Opendata</a> · Publikation 15. Oktober 2025 ·
+    Daten: <a href="#">BAG Opendata</a> · Publikation 23. September 2025 ·
     Nur Pflichtleistungen (OKP) · Kein Sponsoring, keine Vermittlungslinks
   </p>
 
