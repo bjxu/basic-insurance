@@ -58,7 +58,9 @@
     "emptyMessage": "Per questa combinazione non esistono premi nei dati dell'UFSP. Verifica i tuoi dati o modifica i filtri.",
     "discountBadge": "fino a −{pct}% rispetto allo standard",
     "yourInsurerBadge": "La tua cassa",
-    "perMonth": "/mese"
+    "perMonth": "/mese",
+    "discountBadgeExact": "−{pct}% rispetto allo standard",
+    "shownAboveTag": "mostrato sopra"
   },
   "headline": {
     "savingsCurrent": "Se non fai nulla: {amount}/mese con {insurer}.",

@@ -58,7 +58,9 @@
     "emptyMessage": "Aucune prime n'existe dans les données de l'OFSP pour cette combinaison. Veuillez vérifier vos données ou ajuster les filtres.",
     "discountBadge": "jusqu'à −{pct}% par rapport au standard",
     "yourInsurerBadge": "Votre caisse",
-    "perMonth": "/mois"
+    "perMonth": "/mois",
+    "discountBadgeExact": "−{pct}% par rapport au standard",
+    "shownAboveTag": "affiché ci-dessus"
   },
   "headline": {
     "savingsCurrent": "Si vous ne faites rien : {amount}/mois chez {insurer}.",
