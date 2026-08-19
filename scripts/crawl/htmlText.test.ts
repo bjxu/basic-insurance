@@ -23,9 +23,9 @@ describe("htmlToText", () => {
 
 describe("extractTitle", () => {
   it("extracts and decodes the <title> text", () => {
-    expect(extractTitle("<html><head><title>Callmed &ndash; Telmed</title></head></html>".replace("&ndash;", "-"))).toBe(
-      "Callmed - Telmed",
-    );
+    expect(
+      extractTitle("<html><head><title>Ärzte &amp; Praxen</title></head></html>"),
+    ).toBe("Ärzte & Praxen");
   });
 
   it("returns an empty string when there is no <title>", () => {
