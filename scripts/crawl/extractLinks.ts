@@ -10,9 +10,13 @@ export function extractLinks(html: string, baseUrl: string): string[] {
     try {
       resolved = new URL(href, base);
     } catch {
-      continue; // malformed href, e.g. "javascript:void(0)" or "mailto:..."
+      continue; // genuinely unparseable href
     }
-    if (resolved.origin !== base.origin) continue; // stay same-origin
+    // Stay same-origin. This is also what filters out "javascript:"/"mailto:" hrefs:
+    // they parse fine as URLs but have the opaque origin "null", so they never match.
+    if (resolved.origin !== base.origin) continue;
+    // Secondary defensive guard for any other non-http(s) scheme that parses to a
+    // matching origin — the origin check above already handles the common cases.
     if (resolved.protocol !== "http:" && resolved.protocol !== "https:") continue;
     resolved.hash = "";
     links.add(resolved.toString());

@@ -10,11 +10,13 @@ describe("matchProductPage", () => {
     expect(matchProductPage(pages, "Callmed")?.url).toBe("https://x.ch/callmed");
   });
 
-  it("falls back to a body-text mention when no title matches", () => {
+  it("returns null when only body text mentions the product, not the title", () => {
+    // A body-text mention on a category/nav page is not enough to attribute the page to
+    // a specific product — report it unmatched rather than describing the wrong page.
     const pages: CrawledPage[] = [
       { url: "https://x.ch/telmed", title: "Telmed-Modelle", text: "Unser Produkt Sana24 im Detail." },
     ];
-    expect(matchProductPage(pages, "Sana24")?.url).toBe("https://x.ch/telmed");
+    expect(matchProductPage(pages, "Sana24")).toBeNull();
   });
 
   it("is case- and diacritic-insensitive", () => {

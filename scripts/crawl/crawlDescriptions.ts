@@ -29,13 +29,18 @@ async function main() {
   const sources = buildInsurerSources(existingSources);
   await writeFile(INSURER_SOURCES_PATH, JSON.stringify(sources, null, 2) + "\n");
 
+  if (onlyInsurer && !sources[onlyInsurer]) {
+    fail(`--insurer ${onlyInsurer} not found in insurer-sources.json`);
+  }
+
   const products = await loadLatestProducts();
   const descriptions = await readJson<ProductDescriptions>(PRODUCT_DESCRIPTIONS_PATH, {});
   const client = new Anthropic();
 
   const insurerCodes = onlyInsurer ? [onlyInsurer] : Object.keys(sources);
   let matched = 0;
-  let unmatched = 0;
+  let noPageMatch = 0;
+  let extractionFailed = 0;
 
   for (const insurerCode of insurerCodes) {
     const source = sources[insurerCode];
@@ -45,38 +50,59 @@ async function main() {
     if (insurerProducts.length === 0) continue;
 
     console.log(`Crawling ${source.insurerName} (${insurerCode}) from ${source.seedUrl}…`);
-    const pages = await crawlSite(source.seedUrl);
+    let pages;
+    try {
+      pages = await crawlSite(source.seedUrl);
+    } catch (err) {
+      // A bad seedUrl (new URL throws) or a network failure loses only this insurer.
+      console.log(`  ✗ crawl failed for ${source.insurerName}: ${String(err)}`);
+      continue;
+    }
 
-    descriptions[insurerCode] ??= {};
     for (const product of insurerProducts) {
       const page = matchProductPage(pages, product.productName);
       if (!page) {
         console.log(`  ✗ no page match for "${product.productName}" (${product.tarifCode})`);
-        unmatched++;
+        noPageMatch++;
         continue;
       }
-      const result = await extractDescription(client, {
-        pageText: page.text,
-        productName: product.productName,
-        tarifart: product.tarifart,
-      });
-      if (!result) {
-        console.log(`  ✗ extraction failed for "${product.productName}" (${product.tarifCode})`);
-        unmatched++;
-        continue;
+      try {
+        const result = await extractDescription(client, {
+          pageText: page.text,
+          productName: product.productName,
+          tarifart: product.tarifart,
+        });
+        if (!result) {
+          console.log(
+            `  ✗ extraction returned no usable description for "${product.productName}" (${product.tarifCode})`,
+          );
+          extractionFailed++;
+          continue;
+        }
+        // Created lazily so an insurer with no successful extraction leaves no empty {}.
+        (descriptions[insurerCode] ??= {})[product.tarifCode] = {
+          ...result,
+          sourceUrl: page.url,
+          crawledAt: new Date().toISOString().slice(0, 10),
+        };
+        console.log(`  ✔ matched "${product.productName}" (${product.tarifCode}) → ${page.url}`);
+        matched++;
+      } catch (err) {
+        // Rate limits / 5xx from the Anthropic API cost one product, not the whole run.
+        console.log(
+          `  ✗ extraction call failed for "${product.productName}" (${product.tarifCode}): ${String(err)}`,
+        );
+        extractionFailed++;
       }
-      descriptions[insurerCode][product.tarifCode] = {
-        ...result,
-        sourceUrl: page.url,
-        crawledAt: new Date().toISOString().slice(0, 10),
-      };
-      console.log(`  ✔ matched "${product.productName}" (${product.tarifCode}) → ${page.url}`);
-      matched++;
     }
+
+    // Persist after each insurer so one later failure doesn't lose earlier progress.
+    await writeFile(PRODUCT_DESCRIPTIONS_PATH, JSON.stringify(descriptions, null, 2) + "\n");
   }
 
-  await writeFile(PRODUCT_DESCRIPTIONS_PATH, JSON.stringify(descriptions, null, 2) + "\n");
-  console.log(`\n✔ ${matched} product(s) described, ${unmatched} unmatched — see log above for details.`);
+  console.log(
+    `\n✔ ${matched} product(s) described, ${noPageMatch} no page match, ${extractionFailed} extraction failed.`,
+  );
 }
 
 function parseInsurerArg(argv: string[]): string | undefined {
@@ -114,4 +140,4 @@ function uniqueByTarifCode(rows: PremiumRow[]): PremiumRow[] {
   return [...seen.values()];
 }
 
-main();
+main().catch((err) => fail(String(err)));

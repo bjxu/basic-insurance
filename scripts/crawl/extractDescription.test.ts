@@ -43,6 +43,15 @@ describe("parseResponse", () => {
   it("returns null when a locale value is not a string", () => {
     expect(parseResponse('{"de": 1, "en": "y", "fr": "z", "it": "w"}')).toBeNull();
   });
+
+  it("returns null for the {\"insufficient\": true} sentinel so the i18n fallback stays in charge", () => {
+    expect(parseResponse('{"insufficient": true}')).toBeNull();
+  });
+
+  it("returns null when a locale value exceeds the 200-character limit", () => {
+    const tooLong = "x".repeat(201);
+    expect(parseResponse(JSON.stringify({ de: tooLong, en: "y", fr: "z", it: "w" }))).toBeNull();
+  });
 });
 
 describe("extractDescription", () => {

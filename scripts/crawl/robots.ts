@@ -27,12 +27,26 @@ export function parseDisallowedPaths(robotsTxt: string, userAgent: string): stri
       continue;
     }
     inGroup = false;
-    const matchesUs = currentAgents.includes("*") || currentAgents.includes(userAgent.toLowerCase());
+    const matchesUs =
+      currentAgents.includes("*") ||
+      currentAgents.some((agent) => matchesUserAgentToken(agent, userAgent));
     if (key === "disallow" && value !== "" && matchesUs) {
       disallowed.push(value);
     }
   }
   return disallowed;
+}
+
+// A robots.txt "User-agent" line commonly names just the product token (e.g.
+// "PrixioProductDescriptionBot"), while our crawler's real UA header carries a
+// version/comment suffix (e.g. "PrixioProductDescriptionBot/1.0 (+https://...)").
+// Match on the token before the first "/", case-insensitively, rather than requiring
+// byte-for-byte equality — otherwise a site that names us by product token alone would
+// never match and its Disallow rules for us would be silently ignored.
+function matchesUserAgentToken(robotsAgent: string, ourAgent: string): boolean {
+  const robotsToken = robotsAgent.split("/")[0].trim();
+  const ourToken = ourAgent.toLowerCase().split("/")[0].trim();
+  return robotsToken === ourToken;
 }
 
 export function isPathAllowed(disallowedPaths: string[], path: string): boolean {
