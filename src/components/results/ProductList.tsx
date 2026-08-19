@@ -1,11 +1,17 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { PremiumRow } from "@/lib/types";
 import { groupProductsByTarifart, discountVsStandardPct } from "@/lib/lookup";
 import { MODEL_TAG_CLASSES, DEFAULT_MODEL_TAG_CLASSES } from "@/lib/tarifart-style";
 import { formatChf } from "@/lib/format";
 import { applyEnvironmentalLevy } from "@/lib/environmentalLevy";
+import { getProductDescription, type ProductDescriptions } from "@/lib/productDescriptions";
+import rawProductDescriptions from "@/data/product-descriptions.json";
+
+// Cast, not inferred: the JSON file starts as `{}` and is edited by hand/by
+// scripts/crawl/crawlDescriptions.ts — its structural shape isn't statically known.
+const PRODUCT_DESCRIPTIONS = rawProductDescriptions as ProductDescriptions;
 
 type Props = {
   products: PremiumRow[];
@@ -19,6 +25,7 @@ type Props = {
 
 export function ProductList({ products, standardPremium, shownTarifCode, levyPerMonthByYear }: Props) {
   const t = useTranslations();
+  const locale = useLocale();
   const groups = groupProductsByTarifart(products);
 
   return (
@@ -68,7 +75,8 @@ export function ProductList({ products, standardPremium, shownTarifCode, levyPer
                     </span>
                   </div>
                   <p className="text-[11px] text-on-surface-variant mt-0.5">
-                    {t(`copy.tarifart.${product.tarifart}.description`)}
+                    {getProductDescription(PRODUCT_DESCRIPTIONS, product.insurerCode, product.tarifCode, locale) ??
+                      t(`copy.tarifart.${product.tarifart}.description`)}
                   </p>
                 </div>
               );
