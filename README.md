@@ -10,6 +10,7 @@ architecture.
 ```bash
 npm install
 npm run ingest    # download BAG data and regenerate src/data/ + public/data/ JSON (see scripts/ingest.ts)
+npm run crawl-descriptions  # crawl insurer sites for product descriptions (see scripts/crawl/, needs ANTHROPIC_API_KEY and src/data/insurer-sources.json seedUrls)
 npm run dev       # Next.js dev server on :3000
 npm test          # Vitest unit + integration
 ```
