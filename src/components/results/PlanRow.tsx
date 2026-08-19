@@ -4,8 +4,12 @@ import { useLocale, useTranslations } from "next-intl";
 import type { PremiumRow } from "@/lib/types";
 import { discountVsStandardPct } from "@/lib/lookup";
 import { formatChf, formatMemberCount, formatMemberCountDetail } from "@/lib/format";
+import { applyEnvironmentalLevy } from "@/lib/environmentalLevy";
+import metadata from "@/data/metadata.json";
 import { MODEL_TAG_CLASSES, DEFAULT_MODEL_TAG_CLASSES } from "@/lib/tarifart-style";
 import { ProductList } from "./ProductList";
+
+const ENVIRONMENTAL_LEVY_PER_MONTH: Record<string, number> = metadata.environmentalLevyPerMonth;
 
 type Props = {
   plan: PremiumRow;
@@ -96,7 +100,7 @@ export function PlanRow({
         )}
         <div className="text-right">
           <div className={`text-headline-small ${isCheapest ? "text-primary" : "text-on-surface"}`}>
-            {formatChf(plan.monthlyPremium)}
+            {formatChf(applyEnvironmentalLevy(plan.monthlyPremium, plan.year, ENVIRONMENTAL_LEVY_PER_MONTH))}
           </div>
           <div className="text-body-small text-outline">{t("results.perMonth")}</div>
         </div>
@@ -106,7 +110,12 @@ export function PlanRow({
         />
       </summary>
       <div className="px-3.5 pb-3.5">
-        <ProductList products={products} standardPremium={standardPremium} shownTarifCode={plan.tarifCode} />
+        <ProductList
+          products={products}
+          standardPremium={standardPremium}
+          shownTarifCode={plan.tarifCode}
+          levyPerMonthByYear={ENVIRONMENTAL_LEVY_PER_MONTH}
+        />
       </div>
     </details>
   );

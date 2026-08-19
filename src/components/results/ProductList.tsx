@@ -5,14 +5,19 @@ import type { PremiumRow } from "@/lib/types";
 import { groupProductsByTarifart, discountVsStandardPct } from "@/lib/lookup";
 import { MODEL_TAG_CLASSES, DEFAULT_MODEL_TAG_CLASSES } from "@/lib/tarifart-style";
 import { formatChf } from "@/lib/format";
+import { applyEnvironmentalLevy } from "@/lib/environmentalLevy";
 
 type Props = {
   products: PremiumRow[];
   standardPremium: number | undefined;
   shownTarifCode: string;
+  // Passed down from PlanRow (which already imports metadata.json) rather than importing
+  // metadata.json here too — keeps this leaf component's data dependencies to just its props,
+  // same pattern as standardPremium.
+  levyPerMonthByYear: Record<string, number>;
 };
 
-export function ProductList({ products, standardPremium, shownTarifCode }: Props) {
+export function ProductList({ products, standardPremium, shownTarifCode, levyPerMonthByYear }: Props) {
   const t = useTranslations();
   const groups = groupProductsByTarifart(products);
 
@@ -59,7 +64,7 @@ export function ProductList({ products, standardPremium, shownTarifCode }: Props
                       </span>
                     )}
                     <span className="text-[13px] font-semibold w-20 text-right flex-shrink-0">
-                      {formatChf(product.monthlyPremium)}
+                      {formatChf(applyEnvironmentalLevy(product.monthlyPremium, product.year, levyPerMonthByYear))}
                     </span>
                   </div>
                   <p className="text-[11px] text-on-surface-variant mt-0.5">

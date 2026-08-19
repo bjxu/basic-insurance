@@ -16,6 +16,7 @@ import { parseMemberCounts } from "./ingest/members";
 import { buildInsurersJson, INSURER_NAMES } from "./ingest/insurers";
 import { downloadRawFiles } from "./ingest/downloadRaw";
 import { validateIngestOutput, verifyWrittenFile } from "./ingest/validateIngest";
+import { carryForwardEnvironmentalLevy } from "./ingest/metadata";
 import type { Metadata } from "../src/lib/types";
 
 const DATA_DIR = join(process.cwd(), "src", "data");
@@ -91,7 +92,21 @@ async function main() {
   }
 
   const year = rows[0].year;
-  const metadata: Metadata = { publicationDate: args.publicationDate, availableYears: [year], memberCountAsOf };
+
+  // metadata.json is rewritten from scratch below, but environmentalLevyPerMonth is a
+  // hand-maintained BAFU figure with no counterpart in the BAG source files — carry the
+  // existing map forward instead of dropping it (scripts/ingest/metadata.ts).
+  const metadataPath = join(DATA_DIR, "metadata.json");
+  const existingMetadataJson = await readFile(metadataPath, "utf-8").catch(() => null);
+  const levy = carryForwardEnvironmentalLevy(existingMetadataJson, year);
+  if (!levy.ok) fail(levy.error);
+
+  const metadata: Metadata = {
+    publicationDate: args.publicationDate,
+    availableYears: [year],
+    memberCountAsOf,
+    environmentalLevyPerMonth: levy.environmentalLevyPerMonth,
+  };
 
   await mkdir(PUBLIC_DATA_DIR, { recursive: true });
   const premiumsJson = JSON.stringify(rows);
@@ -111,7 +126,7 @@ async function main() {
     join(DATA_DIR, "insurers.json"),
     JSON.stringify(buildInsurersJson(INSURER_NAMES, memberCounts), null, 2),
   );
-  await writeFile(join(DATA_DIR, "metadata.json"), JSON.stringify(metadata, null, 2));
+  await writeFile(metadataPath, JSON.stringify(metadata, null, 2));
 
   console.log(
     `✔ wrote ${rows.length} premium rows for ${year}, ${gemeinden.length} Gemeinden, ` +

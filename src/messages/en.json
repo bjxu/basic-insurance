@@ -73,7 +73,8 @@
     "cheapestOnlyCta": "Enter your current insurer to see how much you could save. ↓"
   },
   "footer": {
-    "dataNotice": "Data: FOPH open data · Published {date} · Mandatory benefits only · No sponsoring, no referral links"
+    "dataNotice": "Data: FOPH open data · Published {date} · Mandatory benefits only · No sponsoring, no referral links",
+    "levyNotice": "Prices include the CO₂/VOC levy redistribution (CHF {amount}/month, {year}) — the same for every insurer, with no effect on ranking"
   },
   "copy": {
     "tarifart": {

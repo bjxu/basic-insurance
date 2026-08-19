@@ -73,7 +73,8 @@
     "cheapestOnlyCta": "Indiquez votre caisse actuelle pour voir combien vous pourriez économiser. ↓"
   },
   "footer": {
-    "dataNotice": "Données : Open Data OFSP · Publication {date} · Prestations obligatoires uniquement (AOS) · Aucun sponsoring, aucun lien d'intermédiation"
+    "dataNotice": "Données : Open Data OFSP · Publication {date} · Prestations obligatoires uniquement (AOS) · Aucun sponsoring, aucun lien d'intermédiation",
+    "levyNotice": "Les prix incluent la restitution de la taxe d'incitation CO₂/COV (CHF {amount}/mois, {year}) — identique pour toutes les caisses, sans effet sur le classement"
   },
   "copy": {
     "tarifart": {

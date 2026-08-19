@@ -73,7 +73,8 @@
     "cheapestOnlyCta": "Indica la tua cassa attuale per vedere quanto potresti risparmiare. ↓"
   },
   "footer": {
-    "dataNotice": "Dati: Open Data UFSP · Pubblicazione {date} · Solo prestazioni obbligatorie (AOMS) · Nessuno sponsor, nessun link di intermediazione"
+    "dataNotice": "Dati: Open Data UFSP · Pubblicazione {date} · Solo prestazioni obbligatorie (AOMS) · Nessuno sponsor, nessun link di intermediazione",
+    "levyNotice": "I prezzi includono la restituzione della tassa d'incentivazione CO₂/COV (CHF {amount}/mese, {year}) — uguale per tutte le casse, senza effetto sulla classifica"
   },
   "copy": {
     "tarifart": {

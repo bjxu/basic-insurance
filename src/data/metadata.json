@@ -3,5 +3,8 @@
   "availableYears": [
     2026
   ],
-  "memberCountAsOf": 2024
+  "memberCountAsOf": 2024,
+  "environmentalLevyPerMonth": {
+    "2026": 5.15
+  }
 }
