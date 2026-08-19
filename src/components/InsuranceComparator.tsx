@@ -31,7 +31,7 @@ const INSURERS = insurersData as Insurer[];
 const MEMBER_COUNTS: Record<string, number> = Object.fromEntries(
   INSURERS.filter((i) => i.memberCount != null).map((i) => [i.insurerCode, i.memberCount!]),
 );
-const ENVIRONMENTAL_LEVY_PER_MONTH = metadata.environmentalLevyPerMonth as Record<string, number>;
+const ENVIRONMENTAL_LEVY_PER_MONTH: Record<string, number> = metadata.environmentalLevyPerMonth;
 const ALT_MODELS: Tarifart[] = ["standard", "hausarzt", "telmed", "hmo", "andere"];
 const DATE_LOCALE: Record<Locale, string> = { de: "de-CH", fr: "fr-CH", it: "it-CH", en: "en-CH" };
 

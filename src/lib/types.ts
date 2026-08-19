@@ -40,6 +40,10 @@ export type Metadata = {
   publicationDate: string; // ISO date, e.g. "2025-10-15"
   availableYears: number[];
   memberCountAsOf: number; // publication year of the Versichertenbestand data (lags publicationDate)
+  // Year -> monthly CO2-/VOC-Lenkungsabgabe redistribution per insured person, in CHF.
+  // Published by BAFU, not BAG, so it is maintained by hand here and carried forward
+  // across ingest runs (scripts/ingest/metadata.ts) rather than derived from the BAG files.
+  environmentalLevyPerMonth: Record<string, number>;
 };
 
 export type CurrentPlan = {

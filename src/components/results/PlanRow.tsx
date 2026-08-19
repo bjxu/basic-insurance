@@ -4,7 +4,7 @@ import { formatChf, formatMemberCount, formatMemberCountDetail } from "@/lib/for
 import { applyEnvironmentalLevy } from "@/lib/environmentalLevy";
 import metadata from "@/data/metadata.json";
 
-const ENVIRONMENTAL_LEVY_PER_MONTH = metadata.environmentalLevyPerMonth as Record<string, number>;
+const ENVIRONMENTAL_LEVY_PER_MONTH: Record<string, number> = metadata.environmentalLevyPerMonth;
 
 type Props = {
   plan: PremiumRow;

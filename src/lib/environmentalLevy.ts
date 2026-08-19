@@ -12,12 +12,19 @@
 
 /** Subtracts the published levy credit for `year` from `monthlyPremium`. Returns
  *  `monthlyPremium` unchanged if no levy amount is published for that year yet — a safe
- *  default (no adjustment) rather than a crash or a wrong number. */
+ *  default (no adjustment) rather than a crash or a wrong number.
+ *
+ *  The result is rounded to two decimals: binary float subtraction doesn't land cleanly
+ *  on rappen (311.60 - 5.15 = 306.45000000000005), and downstream consumers compare
+ *  premiums with strict equality (Headline.tsx's "already cheapest" check) and multiply
+ *  them by 12 for the yearly savings figure. Two decimals is also the documented
+ *  invariant for `PremiumRow.monthlyPremium` (src/lib/types.ts). */
 export function applyEnvironmentalLevy(
   monthlyPremium: number,
   year: number,
   levyPerMonthByYear: Record<string, number>,
 ): number {
   const levy = levyPerMonthByYear[String(year)];
-  return levy != null ? monthlyPremium - levy : monthlyPremium;
+  if (levy == null) return monthlyPremium;
+  return Math.round((monthlyPremium - levy) * 100) / 100;
 }

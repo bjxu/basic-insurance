@@ -90,9 +90,9 @@ it if present, otherwise returns `monthlyPremium` unchanged. Unit-tested in isol
 
 ## Overall declaration (footer)
 
-New message key `footer.levyNotice`, rendered as a second sentence after the existing
-`footer.dataNotice` line, only when `environmentalLevyPerMonth[year]` exists for the
-currently selected year. Kept as a separate key (not merged into `dataNotice`'s existing
+New message key `footer.levyNotice`, appended inside the same footer paragraph as the
+existing `footer.dataNotice` text and joined to it by " · " (matching `mockups/main.html`),
+only when `environmentalLevyPerMonth[year]` exists for the currently selected year. Kept as a separate key (not merged into `dataNotice`'s existing
 interpolation) to avoid touching that string's params across all four locale files.
 
 German wording (as landed in the mockup, `mockups/main.html`):
