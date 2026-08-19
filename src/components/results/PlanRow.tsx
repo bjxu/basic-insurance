@@ -1,6 +1,10 @@
 import { useLocale, useTranslations } from "next-intl";
 import type { PremiumRow } from "@/lib/types";
 import { formatChf, formatMemberCount, formatMemberCountDetail } from "@/lib/format";
+import { applyEnvironmentalLevy } from "@/lib/environmentalLevy";
+import metadata from "@/data/metadata.json";
+
+const ENVIRONMENTAL_LEVY_PER_MONTH = metadata.environmentalLevyPerMonth as Record<string, number>;
 
 type Props = {
   plan: PremiumRow;
@@ -95,7 +99,7 @@ export function PlanRow({
       )}
       <div className="text-right">
         <div className={`text-headline-small ${isCheapest ? "text-primary" : "text-on-surface"}`}>
-          {formatChf(plan.monthlyPremium)}
+          {formatChf(applyEnvironmentalLevy(plan.monthlyPremium, plan.year, ENVIRONMENTAL_LEVY_PER_MONTH))}
         </div>
         <div className="text-body-small text-outline">{t("results.perMonth")}</div>
       </div>
