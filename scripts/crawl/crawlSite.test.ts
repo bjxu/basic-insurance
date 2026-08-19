@@ -15,6 +15,7 @@ const SITE: Record<string, string> = {
   </body></html>`,
   "https://x.ch/produkte/telmed": `<html><head><title>Telmed-Modell</title></head><body>
     <p>Details about the Telmed product.</p>
+    <a href="/produkte/broken">Broken link</a>
   </body></html>`,
   "https://x.ch/admin": `<html><head><title>Admin</title></head><body>Secret</body></html>`,
 };
@@ -65,8 +66,10 @@ describe("crawlSite", () => {
 
   it("skips a page whose fetch fails instead of throwing", async () => {
     const pages = await crawlSite("https://x.ch/start");
-    // https://other.ch/page is a different origin (never fetched) and /admin is
-    // disallowed — neither should appear, and the crawl finishes without throwing.
-    expect(pages.every((p) => p.url.startsWith("https://x.ch/"))).toBe(true);
+    // https://x.ch/produkte/broken is same-origin and robots-allowed but absent from
+    // SITE, so its fetch mock resolves to { ok: false, status: 404 }. It must be
+    // skipped rather than thrown, and the rest of the crawl must still complete.
+    expect(pages.some((p) => p.url === "https://x.ch/produkte/broken")).toBe(false);
+    expect(pages.some((p) => p.url === "https://x.ch/start")).toBe(true);
   });
 });
