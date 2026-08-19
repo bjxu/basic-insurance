@@ -23,6 +23,7 @@ import type { Locale } from "@/i18n/routing";
 import insurersData from "@/data/insurers.json";
 import metadata from "@/data/metadata.json";
 import type { PremiumRow } from "@/lib/types";
+import { applyEnvironmentalLevy } from "@/lib/environmentalLevy";
 
 const INSURERS = insurersData as Insurer[];
 // Static — INSURERS is a module-level import, not component state, so this is derived
@@ -30,6 +31,7 @@ const INSURERS = insurersData as Insurer[];
 const MEMBER_COUNTS: Record<string, number> = Object.fromEntries(
   INSURERS.filter((i) => i.memberCount != null).map((i) => [i.insurerCode, i.memberCount!]),
 );
+const ENVIRONMENTAL_LEVY_PER_MONTH = metadata.environmentalLevyPerMonth as Record<string, number>;
 const ALT_MODELS: Tarifart[] = ["standard", "hausarzt", "telmed", "hmo", "andere"];
 const DATE_LOCALE: Record<Locale, string> = { de: "de-CH", fr: "fr-CH", it: "it-CH", en: "en-CH" };
 
@@ -169,7 +171,16 @@ export function InsuranceComparator() {
         }
       : null;
 
-    const headline = computeHeadline(current, cheapestRows[0] ?? null);
+    // Headline compares the user's self-reported current premium (their real bill —
+    // already net of the levy) against the dataset's cheapest — so the cheapest side needs
+    // the same adjustment to be an apples-to-apples comparison (design doc: "Savings math
+    // fix"). lookup.ts's computeHeadline itself stays levy-agnostic; only this copy's
+    // monthlyPremium is adjusted before being passed in.
+    const cheapestForHeadline = cheapestRows[0]
+      ? { ...cheapestRows[0], monthlyPremium: applyEnvironmentalLevy(cheapestRows[0].monthlyPremium, year, ENVIRONMENTAL_LEVY_PER_MONTH) }
+      : null;
+
+    const headline = computeHeadline(current, cheapestForHeadline);
 
     return { plans: cheapestRows, headline, standardBaseline };
   }, [
