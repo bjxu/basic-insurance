@@ -28,7 +28,7 @@ function normalize(text: string): string {
   return text
     .toLowerCase()
     .normalize("NFKD")
-    .replace(/[̀-ͯ]/g, ""); // strip combining diacritical marks left by NFKD
+    .replace(/[\u0300-\u036f]/g, ""); // strip combining diacritical marks left by NFKD
 }
 
 function countOccurrences(haystack: string, needle: string): number {

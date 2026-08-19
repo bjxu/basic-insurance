@@ -18,8 +18,12 @@ describe("matchProductPage", () => {
   });
 
   it("is case- and diacritic-insensitive", () => {
-    const pages: CrawledPage[] = [{ url: "https://x.ch/gv", title: "GRUNDVERSICHERUNG", text: "" }];
-    expect(matchProductPage(pages, "grundversicherung")?.url).toBe("https://x.ch/gv");
+    const pages: CrawledPage[] = [
+      { url: "https://x.ch/gv", title: "Persönliche Ärzte GRUNDVERSICHERUNG", text: "" },
+    ];
+    expect(matchProductPage(pages, "personliche arzte grundversicherung")?.url).toBe(
+      "https://x.ch/gv",
+    );
   });
 
   it("returns null when no page mentions the product at all", () => {
