@@ -601,9 +601,6 @@
       margin-bottom: 4px;
     }
     .plan-detail-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
       padding: 4px 6px 4px 3px;
       border-radius: 6px;
       border-left: 3px solid transparent;
@@ -611,6 +608,18 @@
     /* Left-border accent rather than a fill — a fill in this insurer's accent color would
        collide with the discount badge, which already uses primary-container. */
     .plan-detail-row.shown-above { border-left-color: var(--md-sys-color-primary); }
+    .plan-detail-row-main {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    /* Per-product description (Design: provider-product-descriptions) — product-specific
+       text where crawled from the insurer's own site, generic tarifart text otherwise. */
+    .plan-detail-desc {
+      font-size: 11px;
+      color: var(--md-sys-color-on-surface-variant);
+      margin: 2px 0 0;
+    }
     .plan-detail-name {
       flex: 1;
       min-width: 0;
@@ -1006,7 +1015,7 @@
 
 
   <!-- ══ Provider product detail — click a row to see all of that insurer's products (docs/superpowers/specs/2026-08-16-provider-product-detail-design.md) ══ -->
-  <p class="mockup-label">Kassenzeile aufklappen — alle Produkte einer Kasse (Design: provider-product-detail)</p>
+  <p class="mockup-label">Kassenzeile aufklappen — alle Produkte einer Kasse, mit produktspezifischer Beschreibung (Design: provider-product-detail, provider-product-descriptions)</p>
 
   <div class="plan-list" role="list">
     <!-- Sanitas: multiple products across several Tarifarten — shown open by default so the
@@ -1032,42 +1041,62 @@
         <div class="plan-detail-group">
           <p class="plan-detail-group-label">Standard</p>
           <div class="plan-detail-row">
-            <span class="model-tag">Standard</span>
-            <span class="plan-detail-name">Grundversicherung</span>
-            <span class="plan-detail-price">CHF 265.35</span>
+            <div class="plan-detail-row-main">
+              <span class="model-tag">Standard</span>
+              <span class="plan-detail-name">Grundversicherung</span>
+              <span class="plan-detail-price">CHF 265.35</span>
+            </div>
+            <!-- No crawled product description for this one — falls back to the generic
+                 tarifart text, same as the app does when product-descriptions.json has no
+                 entry for this (insurerCode, tarifCode). -->
+            <p class="plan-detail-desc">Freie Arztwahl</p>
           </div>
         </div>
         <div class="plan-detail-group">
           <p class="plan-detail-group-label">Hausarzt</p>
           <div class="plan-detail-row">
-            <span class="model-tag haus">Hausarzt</span>
-            <span class="plan-detail-name">Casamed</span>
-            <span class="discount-badge">−11.7% ggü. Standard</span>
-            <span class="plan-detail-price">CHF 233.75</span>
+            <div class="plan-detail-row-main">
+              <span class="model-tag haus">Hausarzt</span>
+              <span class="plan-detail-name">Casamed</span>
+              <span class="discount-badge">−11.7% ggü. Standard</span>
+              <span class="plan-detail-price">CHF 233.75</span>
+            </div>
+            <p class="plan-detail-desc">Erstbehandlung immer in der registrierten Casamed-Praxis; rund 600 Partnerpraxen in der Deutschschweiz.</p>
           </div>
         </div>
         <div class="plan-detail-group">
           <p class="plan-detail-group-label">Telmed</p>
           <div class="plan-detail-row shown-above">
-            <span class="model-tag telmed">Telmed</span>
-            <span class="plan-detail-name">Callmed <span class="shown-above-tag">oben angezeigt</span></span>
-            <span class="discount-badge">−18.0% ggü. Standard</span>
-            <span class="plan-detail-price">CHF 216.65</span>
+            <div class="plan-detail-row-main">
+              <span class="model-tag telmed">Telmed</span>
+              <span class="plan-detail-name">Callmed <span class="shown-above-tag">oben angezeigt</span></span>
+              <span class="discount-badge">−18.0% ggü. Standard</span>
+              <span class="plan-detail-price">CHF 216.65</span>
+            </div>
+            <p class="plan-detail-desc">Anruf bei der Callmed-Hotline erforderlich vor jedem Arztbesuch; Terminvereinbarung auch über die App möglich.</p>
           </div>
           <div class="plan-detail-row">
-            <span class="model-tag telmed">Telmed</span>
-            <span class="plan-detail-name">Sana24</span>
-            <span class="discount-badge">−15.2% ggü. Standard</span>
-            <span class="plan-detail-price">CHF 224.25</span>
+            <div class="plan-detail-row-main">
+              <span class="model-tag telmed">Telmed</span>
+              <span class="plan-detail-name">Sana24</span>
+              <span class="discount-badge">−15.2% ggü. Standard</span>
+              <span class="plan-detail-price">CHF 224.25</span>
+            </div>
+            <!-- Same tarifart as Callmed above, but a distinct product-specific description
+                 rather than a shared generic Telmed line — the point of this feature. -->
+            <p class="plan-detail-desc">Anruf bei der Sana24-Hotline rund um die Uhr erforderlich vor jedem Arztbesuch.</p>
           </div>
         </div>
         <div class="plan-detail-group">
           <p class="plan-detail-group-label">HMO</p>
           <div class="plan-detail-row">
-            <span class="model-tag hmo">HMO</span>
-            <span class="plan-detail-name">Bonus Care</span>
-            <span class="discount-badge">−13.6% ggü. Standard</span>
-            <span class="plan-detail-price">CHF 228.45</span>
+            <div class="plan-detail-row-main">
+              <span class="model-tag hmo">HMO</span>
+              <span class="plan-detail-name">Bonus Care</span>
+              <span class="discount-badge">−13.6% ggü. Standard</span>
+              <span class="plan-detail-price">CHF 228.45</span>
+            </div>
+            <p class="plan-detail-desc">Erstanlaufstelle immer im Bonus-Care-Gesundheitszentrum; 12 Standorte in der Deutschschweiz.</p>
           </div>
         </div>
       </div>
@@ -1096,9 +1125,12 @@
         <div class="plan-detail-group">
           <p class="plan-detail-group-label">Standard</p>
           <div class="plan-detail-row shown-above">
-            <span class="model-tag">Standard</span>
-            <span class="plan-detail-name">Grundversicherung <span class="shown-above-tag">oben angezeigt</span></span>
-            <span class="plan-detail-price">CHF 295.95</span>
+            <div class="plan-detail-row-main">
+              <span class="model-tag">Standard</span>
+              <span class="plan-detail-name">Grundversicherung <span class="shown-above-tag">oben angezeigt</span></span>
+              <span class="plan-detail-price">CHF 295.95</span>
+            </div>
+            <p class="plan-detail-desc">Freie Arztwahl</p>
           </div>
         </div>
       </div>
