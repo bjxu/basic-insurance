@@ -71,7 +71,8 @@
     "cheapestOnlyCta": "Gib deine aktuelle Kasse an, um zu sehen, wie viel du sparen könntest. ↓"
   },
   "footer": {
-    "dataNotice": "Daten: BAG Opendata · Publikation {date} · Nur Pflichtleistungen (OKP) · Kein Sponsoring, keine Vermittlungslinks"
+    "dataNotice": "Daten: BAG Opendata · Publikation {date} · Nur Pflichtleistungen (OKP) · Kein Sponsoring, keine Vermittlungslinks",
+    "levyNotice": "Preise enthalten die Rückerstattung der CO₂-/VOC-Lenkungsabgabe (CHF {amount}/Monat, {year}) — für alle Kassen gleich hoch, ohne Einfluss auf die Rangfolge"
   },
   "copy": {
     "tarifart": {

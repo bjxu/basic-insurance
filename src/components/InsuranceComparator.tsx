@@ -312,6 +312,12 @@ export function InsuranceComparator() {
             year: "numeric",
           }),
         })}
+        {ENVIRONMENTAL_LEVY_PER_MONTH[String(year)] != null && (
+          <>
+            {" · "}
+            {t("footer.levyNotice", { amount: ENVIRONMENTAL_LEVY_PER_MONTH[String(year)].toFixed(2), year })}
+          </>
+        )}
       </p>
     </main>
   );
