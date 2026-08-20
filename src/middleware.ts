@@ -35,18 +35,24 @@ export function middleware(request: NextRequest) {
 
     if (!authorized) {
       if (isProtectedApi) {
-        return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+        return withRobotsHeader(NextResponse.json({ error: "unauthorized" }, { status: 401 }));
       }
       const loginUrl = new URL("/admin/login", request.url);
-      return NextResponse.redirect(loginUrl);
+      return withRobotsHeader(NextResponse.redirect(loginUrl));
     }
   }
 
   if (isAdminRoute) {
-    return NextResponse.next();
+    return withRobotsHeader(NextResponse.next());
   }
 
   return intlMiddleware(request);
+}
+
+// §13.5: /admin/** and /api/admin/** must never be indexed.
+function withRobotsHeader(response: NextResponse): NextResponse {
+  response.headers.set("X-Robots-Tag", "noindex, nofollow");
+  return response;
 }
 
 export const config = {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatChf, formatMemberCount, formatMemberCountDetail } from "@/lib/format";
+import { formatChf, formatMemberCount, formatMemberCountDetail, formatCount } from "@/lib/format";
 
 describe("formatChf", () => {
   it("formats with apostrophe thousands separator and two decimals", () => {
@@ -56,5 +56,17 @@ describe("formatMemberCountDetail", () => {
   });
   it("rounds a fractional count before grouping", () => {
     expect(formatMemberCountDetail(2791.6, 2024, "de")).toBe("2'792 Versicherte · Stand 2024");
+  });
+});
+
+describe("formatCount", () => {
+  it("groups thousands with an apostrophe, no currency or decimals", () => {
+    expect(formatCount(34210)).toBe("34'210");
+    expect(formatCount(999)).toBe("999");
+    expect(formatCount(1234567)).toBe("1'234'567");
+  });
+
+  it("rounds non-integer input", () => {
+    expect(formatCount(41.6)).toBe("42");
   });
 });

@@ -2,6 +2,7 @@
 // Silent on failure — logging must never block or degrade the comparison UI.
 
 import { NextRequest, NextResponse } from "next/server";
+import { getSql } from "@/lib/db";
 
 const TARIFARTEN = ["standard", "hmo", "hausarzt", "telmed", "andere"];
 const ALTERSKLASSEN = ["kind", "jung", "erwachsen"];
@@ -49,9 +50,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    // Deferred: wire up @vercel/postgres once POSTGRES_URL is provisioned.
-    // await sql`INSERT INTO inquiry_log (region_id, altersklasse, franchise, year, models, accident)
-    //           VALUES (${body.regionId}, ${body.altersklasse}, ${body.franchise}, ${body.year}, ${body.models}, ${body.accident})`;
+    const sql = getSql();
+    await sql`INSERT INTO inquiry_log (region_id, altersklasse, franchise, year, models, accident)
+              VALUES (${body.regionId}, ${body.altersklasse}, ${body.franchise}, ${body.year}, ${body.models}, ${body.accident})`;
     return new NextResponse(null, { status: 204 });
   } catch {
     // Logging failures must never surface to the user.

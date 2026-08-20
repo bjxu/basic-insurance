@@ -64,3 +64,8 @@ export function formatMemberCountDetail(count: number, asOfYear: number, locale:
   const asOf = AS_OF_WORD[locale as Locale] ?? AS_OF_WORD.de;
   return `${groupThousands(String(Math.round(count)))} ${insured} · ${asOf} ${asOfYear}`;
 }
+
+// Thousands-grouped integer count, no currency (admin dashboard stat/breakdown panels).
+export function formatCount(n: number): string {
+  return groupThousands(String(Math.round(n)));
+}
