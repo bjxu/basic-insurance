@@ -40,4 +40,10 @@ describe("middleware — X-Robots-Tag on /admin routes", () => {
     expect(res.status).toBe(401);
     expect(res.headers.get("X-Robots-Tag")).toBe("noindex, nofollow");
   });
+
+  it("does not set X-Robots-Tag on a non-admin locale-routed path", () => {
+    const req = new NextRequest("http://localhost/de");
+    const res = middleware(req);
+    expect(res.headers.get("X-Robots-Tag")).toBeNull();
+  });
 });
