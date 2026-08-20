@@ -10,7 +10,7 @@ type Row = { label: string; value: number };
 
 export function BreakdownBar({ rows, labelWidth = "normal", total: totalOverride }: { rows: Row[]; labelWidth?: "normal" | "short"; total?: number }) {
   const max = Math.max(1, ...rows.map((r) => r.value));
-  const total = totalOverride ?? (rows.reduce((sum, r) => sum + r.value, 0) || 1);
+  const total = (totalOverride ?? rows.reduce((sum, r) => sum + r.value, 0)) || 1;
 
   return (
     <div className="flex flex-col gap-2.5">
