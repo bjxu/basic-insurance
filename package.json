@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "ingest": "tsx scripts/ingest.ts",
+    "crawl-descriptions": "tsx scripts/crawl/crawlDescriptions.ts",
     "test": "vitest run"
   },
   "dependencies": {
@@ -18,6 +19,7 @@
     "react-dom": "19.1.0"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.120.0",
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",

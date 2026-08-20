@@ -36,6 +36,19 @@ export type Insurer = {
   memberCount?: number; // OKP enrollment (BAG Versichertenbestand), absent if unmatched
 };
 
+// A provider-specific product description, crawled from the insurer's own site
+// (docs/superpowers/specs/2026-08-19-provider-product-descriptions-design.md). Keyed
+// externally by (insurerCode, tarifCode) — see ProductDescriptions in
+// src/lib/productDescriptions.ts — since tarifCode alone is not globally unique.
+export type ProductDescription = {
+  de: string;
+  en: string;
+  fr: string;
+  it: string;
+  sourceUrl: string;
+  crawledAt: string; // ISO date
+};
+
 export type Metadata = {
   publicationDate: string; // ISO date, e.g. "2025-10-15"
   availableYears: number[];
