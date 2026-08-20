@@ -54,15 +54,23 @@ export function TrendChart({ data, granularity }: { data: Point[]; granularity: 
           role="img"
           aria-label={`Anfragen ${GRANULARITY_LABEL[granularity]}, ${data.length} Datenpunkte`}
         >
+          {/* Grid lines — always visible, matches mockup */}
+          <line x1="0" y1="0" x2="760" y2="0" stroke="var(--md-sys-color-surface-variant)" strokeWidth="1" />
+          <line x1="0" y1="36" x2="760" y2="36" stroke="var(--md-sys-color-surface-variant)" strokeWidth="1" />
+          <line x1="0" y1="72" x2="760" y2="72" stroke="var(--md-sys-color-surface-variant)" strokeWidth="1" />
+
           {data.length > 0 && (
             <>
               <path d={areaPath} fill="rgba(0,83,219,.08)" />
               <path d={linePath} fill="none" stroke="var(--md-sys-color-primary)" strokeWidth={2} strokeLinejoin="round" />
-              {labelIndices.map((i) => (
-                <text key={i} x={points[i].x} y={108} className="text-[11px] fill-outline">
-                  {formatBucketLabel(data[i].bucket, granularity)}
-                </text>
-              ))}
+              {labelIndices.map((i, idx) => {
+                const anchor = idx === 0 ? "start" : idx === labelIndices.length - 1 ? "end" : "middle";
+                return (
+                  <text key={i} x={points[i].x} y={108} textAnchor={anchor} className="text-[11px] fill-outline">
+                    {formatBucketLabel(data[i].bucket, granularity)}
+                  </text>
+                );
+              })}
             </>
           )}
         </svg>
