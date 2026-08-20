@@ -4,6 +4,7 @@
 // buildTrendPath.
 
 import { buildTrendPath, TREND_CHART_VIEWBOX } from "@/lib/trendPath";
+import { MONTHS_DE } from "@/lib/adminRanges";
 import type { Granularity } from "@/lib/adminStats";
 
 type Point = { bucket: string; n: number };
@@ -14,15 +15,20 @@ const GRANULARITY_LABEL: Record<Granularity, string> = {
   month: "monatlich",
 };
 
+// Hand-written instead of Intl/toLocaleDateString so the trend chart's x-axis
+// uses the exact same German month abbreviations as the range-picker's label
+// (adminRanges.ts's MONTHS_DE) rather than a second, differently-abbreviated
+// set from the locale data — and to match mockups/admin.html's compact,
+// unpunctuated "12 Jul" style.
 function formatBucketLabel(iso: string, granularity: Granularity): string {
   const d = new Date(iso);
   if (granularity === "hour") {
     return d.toLocaleTimeString("de-CH", { hour: "2-digit", minute: "2-digit", timeZone: "UTC" });
   }
   if (granularity === "month") {
-    return d.toLocaleDateString("de-CH", { month: "short", year: "numeric", timeZone: "UTC" });
+    return `${MONTHS_DE[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
   }
-  return d.toLocaleDateString("de-CH", { day: "2-digit", month: "short", timeZone: "UTC" });
+  return `${d.getUTCDate()} ${MONTHS_DE[d.getUTCMonth()]}`;
 }
 
 // Evenly-spaced label indices, capped at `maxLabels`, so a long trend doesn't

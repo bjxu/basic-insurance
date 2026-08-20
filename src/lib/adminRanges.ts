@@ -53,7 +53,7 @@ export function presetRange(key: PresetKey, today: Date): { from: string; to: st
   }
 }
 
-const MONTHS_DE = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
+export const MONTHS_DE = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
 
 function formatDe(iso: string): { day: number; month: string; year: number } {
   const [y, m, d] = iso.split("-").map(Number);
