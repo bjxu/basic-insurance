@@ -61,13 +61,13 @@ export function Dashboard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [range.from, range.to]);
 
-  const { data: stats, isLoading } = useSWR<Stats>(
+  const { data: stats, isValidating } = useSWR<Stats>(
     `/api/admin/stats?from=${range.from}&to=${range.to}`,
     fetcher,
     { keepPreviousData: true },
   );
 
-  const showSkeleton = isLoading && !stats;
+  const showSkeleton = isValidating;
 
   return (
     <main className="max-w-[1100px] mx-auto my-7 px-5">
