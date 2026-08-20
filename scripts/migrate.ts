@@ -4,7 +4,7 @@
 // Requires POSTGRES_URL in the environment — see architecture.md §14.
 
 import { neon } from "@neondatabase/serverless";
-import { MIGRATE_SQL } from "./migrateSql";
+import { CREATE_TABLE_SQL, CREATE_INDEX_SQL } from "./migrateSql";
 
 async function main() {
   const url = process.env.POSTGRES_URL;
@@ -14,7 +14,8 @@ async function main() {
   }
 
   const sql = neon(url);
-  await sql.query(MIGRATE_SQL);
+  await sql.query(CREATE_TABLE_SQL);
+  await sql.query(CREATE_INDEX_SQL);
   console.log("✓ inquiry_log table ready.");
 }
 

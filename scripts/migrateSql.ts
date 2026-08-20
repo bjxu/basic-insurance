@@ -3,7 +3,7 @@
 // imported safely from a test. Columns and types match architecture.md
 // §10.3 exactly.
 
-export const MIGRATE_SQL = `
+export const CREATE_TABLE_SQL = `
 CREATE TABLE IF NOT EXISTS inquiry_log (
   id           BIGSERIAL PRIMARY KEY,
   ts           TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS inquiry_log (
   models       TEXT[] NOT NULL,
   accident     BOOLEAN NOT NULL
 );
+`.trim();
 
+export const CREATE_INDEX_SQL = `
 CREATE INDEX IF NOT EXISTS idx_inquiry_log_ts ON inquiry_log (ts);
 `.trim();
