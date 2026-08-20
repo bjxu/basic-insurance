@@ -25,6 +25,7 @@ import {
 } from "@/lib/lookup";
 import { encodeState, decodeState } from "@/lib/url-state";
 import { validateCurrentPremium } from "@/lib/validate";
+import { buildInquiryLogPayload } from "@/lib/inquiryLog";
 import type { CurrentPlan, Insurer, SelfReportedPlan } from "@/lib/types";
 import type { Locale } from "@/i18n/routing";
 
@@ -138,6 +139,34 @@ export function InsuranceComparator() {
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [plz, bfsNr, birthYear, franchise, year, unfalldeckung, altModelsActive, currentPlan]);
+
+  // Log the resolved query once premium data has loaded and results can render
+  // (REQ-21, architecture.md §10.1) — fires on first valid+rendered results, and
+  // again whenever a filter that changes the result set (models/accident/year)
+  // is toggled. Debounced 1s so rapid toggling coalesces into one request.
+  // currentPlan is deliberately excluded from the deps — it doesn't affect the
+  // result set, only the headline comparison, so editing it shouldn't re-log.
+  useEffect(() => {
+    const payload = buildInquiryLogPayload({
+      praemienregionId,
+      altersklasse,
+      franchise,
+      year,
+      altModelsActive,
+      unfalldeckung,
+    });
+    if (!payload || ALL_PREMIUMS.length === 0) return;
+
+    const timer = setTimeout(() => {
+      fetch("/api/log-inquiry", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload),
+      }).catch(() => {}); // logging must never surface to the user (architecture.md §10.2)
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [praemienregionId, altersklasse, franchise, year, altModelsActive, unfalldeckung, ALL_PREMIUMS.length]);
 
   const inputsValid = Boolean(praemienregionId && altersklasse && franchise);
 
