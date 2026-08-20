@@ -2,6 +2,16 @@
 // No raw log rows are ever exposed through this route — counts/aggregates only.
 
 import { NextRequest, NextResponse } from "next/server";
+import { getSql } from "@/lib/db";
+import { selectGranularity } from "@/lib/adminStats";
+
+type TotalRow = { total: number };
+type TrendRow = { bucket: string; n: number };
+type RegionRow = { regionId: string; n: number };
+type AgeRow = { altersklasse: string; n: number };
+type FranchiseRow = { franchise: number; n: number };
+type ModelRow = { model: string; n: number };
+type AccidentRow = { accident: boolean; n: number };
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -27,7 +37,27 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  // Deferred: wire up @vercel/postgres and run the aggregation queries from
-  // architecture.md §13.2 once POSTGRES_URL is provisioned.
-  return NextResponse.json({ error: "not implemented" }, { status: 501 });
+  const sql = getSql();
+  const granularity = selectGranularity(from, to);
+
+  const [totalRows, trendRows, regionRows, ageRows, franchiseRows, modelRows, accidentRows] = (await Promise.all([
+    sql`SELECT COUNT(*)::int AS total FROM inquiry_log WHERE ts >= ${from} AND ts < ${to}`,
+    sql`SELECT date_trunc(${granularity}, ts) AS bucket, COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1 ORDER BY 1`,
+    sql`SELECT region_id AS "regionId", COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1 ORDER BY 2 DESC LIMIT 10`,
+    sql`SELECT altersklasse, COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1 ORDER BY 2 DESC`,
+    sql`SELECT franchise, COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1 ORDER BY 1`,
+    sql`SELECT unnest(models) AS model, COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1 ORDER BY 2 DESC`,
+    sql`SELECT accident, COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1`,
+  ])) as [TotalRow[], TrendRow[], RegionRow[], AgeRow[], FranchiseRow[], ModelRow[], AccidentRow[]];
+
+  return NextResponse.json({
+    total: totalRows[0]?.total ?? 0,
+    granularity,
+    trend: trendRows,
+    topRegions: regionRows,
+    altersklasse: ageRows,
+    franchise: franchiseRows,
+    models: modelRows,
+    accident: accidentRows,
+  });
 }
