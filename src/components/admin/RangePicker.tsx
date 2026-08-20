@@ -75,7 +75,12 @@ export function RangePicker({ from, to, activePreset, onChange }: Props) {
           className="h-8 px-2 rounded-md border border-outline-variant text-[13px] text-on-surface-variant"
         />
       </div>
-      <span className="ml-auto text-xs text-outline">{formatRangeLabel(from, to)}</span>
+      <span className="ml-auto text-xs text-outline">
+        {activePreset && PRESETS.find((p) => p.key === activePreset)?.label
+          ? `${PRESETS.find((p) => p.key === activePreset)?.label} · `
+          : ""}
+        {formatRangeLabel(from, to)}
+      </span>
     </div>
   );
 }
