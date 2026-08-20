@@ -3,7 +3,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getSql } from "@/lib/db";
-import { selectGranularity } from "@/lib/adminStats";
+import { selectGranularity, fillTrendGaps } from "@/lib/adminStats";
 
 type TotalRow = { total: number };
 type TrendRow = { bucket: string; n: number };
@@ -37,23 +37,38 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  const sql = getSql();
   const granularity = selectGranularity(from, to);
 
-  const [totalRows, trendRows, regionRows, ageRows, franchiseRows, modelRows, accidentRows] = (await Promise.all([
-    sql`SELECT COUNT(*)::int AS total FROM inquiry_log WHERE ts >= ${from} AND ts < ${to}`,
-    sql`SELECT date_trunc(${granularity}, ts) AS bucket, COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1 ORDER BY 1`,
-    sql`SELECT region_id AS "regionId", COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1 ORDER BY 2 DESC LIMIT 10`,
-    sql`SELECT altersklasse, COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1 ORDER BY 2 DESC`,
-    sql`SELECT franchise, COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1 ORDER BY 1`,
-    sql`SELECT unnest(models) AS model, COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1 ORDER BY 2 DESC`,
-    sql`SELECT accident, COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1`,
-  ])) as [TotalRow[], TrendRow[], RegionRow[], AgeRow[], FranchiseRow[], ModelRow[], AccidentRow[]];
+  let totalRows: TotalRow[];
+  let trendRows: TrendRow[];
+  let regionRows: RegionRow[];
+  let ageRows: AgeRow[];
+  let franchiseRows: FranchiseRow[];
+  let modelRows: ModelRow[];
+  let accidentRows: AccidentRow[];
+
+  try {
+    const sql = getSql();
+    [totalRows, trendRows, regionRows, ageRows, franchiseRows, modelRows, accidentRows] = (await Promise.all([
+      sql`SELECT COUNT(*)::int AS total FROM inquiry_log WHERE ts >= ${from} AND ts < ${to}`,
+      sql`SELECT date_trunc(${granularity}, ts) AS bucket, COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1 ORDER BY 1`,
+      sql`SELECT region_id AS "regionId", COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1 ORDER BY 2 DESC LIMIT 10`,
+      sql`SELECT altersklasse, COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1 ORDER BY 2 DESC`,
+      sql`SELECT franchise, COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1 ORDER BY 1`,
+      sql`SELECT unnest(models) AS model, COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1 ORDER BY 2 DESC`,
+      sql`SELECT accident, COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1`,
+    ])) as [TotalRow[], TrendRow[], RegionRow[], AgeRow[], FranchiseRow[], ModelRow[], AccidentRow[]];
+  } catch {
+    // DB unreachable or inquiry_log not migrated yet — surface a real error
+    // rather than a well-formed-but-empty payload that would look identical
+    // to "zero inquiries in range" and hide an infrastructure problem.
+    return NextResponse.json({ error: "query failed" }, { status: 500 });
+  }
 
   return NextResponse.json({
     total: totalRows[0]?.total ?? 0,
     granularity,
-    trend: trendRows,
+    trend: fillTrendGaps(trendRows, granularity, from, to),
     topRegions: regionRows,
     altersklasse: ageRows,
     franchise: franchiseRows,

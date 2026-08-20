@@ -2,6 +2,7 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { NextRequest } from "next/server";
 import { GET } from "./route";
 import * as db from "@/lib/db";
+import { fillTrendGaps } from "@/lib/adminStats";
 
 vi.mock("@/lib/db", () => ({ getSql: vi.fn() }));
 
@@ -55,15 +56,34 @@ describe("GET /api/admin/stats", () => {
     const res = await GET(makeRequest("from=2026-07-12&to=2026-08-11"));
     const json = await res.json();
 
+    // The trend query only returns rows for buckets with data — the route is
+    // expected to gap-fill the rest with n: 0 (see src/lib/adminStats.ts).
+    const expectedTrend = fillTrendGaps(
+      [{ bucket: "2026-08-01T00:00:00.000Z", n: 5 }],
+      "day",
+      "2026-07-12",
+      "2026-08-11",
+    );
+
     expect(json).toEqual({
       total: 42,
       granularity: "day",
-      trend: [{ bucket: "2026-08-01T00:00:00.000Z", n: 5 }],
+      trend: expectedTrend,
       topRegions: [{ regionId: "ZH-1", n: 20 }],
       altersklasse: [{ altersklasse: "erwachsen", n: 30 }],
       franchise: [{ franchise: 300, n: 10 }],
       models: [{ model: "standard", n: 40 }],
       accident: [{ accident: true, n: 35 }],
     });
+  });
+
+  it("returns 500 with an error body when the DB queries fail (e.g. inquiry_log not migrated yet)", async () => {
+    process.env.POSTGRES_URL = "postgres://test";
+    const fakeSql = vi.fn(() => Promise.reject(new Error("relation \"inquiry_log\" does not exist")));
+    vi.mocked(db.getSql).mockReturnValue(fakeSql as unknown as ReturnType<typeof db.getSql>);
+
+    const res = await GET(makeRequest("from=2026-07-12&to=2026-08-11"));
+    expect(res.status).toBe(500);
+    expect(await res.json()).toEqual({ error: "query failed" });
   });
 });

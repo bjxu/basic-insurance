@@ -26,7 +26,11 @@ type Stats = {
   accident: { accident: boolean; n: number }[];
 };
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+const fetcher = async (url: string) => {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`stats fetch failed: ${res.status}`);
+  return res.json();
+};
 
 const ALTERSKLASSE_LABEL: Record<string, string> = {
   erwachsen: "Erwachsen (26+)",
@@ -61,7 +65,7 @@ export function Dashboard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [range.from, range.to]);
 
-  const { data: stats, isValidating } = useSWR<Stats>(
+  const { data: stats, error, isValidating } = useSWR<Stats>(
     `/api/admin/stats?from=${range.from}&to=${range.to}`,
     fetcher,
     { keepPreviousData: true },
@@ -75,68 +79,72 @@ export function Dashboard({
 
       <RangePicker from={range.from} to={range.to} activePreset={range.preset} onChange={setRange} />
 
-      <div className={showSkeleton ? "animate-pulse" : undefined}>
-        <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-5 inline-block mb-5 min-w-[220px]">
-          <div className="text-xs font-semibold text-outline uppercase tracking-wide">Anfragen im Zeitraum</div>
-          <div className="text-4xl font-bold tracking-tight my-1 text-on-surface">
-            {stats ? formatCount(stats.total) : "–"}
+      {error ? (
+        <p className="text-error">Fehler beim Laden der Statistik.</p>
+      ) : (
+        <div className={showSkeleton ? "animate-pulse" : undefined}>
+          <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-5 inline-block mb-5 min-w-[220px]">
+            <div className="text-xs font-semibold text-outline uppercase tracking-wide">Anfragen im Zeitraum</div>
+            <div className="text-4xl font-bold tracking-tight my-1 text-on-surface">
+              {stats ? formatCount(stats.total) : "–"}
+            </div>
+            <div className="text-xs text-outline">{formatRangeLabel(range.from, range.to)}</div>
           </div>
-          <div className="text-xs text-outline">{formatRangeLabel(range.from, range.to)}</div>
-        </div>
 
-        <TrendChart data={stats?.trend ?? []} granularity={stats?.granularity ?? "day"} />
+          <TrendChart data={stats?.trend ?? []} granularity={stats?.granularity ?? "day"} />
 
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-5">
-            <h2 className="text-title-medium text-on-surface-variant uppercase tracking-wide mb-4">
-              Top 10 Prämienregionen
-            </h2>
-            <BreakdownBar
-              rows={(stats?.topRegions ?? []).map((r) => ({ label: r.regionId, value: r.n }))}
-              total={stats?.total}
-            />
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-5">
+              <h2 className="text-title-medium text-on-surface-variant uppercase tracking-wide mb-4">
+                Top 10 Prämienregionen
+              </h2>
+              <BreakdownBar
+                rows={(stats?.topRegions ?? []).map((r) => ({ label: r.regionId, value: r.n }))}
+                total={stats?.total}
+              />
+            </div>
+            <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-5">
+              <h2 className="text-title-medium text-on-surface-variant uppercase tracking-wide mb-4">Altersklasse</h2>
+              <BreakdownBar
+                rows={(stats?.altersklasse ?? []).map((r) => ({
+                  label: ALTERSKLASSE_LABEL[r.altersklasse] ?? r.altersklasse,
+                  value: r.n,
+                }))}
+              />
+              <h2 className="text-title-medium text-on-surface-variant uppercase tracking-wide mt-6 mb-4">
+                Unfalldeckung
+              </h2>
+              <BreakdownBar
+                rows={(stats?.accident ?? []).map((r) => ({
+                  label: r.accident ? "Eingeschlossen" : "Ausgeschlossen",
+                  value: r.n,
+                }))}
+              />
+            </div>
           </div>
-          <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-5">
-            <h2 className="text-title-medium text-on-surface-variant uppercase tracking-wide mb-4">Altersklasse</h2>
-            <BreakdownBar
-              rows={(stats?.altersklasse ?? []).map((r) => ({
-                label: ALTERSKLASSE_LABEL[r.altersklasse] ?? r.altersklasse,
-                value: r.n,
-              }))}
-            />
-            <h2 className="text-title-medium text-on-surface-variant uppercase tracking-wide mt-6 mb-4">
-              Unfalldeckung
-            </h2>
-            <BreakdownBar
-              rows={(stats?.accident ?? []).map((r) => ({
-                label: r.accident ? "Eingeschlossen" : "Ausgeschlossen",
-                value: r.n,
-              }))}
-            />
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-5">
+              <h2 className="text-title-medium text-on-surface-variant uppercase tracking-wide mb-4">
+                Franchise-Verteilung
+              </h2>
+              <BreakdownBar
+                labelWidth="short"
+                rows={(stats?.franchise ?? []).map((r) => ({ label: `CHF ${r.franchise}`, value: r.n }))}
+              />
+            </div>
+            <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-5">
+              <h2 className="text-title-medium text-on-surface-variant uppercase tracking-wide mb-4">
+                Versicherungsmodell
+              </h2>
+              <BreakdownBar
+                labelWidth="short"
+                rows={(stats?.models ?? []).map((r) => ({ label: MODEL_LABEL[r.model] ?? r.model, value: r.n }))}
+              />
+            </div>
           </div>
         </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-5">
-            <h2 className="text-title-medium text-on-surface-variant uppercase tracking-wide mb-4">
-              Franchise-Verteilung
-            </h2>
-            <BreakdownBar
-              labelWidth="short"
-              rows={(stats?.franchise ?? []).map((r) => ({ label: `CHF ${r.franchise}`, value: r.n }))}
-            />
-          </div>
-          <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-5">
-            <h2 className="text-title-medium text-on-surface-variant uppercase tracking-wide mb-4">
-              Versicherungsmodell
-            </h2>
-            <BreakdownBar
-              labelWidth="short"
-              rows={(stats?.models ?? []).map((r) => ({ label: MODEL_LABEL[r.model] ?? r.model, value: r.n }))}
-            />
-          </div>
-        </div>
-      </div>
+      )}
     </main>
   );
 }
