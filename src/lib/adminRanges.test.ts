@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { presetRange, formatRangeLabel } from "./adminRanges";
+import { presetRange, formatRangeLabel, PRESETS } from "./adminRanges";
 
 const TODAY = new Date(Date.UTC(2026, 7, 11)); // 11 Aug 2026 (month is 0-indexed)
 
@@ -26,6 +26,30 @@ describe("presetRange", () => {
 
   it("year: from 1 January of the current calendar year", () => {
     expect(presetRange("year", TODAY)).toEqual({ from: "2026-01-01", to: "2026-08-12" });
+  });
+
+  it("30d with year-rollover: rolls into previous year on early January date", () => {
+    const jan5 = new Date(Date.UTC(2026, 0, 5)); // 5 Jan 2026
+    expect(presetRange("30d", jan5)).toEqual({ from: "2025-12-07", to: "2026-01-06" });
+  });
+
+  it("30d with leap-year: correctly handles February with 29 days", () => {
+    const mar1 = new Date(Date.UTC(2028, 2, 1)); // 1 Mar 2028 (leap year)
+    expect(presetRange("30d", mar1)).toEqual({ from: "2028-02-01", to: "2028-03-02" });
+  });
+});
+
+describe("PRESETS", () => {
+  it("has exactly 6 entries with the correct keys and German labels in order", () => {
+    expect(PRESETS).toHaveLength(6);
+    expect(PRESETS).toEqual([
+      { key: "today", label: "Heute" },
+      { key: "7d", label: "7 Tage" },
+      { key: "30d", label: "30 Tage" },
+      { key: "month", label: "Dieser Monat" },
+      { key: "3m", label: "3 Monate" },
+      { key: "year", label: "Dieses Jahr" },
+    ]);
   });
 });
 
