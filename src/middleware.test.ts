@@ -1,13 +1,12 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { middleware } from "./middleware";
 
 // Mock next-intl middleware to avoid Edge Runtime module resolution issues in vitest
 vi.mock("next-intl/middleware", () => ({
-  default: () => (req: NextRequest) => {
+  default: () => () => {
     // Return a pass-through response
-    const response = new (require("next/server").NextResponse)();
-    return response;
+    return new NextResponse();
   },
 }));
 
