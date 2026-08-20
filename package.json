@@ -9,6 +9,7 @@
     "lint": "eslint",
     "ingest": "tsx scripts/ingest.ts",
     "crawl-descriptions": "tsx scripts/crawl/crawlDescriptions.ts",
+    "db:migrate": "tsx scripts/migrate.ts",
     "test": "vitest run"
   },
   "dependencies": {
