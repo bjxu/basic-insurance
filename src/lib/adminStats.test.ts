@@ -13,7 +13,15 @@ describe("selectGranularity", () => {
     expect(selectGranularity("2026-05-13", "2026-08-11")).toBe("day"); // exactly 90 days
   });
 
+  it("returns day for exactly 3 days (lower boundary)", () => {
+    expect(selectGranularity("2026-08-08", "2026-08-11")).toBe("day");
+  });
+
   it("returns month for a range over 90 days", () => {
     expect(selectGranularity("2026-01-01", "2026-08-11")).toBe("month");
+  });
+
+  it("returns month for exactly 91 days (just over the threshold)", () => {
+    expect(selectGranularity("2026-05-12", "2026-08-11")).toBe("month");
   });
 });
