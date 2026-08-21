@@ -1,1 +1,12 @@
-{}
+{
+  "1562": {
+    "PREMED": {
+      "de": "Vor jedem Arztbesuch Anruf bei der Medi24-Hotline nötig, danach freie Arztwahl; Ausnahmen: Schwangerschaft, Gynäkologie, Zahn- und Brillenbehandlungen sowie Notfälle.",
+      "en": "Call the Medi24 hotline before any doctor visit, then free choice of doctor; exceptions apply for pregnancy, gynaecology, dental and eyewear care, and emergencies.",
+      "fr": "Appel obligatoire à la hotline Medi24 avant toute consultation, puis libre choix du médecin; exceptions pour grossesse, gynécologie, soins dentaires, lunettes et urgences.",
+      "it": "Prima di ogni visita occorre chiamare la hotline Medi24, poi libera scelta del medico; eccezioni per gravidanza, ginecologia, cure dentarie, occhiali ed emergenze.",
+      "sourceUrl": "https://www.helsana.ch/de/private/versicherungen/grundversicherung/premed-24.html",
+      "crawledAt": "2026-08-21"
+    }
+  }
+}
