@@ -159,8 +159,13 @@ corrected or added by hand is never touched by a later crawl run.
   the specific variant row matching `shownTarifCode` — preserves today's exact behavior of
   pointing at the one plan being compared above, now at the more precise variant level.
 - Groups with a single variant — the common case, since most insurers have no
-  `product-groups.json` entries yet — render identically to today's one-row-per-product layout
-  through the same code path; no special-casing.
+  `product-groups.json` entries yet — render via today's exact flat single-row JSX (tag + name +
+  discount badge + price all on one line, price inline not indented below). This *is* a render-
+  level branch on `variants.length`, not a data-level one: both cases still flow through the same
+  `groupProductsByTarifart` output and the same `ProductGroup` shape — only `ProductList.tsx`
+  chooses which JSX shape to paint. Only `variants.length > 1` gets the new header/description/
+  indented-variants shape. This matches the mockup, where Sanitas/Assura's ungrouped rows stayed
+  pixel-identical and only the Helsana Hausarzt example used the new nested shape.
 - No new collapse/expand interaction: groups and their variants render fully open, same as
   `ProductList` itself renders fully open once its parent `PlanRow` is expanded today.
 
