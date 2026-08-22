@@ -16,10 +16,13 @@ import { buildInsurerSources, type InsurerSources } from "./insurerSources";
 import { crawlSite } from "./crawlSite";
 import { matchProductPage } from "./matchProductPage";
 import { extractDescription } from "./extractDescription";
+import { deriveProductGroups, mergeProductGroups, type MatchedProduct } from "./deriveProductGroups";
+import type { ProductGroups } from "../../src/lib/productGroups";
 
 const DATA_DIR = join(process.cwd(), "src", "data");
 const INSURER_SOURCES_PATH = join(DATA_DIR, "insurer-sources.json");
 const PRODUCT_DESCRIPTIONS_PATH = join(DATA_DIR, "product-descriptions.json");
+const PRODUCT_GROUPS_PATH = join(DATA_DIR, "product-groups.json");
 
 async function main() {
   const onlyInsurer = parseInsurerArg(process.argv.slice(2));
@@ -35,6 +38,7 @@ async function main() {
 
   const products = await loadLatestProducts();
   const descriptions = await readJson<ProductDescriptions>(PRODUCT_DESCRIPTIONS_PATH, {});
+  let productGroups = await readJson<ProductGroups>(PRODUCT_GROUPS_PATH, {});
   const client = new Anthropic();
 
   const insurerCodes = onlyInsurer ? [onlyInsurer] : Object.keys(sources);
@@ -50,6 +54,7 @@ async function main() {
     if (insurerProducts.length === 0) continue;
 
     console.log(`Crawling ${source.insurerName} (${insurerCode}) from ${source.seedUrl}…`);
+    const matchedProducts: MatchedProduct[] = [];
     let pages;
     try {
       pages = await crawlSite(source.seedUrl);
@@ -66,6 +71,7 @@ async function main() {
         noPageMatch++;
         continue;
       }
+      matchedProducts.push({ tarifCode: product.tarifCode, productName: product.productName, pageUrl: page.url });
       try {
         const result = await extractDescription(client, {
           pageText: page.text,
@@ -95,6 +101,11 @@ async function main() {
         extractionFailed++;
       }
     }
+
+    // Hand-entered groups always win — mergeProductGroups only fills in a tarifCode with no
+    // existing entry.
+    productGroups = mergeProductGroups(productGroups, insurerCode, deriveProductGroups(matchedProducts));
+    await writeFile(PRODUCT_GROUPS_PATH, JSON.stringify(productGroups, null, 2) + "\n");
 
     // Persist after each insurer so one later failure doesn't lose earlier progress.
     await writeFile(PRODUCT_DESCRIPTIONS_PATH, JSON.stringify(descriptions, null, 2) + "\n");
