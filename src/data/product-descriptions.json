@@ -1,1 +1,20 @@
-{}
+{
+  "1509": {
+    "BASE": {
+      "de": "Freie Arztwahl vor jeder Behandlung, ohne Überweisung zu Spezialisten",
+      "en": "Free choice of doctor before each treatment, no referral needed for specialists",
+      "fr": "Libre choix du médecin avant chaque traitement, sans renvoi nécessaire vers un spécialiste",
+      "it": "Libera scelta del medico prima di ogni trattamento, senza rinvio necessario allo specialista",
+      "sourceUrl": "https://www.sanitas.com/de/privatkunden/versicherungen/grundversicherung.html",
+      "crawledAt": "2026-08-22"
+    },
+    "MultiAccess": {
+      "de": "Freie Wahl der Erstanlaufstelle: Hausarzt-/Gruppenpraxis, telemedizinisches Zentrum oder Partnerapotheke",
+      "en": "Free choice of first point of contact: family/group practice, telemedicine center or partner pharmacy",
+      "fr": "Choix libre du premier point de contact: cabinet de médecin de famille/groupe, centre de télémédecine ou pharmacie partenaire",
+      "it": "Scelta libera del primo punto di contatto: studio medico di famiglia/di gruppo, centro telemedico o farmacia partner",
+      "sourceUrl": "https://www.sanitas.com/de/privatkunden/versicherungen/grundversicherung/netzwerk-modell.html",
+      "crawledAt": "2026-08-22"
+    }
+  }
+}
