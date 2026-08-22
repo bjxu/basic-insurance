@@ -101,6 +101,44 @@ same-named groups in two different tarifart sections rather than erroring — ac
 this is hand-reviewed data, consistent with the "no guessing, degrade gracefully" pattern
 elsewhere in this data layer.
 
+## Crawler auto-population
+
+`product-groups.json` is filled two ways, same dual pattern as `product-descriptions.json`:
+the crawler populates it incrementally as insurers are crawled, and hand edits remain a full
+backup/override path (useful for insurers with no `seedUrl`, or to correct/pre-empt a bad
+auto-derived grouping).
+
+In `scripts/crawl/crawlDescriptions.ts`, after matching that insurer's products to crawled
+pages (existing `matchProductPage` step): group the *matched* products by which page URL they
+landed on. Multiple tarifCodes landing on the same page is itself the grouping signal — no
+separate similarity heuristic on names.
+
+This does **not** cover Helsana's own `BeneFit PLUS Hausarzt R1`–`R4` example: `matchProductPage`
+requires a page's `<title>` to contain the product's full BAG name, and Helsana's page for that
+product — title *and* `<h1>` — is just "Hausarztmodell"; "BeneFit PLUS Hausarzt" doesn't appear
+on the page at all. That's a genuine vocabulary mismatch between BAG's product naming and the
+insurer's own marketing copy, not a matching-strictness bug — loosening the rule to catch it
+(e.g. word-overlap instead of full-string substring) would reopen exactly the nav/footer
+false-positive problem `matchProductPage` was deliberately tightened against (see its module
+comment). So `matchProductPage` is intentionally left as-is here. Helsana's Hausarzt/Flexmed
+groups stay on the **manual-edit path** — expected, not a gap: this is precisely the case the
+hand-maintained backup exists for. Other insurers whose product pages do echo the BAG name
+(commonly true — Sanitas's `Hausarztmodell 1`–`4` example, unlike Helsana's, uses that exact
+wording as both the tarifCode-adjacent name and likely the page title) get auto-grouped as
+described below without needing this exception.
+
+For each such multi-tarifCode-one-page group: derive the group name as the **shared leading
+words** across their `productName`s — split each on whitespace, take the longest common prefix
+at the word level (not character level, so `"...Hausarzt R1"` / `"...Hausarzt R2"` correctly
+yields `"...Hausarzt"` rather than cutting mid-token at `"...Hausarzt R"`). If the derived name
+is empty (no shared leading word — shouldn't happen given they share a page, but never write a
+guess), leave those tarifCodes ungrouped for this run rather than writing a blank/nonsense name.
+
+**Hand edits always win**: before writing, the crawler only sets `productGroups[insurerCode]
+[tarifCode]` for a tarifCode that has no existing entry — mirrors `buildInsurerSources`'s
+`existing[insurerCode]?.seedUrl ?? null` merge in `insurerSources.ts`. A grouping you've
+corrected or added by hand is never touched by a later crawl run.
+
 ## UI integration
 
 `ProductList.tsx` restructures each tarifart section from a flat list of product rows into:
@@ -129,10 +167,12 @@ elsewhere in this data layer.
 ## Mockup
 
 [`mockups/main.html`](../../../mockups/main.html)'s `.plan-detail-row` section (kept in sync
-with `ProductList.tsx` since the product-descriptions work) gets one illustrative grouped
-example added — Helsana's BeneFit PLUS Hausarzt R1–R4 under one header/description with four
-price sub-rows — alongside its existing ungrouped rows, demonstrating both the grouped and
-singleton (unchanged) rendering paths side by side.
+with `ProductList.tsx` since the product-descriptions work) got one illustrative grouped example
+added — Helsana's BeneFit PLUS Hausarzt R1–R4 under one header/description with four price
+sub-rows — alongside its existing ungrouped rows, demonstrating both the grouped and singleton
+(unchanged) rendering paths side by side. **Done** ahead of the rest of this plan, as a design
+preview (`.plan-detail-product-header` / `.plan-detail-variants` / `.plan-detail-variant` CSS
+added, no JS/data changes).
 
 ## Testing
 
@@ -143,3 +183,7 @@ singleton (unchanged) rendering paths side by side.
 - Component test: `ProductList` renders one header/description with N price sub-rows for a
   grouped product; renders today's single-row shape for an ungrouped one; the
   `shownTarifCode` highlight lands on the correct variant row, not the group header.
+- `crawlDescriptions.ts`: unit test for the group-derivation step (word-level longest-common-
+  prefix, same-page detection, empty-prefix → no group, existing hand entry → not overwritten)
+  against fixture data, same style as `insurerSources.test.ts`'s merge test. `matchProductPage`
+  itself is untouched — no test changes there.
