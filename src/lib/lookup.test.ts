@@ -8,6 +8,7 @@ import {
   discountVsStandardPct,
   groupByInsurer,
   groupProductsByTarifart,
+  deriveVariantLabel,
 } from "@/lib/lookup";
 import type { PremiumRow, SelfReportedPlan } from "@/lib/types";
 
@@ -180,14 +181,15 @@ describe("groupProductsByTarifart", () => {
   ];
 
   it("groups by tarifart in Standard → Hausarzt → Telmed → HMO → Andere order", () => {
-    const result = groupProductsByTarifart(products);
+    const result = groupProductsByTarifart(products, {});
     expect(result.map((g) => g.tarifart)).toEqual(["standard", "hausarzt", "telmed", "hmo"]);
   });
 
-  it("sorts each group's products by price ascending", () => {
-    const result = groupProductsByTarifart(products);
+  it("sorts each tarifart's groups by price ascending when ungrouped (one variant each)", () => {
+    const result = groupProductsByTarifart(products, {});
     const telmedGroup = result.find((g) => g.tarifart === "telmed")!;
-    expect(telmedGroup.products.map((p) => p.productName)).toEqual(["Callmed", "Sana24"]);
+    expect(telmedGroup.groups.map((g) => g.groupName)).toEqual(["Callmed", "Sana24"]);
+    expect(telmedGroup.groups.every((g) => g.variants.length === 1)).toBe(true);
   });
 
   it("breaks price ties alphabetically by productName (de-CH)", () => {
@@ -195,11 +197,61 @@ describe("groupProductsByTarifart", () => {
       { ...ROWS[0], tarifart: "hmo", tarifCode: "HMO-Z", productName: "Zeta HMO", monthlyPremium: 200 },
       { ...ROWS[0], tarifart: "hmo", tarifCode: "HMO-A", productName: "Alpha HMO", monthlyPremium: 200 },
     ];
-    const result = groupProductsByTarifart(tiedProducts);
-    expect(result[0].products.map((p) => p.productName)).toEqual(["Alpha HMO", "Zeta HMO"]);
+    const result = groupProductsByTarifart(tiedProducts, {});
+    expect(result[0].groups.map((g) => g.groupName)).toEqual(["Alpha HMO", "Zeta HMO"]);
   });
 
   it("returns an empty array for empty input", () => {
-    expect(groupProductsByTarifart([])).toEqual([]);
+    expect(groupProductsByTarifart([], {})).toEqual([]);
+  });
+
+  it("nests tarifCodes sharing a product-groups.json entry into one group's variants", () => {
+    const variants: PremiumRow[] = [
+      { ...ROWS[0], insurerCode: "1562", tarifart: "hausarzt", tarifCode: "BFP_CP", productName: "BeneFit PLUS Hausarzt R1", monthlyPremium: 400.15 },
+      { ...ROWS[0], insurerCode: "1562", tarifart: "hausarzt", tarifCode: "BFP_BF", productName: "BeneFit PLUS Hausarzt R4", monthlyPremium: 451.65 },
+    ];
+    const productGroups = {
+      "1562": { BFP_CP: "BeneFit PLUS Hausarzt", BFP_BF: "BeneFit PLUS Hausarzt" },
+    };
+    const result = groupProductsByTarifart(variants, productGroups);
+    const hausarzt = result.find((g) => g.tarifart === "hausarzt")!;
+    expect(hausarzt.groups).toHaveLength(1);
+    expect(hausarzt.groups[0].groupName).toBe("BeneFit PLUS Hausarzt");
+    expect(hausarzt.groups[0].variants.map((v) => v.tarifCode)).toEqual(["BFP_CP", "BFP_BF"]); // price ascending
+  });
+
+  it("orders groups by their own cheapest variant", () => {
+    const variants: PremiumRow[] = [
+      { ...ROWS[0], insurerCode: "1562", tarifart: "hausarzt", tarifCode: "BFP_CAF", productName: "BeneFit PLUS Flexmed R3", monthlyPremium: 432.35 },
+      { ...ROWS[0], insurerCode: "1562", tarifart: "hausarzt", tarifCode: "BFP_CP", productName: "BeneFit PLUS Hausarzt R1", monthlyPremium: 400.15 },
+      { ...ROWS[0], insurerCode: "1562", tarifart: "hausarzt", tarifCode: "BFP_BF", productName: "BeneFit PLUS Hausarzt R4", monthlyPremium: 451.65 },
+    ];
+    const productGroups = {
+      "1562": {
+        BFP_CP: "BeneFit PLUS Hausarzt",
+        BFP_BF: "BeneFit PLUS Hausarzt",
+        BFP_CAF: "BeneFit PLUS Flexmed",
+      },
+    };
+    const result = groupProductsByTarifart(variants, productGroups);
+    const hausarzt = result.find((g) => g.tarifart === "hausarzt")!;
+    // Hausarzt's cheapest variant (400.15) undercuts Flexmed's only variant (432.35).
+    expect(hausarzt.groups.map((g) => g.groupName)).toEqual(["BeneFit PLUS Hausarzt", "BeneFit PLUS Flexmed"]);
+  });
+});
+
+describe("deriveVariantLabel", () => {
+  it("strips the group name prefix and trims the remainder", () => {
+    expect(deriveVariantLabel("BeneFit PLUS Hausarzt", "BeneFit PLUS Hausarzt R1")).toBe("R1");
+  });
+
+  it("returns an empty string for a singleton group (productName === groupName)", () => {
+    expect(deriveVariantLabel("Grundversicherung", "Grundversicherung")).toBe("");
+  });
+
+  it("falls back to the full productName when it doesn't start with the group name", () => {
+    expect(deriveVariantLabel("BeneFit PLUS Hausarzt", "Completely Different Name")).toBe(
+      "Completely Different Name",
+    );
   });
 });
