@@ -1,6 +1,8 @@
 // Derives product-groups.json entries from a crawl run's matched pages — multiple tarifCodes
 // landing on the same page is itself the grouping signal (docs/superpowers/specs/2026-08-22-
-// provider-product-grouping-design.md), not a separate name-similarity heuristic.
+// provider-product-grouping-design.md), not a separate name-similarity heuristic. Like
+// product-descriptions.json, any crawler-written diff to product-groups.json is meant to be
+// spot-checked by a human, not trusted blindly — two genuinely distinct products can share a page.
 
 import type { ProductGroups } from "../../src/lib/productGroups";
 
@@ -22,7 +24,11 @@ export function deriveProductGroups(matches: MatchedProduct[]): Record<string, s
   for (const pageMatches of byPage.values()) {
     if (pageMatches.length < 2) continue;
     const groupName = commonLeadingWords(pageMatches.map((m) => m.productName));
-    if (!groupName) continue;
+    // Skip a cluster with no shared leading word, and also a cluster where the derived name
+    // equals one member's full productName — that shape means one product's full name is a
+    // strict prefix of another's (e.g. "Managed Care" / "Managed Care ohne Capitation"), not a
+    // genuine tier family, and would leave the prefix member with a blank variant label.
+    if (!groupName || pageMatches.some((m) => m.productName === groupName)) continue;
     for (const m of pageMatches) result[m.tarifCode] = groupName;
   }
   return result;

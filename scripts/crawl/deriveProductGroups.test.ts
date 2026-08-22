@@ -60,6 +60,17 @@ describe("deriveProductGroups", () => {
     });
   });
 
+  it("does not group when one product's full name is a strict prefix of another's", () => {
+    // "Managed Care" / "Managed Care ohne Capitation" — the naive longest-common-prefix would
+    // derive groupName "Managed Care", which equals MCMIT's own full productName and would leave
+    // it with a blank deriveVariantLabel. Real Sanitas products, both tarifart: hmo.
+    const matches: MatchedProduct[] = [
+      { tarifCode: "MCMIT", productName: "Managed Care", pageUrl: "https://x.ch/hmo.html" },
+      { tarifCode: "MCOHNE", productName: "Managed Care ohne Capitation", pageUrl: "https://x.ch/hmo.html" },
+    ];
+    expect(deriveProductGroups(matches)).toEqual({});
+  });
+
   it("returns an empty object for empty input", () => {
     expect(deriveProductGroups([])).toEqual({});
   });

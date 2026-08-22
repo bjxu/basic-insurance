@@ -1,9 +1,11 @@
 // Crawls insurer websites (from src/data/insurer-sources.json) to generate
 // product-specific descriptions for src/data/product-descriptions.json
-// (docs/superpowers/specs/2026-08-19-provider-product-descriptions-design.md). Run
+// (docs/superpowers/specs/2026-08-19-provider-product-descriptions-design.md), and derives
+// product-groups.json entries along the way (scripts/crawl/deriveProductGroups.ts). Run
 // manually via `npm run crawl-descriptions` (add `-- --insurer <code>` to scope to one
 // insurer while iterating) — kept separate from `npm run ingest`: this is network- and
-// LLM-dependent, non-deterministic, and meant to be spot-checked, not trusted blindly.
+// LLM-dependent, non-deterministic, and every file it writes is meant to be spot-checked,
+// not trusted blindly.
 //
 // Requires ANTHROPIC_API_KEY in the environment (see README.md).
 
@@ -104,8 +106,12 @@ async function main() {
 
     // Hand-entered groups always win — mergeProductGroups only fills in a tarifCode with no
     // existing entry.
+    const productGroupsBeforeMerge = productGroups;
     productGroups = mergeProductGroups(productGroups, insurerCode, deriveProductGroups(matchedProducts));
-    await writeFile(PRODUCT_GROUPS_PATH, JSON.stringify(productGroups, null, 2) + "\n");
+    // mergeProductGroups returns the same reference when nothing changed — skip the write then.
+    if (productGroups !== productGroupsBeforeMerge) {
+      await writeFile(PRODUCT_GROUPS_PATH, JSON.stringify(productGroups, null, 2) + "\n");
+    }
 
     // Persist after each insurer so one later failure doesn't lose earlier progress.
     await writeFile(PRODUCT_DESCRIPTIONS_PATH, JSON.stringify(descriptions, null, 2) + "\n");

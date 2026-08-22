@@ -125,7 +125,7 @@ function GroupedProductRow({ group, standardPremium, shownTarifCode, levyPerMont
       .find((d): d is string => d != null) ?? t(`copy.tarifart.${group.tarifart}.description`);
 
   return (
-    <div className="rounded-md px-1.5 py-1">
+    <div className="rounded-md px-1.5 py-1 border-l-[3px] border-transparent">
       <div className="flex items-center gap-2">
         <span
           className={`inline-block px-1.5 py-px rounded text-[11px] font-semibold ${
@@ -142,7 +142,9 @@ function GroupedProductRow({ group, standardPremium, shownTarifCode, levyPerMont
           <VariantRow
             key={variant.tarifCode}
             variant={variant}
-            label={deriveVariantLabel(group.groupName, variant.productName)}
+            // deriveVariantLabel returns "" for a singleton-shaped name (e.g. hand-edited data
+            // whose groupName equals a variant's full productName) — never render a blank label.
+            label={deriveVariantLabel(group.groupName, variant.productName) || variant.productName}
             standardPremium={standardPremium}
             isShown={variant.tarifCode === shownTarifCode}
             levyPerMonthByYear={levyPerMonthByYear}
