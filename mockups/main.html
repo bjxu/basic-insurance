@@ -646,6 +646,38 @@
       width: 88px;
       text-align: right;
     }
+    /* Grouped product variants (Design: provider-product-grouping) — same-plan price tiers
+       (e.g. Helsana's BeneFit PLUS Hausarzt R1–R4) nest under one shared name/description
+       instead of repeating both once per tier. .plan-detail-row above is unchanged and still
+       used as-is for singleton products (the common case for insurers not yet reviewed). */
+    .plan-detail-product-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .plan-detail-variants {
+      margin: 4px 0 0 8px;
+      padding-left: 10px;
+      border-left: 2px solid var(--md-sys-color-outline-variant);
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .plan-detail-variant {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 3px 6px 3px 5px;
+      border-radius: 6px;
+      border-left: 3px solid transparent;
+    }
+    .plan-detail-variant.shown-above { border-left-color: var(--md-sys-color-primary); }
+    .plan-detail-variant-label {
+      flex: 1;
+      min-width: 0;
+      font-size: 12px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
 
     /* ── Data notice ── */
     .data-notice {
@@ -1097,6 +1129,77 @@
               <span class="plan-detail-price">CHF 228.45</span>
             </div>
             <p class="plan-detail-desc">Erstanlaufstelle immer im Bonus-Care-Gesundheitszentrum; 12 Standorte in der Deutschschweiz.</p>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- Helsana: demonstrates grouped product variants (Design: provider-product-grouping) —
+         BeneFit PLUS Hausarzt R1–R4 are four separately-priced risk tiers of the same plan,
+         nested under one shared name/description instead of repeating both 4x. The Standard
+         row alongside it is an ordinary singleton — the unchanged, still-far-more-common case
+         for insurers with no src/data/product-groups.json entries yet. -->
+    <details class="plan-row-expandable" role="listitem" open>
+      <summary>
+        <div class="plan-rank">2</div>
+        <div class="plan-insurer">
+          <div class="name">Helsana</div>
+          <div class="model-badge"><span class="model-tag haus">Hausarzt</span> <span class="discount-badge">bis zu −21.3% ggü. Standard</span> · Erstanlaufstelle immer die gewählte Hausarztpraxis</div>
+        </div>
+        <div class="member-badge" title="1'245'890 Versicherte · Stand 2024" aria-label="1'245'890 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 1.2 Mio.</div>
+        <div class="plan-yoy up">+1.8%</div>
+        <div class="plan-price">
+          <div class="amount">CHF 400.15</div>
+          <div class="per">/Monat</div>
+        </div>
+        <span class="plan-expand-icon" aria-hidden="true"></span>
+      </summary>
+
+      <div class="plan-detail">
+        <div class="plan-detail-group">
+          <p class="plan-detail-group-label">Standard</p>
+          <div class="plan-detail-row">
+            <div class="plan-detail-row-main">
+              <span class="model-tag">Standard</span>
+              <span class="plan-detail-name">Grundversicherung</span>
+              <span class="plan-detail-price">CHF 485.20</span>
+            </div>
+            <p class="plan-detail-desc">Freie Arztwahl</p>
+          </div>
+        </div>
+        <div class="plan-detail-group">
+          <p class="plan-detail-group-label">Hausarzt</p>
+          <!-- Grouped: one name + one description, four price tiers underneath. src/data/product-groups.json
+               maps tarifCodes BFP_CP/BFP_CM/BFP_CA/BFP_BF to the shared group name "BeneFit PLUS Hausarzt";
+               the R1–R4 sub-row labels are derived by stripping that group name off each productName. -->
+          <div class="plan-detail-row">
+            <div class="plan-detail-product-header">
+              <span class="model-tag haus">Hausarzt</span>
+              <span class="plan-detail-name">BeneFit PLUS Hausarzt</span>
+            </div>
+            <p class="plan-detail-desc">Erstanlaufstelle immer die gewählte Hausarztpraxis.</p>
+            <div class="plan-detail-variants">
+              <div class="plan-detail-variant">
+                <span class="plan-detail-variant-label">R1</span>
+                <span class="discount-badge">−21.3% ggü. Standard</span>
+                <span class="plan-detail-price">CHF 400.15</span>
+              </div>
+              <div class="plan-detail-variant">
+                <span class="plan-detail-variant-label">R2</span>
+                <span class="discount-badge">−17.5% ggü. Standard</span>
+                <span class="plan-detail-price">CHF 419.45</span>
+              </div>
+              <div class="plan-detail-variant shown-above">
+                <span class="plan-detail-variant-label">R3 <span class="shown-above-tag">oben angezeigt</span></span>
+                <span class="discount-badge">−15.0% ggü. Standard</span>
+                <span class="plan-detail-price">CHF 432.35</span>
+              </div>
+              <div class="plan-detail-variant">
+                <span class="plan-detail-variant-label">R4</span>
+                <span class="discount-badge">−11.2% ggü. Standard</span>
+                <span class="plan-detail-price">CHF 451.65</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

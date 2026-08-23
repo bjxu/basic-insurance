@@ -1,9 +1,11 @@
 // Crawls insurer websites (from src/data/insurer-sources.json) to generate
 // product-specific descriptions for src/data/product-descriptions.json
-// (docs/superpowers/specs/2026-08-19-provider-product-descriptions-design.md). Run
+// (docs/superpowers/specs/2026-08-19-provider-product-descriptions-design.md), and derives
+// product-groups.json entries along the way (scripts/crawl/deriveProductGroups.ts). Run
 // manually via `npm run crawl-descriptions` (add `-- --insurer <code>` to scope to one
 // insurer while iterating) — kept separate from `npm run ingest`: this is network- and
-// LLM-dependent, non-deterministic, and meant to be spot-checked, not trusted blindly.
+// LLM-dependent, non-deterministic, and every file it writes is meant to be spot-checked,
+// not trusted blindly.
 //
 // Requires ANTHROPIC_API_KEY in the environment (see README.md).
 
@@ -16,10 +18,13 @@ import { buildInsurerSources, type InsurerSources } from "./insurerSources";
 import { crawlSite } from "./crawlSite";
 import { matchProductPage } from "./matchProductPage";
 import { extractDescription } from "./extractDescription";
+import { deriveProductGroups, mergeProductGroups, type MatchedProduct } from "./deriveProductGroups";
+import type { ProductGroups } from "../../src/lib/productGroups";
 
 const DATA_DIR = join(process.cwd(), "src", "data");
 const INSURER_SOURCES_PATH = join(DATA_DIR, "insurer-sources.json");
 const PRODUCT_DESCRIPTIONS_PATH = join(DATA_DIR, "product-descriptions.json");
+const PRODUCT_GROUPS_PATH = join(DATA_DIR, "product-groups.json");
 
 async function main() {
   const onlyInsurer = parseInsurerArg(process.argv.slice(2));
@@ -35,6 +40,7 @@ async function main() {
 
   const products = await loadLatestProducts();
   const descriptions = await readJson<ProductDescriptions>(PRODUCT_DESCRIPTIONS_PATH, {});
+  let productGroups = await readJson<ProductGroups>(PRODUCT_GROUPS_PATH, {});
   const client = new Anthropic();
 
   const insurerCodes = onlyInsurer ? [onlyInsurer] : Object.keys(sources);
@@ -50,6 +56,7 @@ async function main() {
     if (insurerProducts.length === 0) continue;
 
     console.log(`Crawling ${source.insurerName} (${insurerCode}) from ${source.seedUrl}…`);
+    const matchedProducts: MatchedProduct[] = [];
     let pages;
     try {
       pages = await crawlSite(source.seedUrl);
@@ -66,6 +73,7 @@ async function main() {
         noPageMatch++;
         continue;
       }
+      matchedProducts.push({ tarifCode: product.tarifCode, productName: product.productName, pageUrl: page.url });
       try {
         const result = await extractDescription(client, {
           pageText: page.text,
@@ -94,6 +102,15 @@ async function main() {
         );
         extractionFailed++;
       }
+    }
+
+    // Hand-entered groups always win — mergeProductGroups only fills in a tarifCode with no
+    // existing entry.
+    const productGroupsBeforeMerge = productGroups;
+    productGroups = mergeProductGroups(productGroups, insurerCode, deriveProductGroups(matchedProducts));
+    // mergeProductGroups returns the same reference when nothing changed — skip the write then.
+    if (productGroups !== productGroupsBeforeMerge) {
+      await writeFile(PRODUCT_GROUPS_PATH, JSON.stringify(productGroups, null, 2) + "\n");
     }
 
     // Persist after each insurer so one later failure doesn't lose earlier progress.

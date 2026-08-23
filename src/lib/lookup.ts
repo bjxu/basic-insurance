@@ -1,6 +1,7 @@
 // Pure lookup functions (architecture.md §6). Testable in isolation, no I/O.
 
 import type { HeadlineState, PremiumRow, SelfReportedPlan, Tarifart } from "./types";
+import { getProductGroupName, type ProductGroups } from "./productGroups";
 
 export type FilterParams = {
   praemienregionId: string;
@@ -121,13 +122,24 @@ export function groupByInsurer(rows: PremiumRow[]): Map<string, PremiumRow[]> {
   return byInsurer;
 }
 
-export type TarifartGroup = { tarifart: Tarifart; products: PremiumRow[] };
+export type ProductGroup = {
+  groupName: string;
+  tarifart: Tarifart;
+  variants: PremiumRow[]; // sorted by monthlyPremium asc, tie-break productName (de-CH)
+};
+export type TarifartGroup = { tarifart: Tarifart; groups: ProductGroup[] };
 
-/** Groups one insurer's products by tarifart, in TARIFART_PRIORITY order (Standard →
- *  Hausarzt → Telmed → HMO → Andere), sorted by price ascending within each group, ties
- *  broken alphabetically by productName ("de-CH") — the provider-product-detail
- *  accordion's row order. */
-export function groupProductsByTarifart(products: PremiumRow[]): TarifartGroup[] {
+/** Groups one insurer's products by tarifart (Standard → Hausarzt → Telmed → HMO → Andere),
+ *  then within each tarifart by product group — `productGroups[insurerCode]?.[tarifCode]`, or
+ *  the product's own `productName` when absent (a group of one) — the provider-product-detail
+ *  accordion's row order (docs/superpowers/specs/2026-08-22-provider-product-grouping-design.md).
+ *  Variants are sorted by price ascending within each group, ties broken alphabetically by
+ *  productName ("de-CH"); groups come out ordered by their own cheapest variant, since that's
+ *  the order their first member appears in the already price-sorted tarifart bucket. */
+export function groupProductsByTarifart(
+  products: PremiumRow[],
+  productGroups: ProductGroups,
+): TarifartGroup[] {
   const byTarifart = new Map<Tarifart, PremiumRow[]>();
   for (const p of products) {
     if (!byTarifart.has(p.tarifart)) byTarifart.set(p.tarifart, []);
@@ -135,12 +147,33 @@ export function groupProductsByTarifart(products: PremiumRow[]): TarifartGroup[]
   }
   return Array.from(byTarifart.entries())
     .sort(([a], [b]) => TARIFART_PRIORITY[a] - TARIFART_PRIORITY[b])
-    .map(([tarifart, group]) => ({
-      tarifart,
-      products: [...group].sort((a, b) =>
+    .map(([tarifart, tarifartProducts]) => {
+      const sorted = [...tarifartProducts].sort((a, b) =>
         a.monthlyPremium !== b.monthlyPremium
           ? a.monthlyPremium - b.monthlyPremium
           : a.productName.localeCompare(b.productName, "de-CH"),
-      ),
-    }));
+      );
+      const byGroupName = new Map<string, PremiumRow[]>();
+      for (const p of sorted) {
+        const groupName = getProductGroupName(productGroups, p.insurerCode, p.tarifCode) ?? p.productName;
+        if (!byGroupName.has(groupName)) byGroupName.set(groupName, []);
+        byGroupName.get(groupName)!.push(p);
+      }
+      const groups: ProductGroup[] = Array.from(byGroupName.entries()).map(([groupName, variants]) => ({
+        groupName,
+        tarifart,
+        variants,
+      }));
+      return { tarifart, groups };
+    });
+}
+
+/** The text shown next to a grouped variant's price (e.g. "R1") — the group name stripped as a
+ *  literal prefix off that variant's own productName, trimmed. Returns the full productName
+ *  unchanged if it doesn't start with groupName (shouldn't happen with correct data, but
+ *  hand-edited files can drift — never show a blank/broken label). A singleton group's variant
+ *  always has productName === groupName, so this correctly returns "". */
+export function deriveVariantLabel(groupName: string, productName: string): string {
+  if (!productName.startsWith(groupName)) return productName;
+  return productName.slice(groupName.length).trim();
 }
