@@ -55,7 +55,14 @@ export function PlanRow({
           {rank}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="font-semibold text-[15px] truncate">{plan.insurerName}</div>
+          <div className="flex items-center gap-1.5 min-w-0">
+            <div className="font-semibold text-[15px] truncate min-w-0">{plan.insurerName}</div>
+            {isCurrentPlan && (
+              <span className="text-[11px] font-semibold px-1.5 py-px rounded bg-error-container text-error flex-shrink-0">
+                {t("results.yourInsurerBadge")}
+              </span>
+            )}
+          </div>
           <div className="text-xs text-on-surface-variant mt-0.5 flex flex-wrap items-center gap-1">
             <span
               className={`inline-block px-1.5 py-px rounded text-[11px] font-semibold ${
@@ -82,11 +89,6 @@ export function PlanRow({
               <span aria-hidden="true">👥</span> {formatMemberCount(memberCount, locale)}
             </span>
           </div>
-        )}
-        {isCurrentPlan && (
-          <span className="text-[11px] font-semibold px-1.5 py-px rounded bg-error-container text-error">
-            {t("results.yourInsurerBadge")}
-          </span>
         )}
         {yoy != null && (
           <div
