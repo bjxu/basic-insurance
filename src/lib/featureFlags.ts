@@ -9,4 +9,4 @@
 // full; paused so the results list ships with one price per provider
 // while the grouping/description work (src/lib/productGroups.ts,
 // src/lib/productDescriptions.ts) keeps maturing.
-export const PRODUCT_DETAIL_DROPDOWN_ENABLED = false;
+export const PRODUCT_DETAIL_DROPDOWN_ENABLED: boolean = false;

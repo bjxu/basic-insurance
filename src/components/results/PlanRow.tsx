@@ -44,7 +44,11 @@ export function PlanRow({
   const discountPct =
     plan.tarifart === "standard" ? null : discountVsStandardPct(standardPremium, plan.monthlyPremium);
 
-  const summary = (
+  const containerClass = `rounded-lg border shadow-sm ${
+    isCurrentPlan ? "border-error bg-error-container" : "border-outline-variant bg-surface"
+  }`;
+
+  const rowContent = (
     <>
       <div className={`w-5 text-center text-sm font-bold ${rank === 1 ? "text-primary" : "text-outline"}`}>
         {rank}
@@ -104,15 +108,14 @@ export function PlanRow({
     </>
   );
 
+  // Flag off (default): plain row, no expand affordance — see @/lib/featureFlags.
   if (!PRODUCT_DETAIL_DROPDOWN_ENABLED) {
     return (
       <div
         role="listitem"
-        className={`flex items-center gap-3 rounded-lg border p-3.5 shadow-sm ${
-          isCurrentPlan ? "border-error bg-error-container" : "border-outline-variant bg-surface"
-        }`}
+        className={`flex items-center gap-3 p-3.5 ${containerClass}`}
       >
-        {summary}
+        {rowContent}
       </div>
     );
   }
@@ -120,12 +123,10 @@ export function PlanRow({
   return (
     <details
       role="listitem"
-      className={`rounded-lg border shadow-sm ${
-        isCurrentPlan ? "border-error bg-error-container" : "border-outline-variant bg-surface"
-      }`}
+      className={containerClass}
     >
       <summary className="flex items-center gap-3 p-3.5 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
-        {summary}
+        {rowContent}
         <span
           aria-hidden="true"
           className="text-outline text-xs w-3 text-center flex-shrink-0 before:content-['▸'] [details[open]_&]:before:content-['▾']"
