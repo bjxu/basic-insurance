@@ -26,6 +26,7 @@ import {
 import { encodeState, decodeState } from "@/lib/url-state";
 import { validateCurrentPremium } from "@/lib/validate";
 import { buildInquiryLogPayload } from "@/lib/inquiryLog";
+import { PRODUCT_DETAIL_DROPDOWN_ENABLED } from "@/lib/featureFlags";
 import type { CurrentPlan, Insurer, SelfReportedPlan } from "@/lib/types";
 import type { Locale } from "@/i18n/routing";
 
@@ -202,15 +203,20 @@ export function InsuranceComparator() {
     // Every one of each insurer's products at this context, independent of altModelsActive
     // — the provider-product-detail accordion always shows all model types, even when the
     // main list is currently filtered to Standard-only (design spec: "Data & filtering").
-    const allProducts = filterPlans(ALL_PREMIUMS, {
-      praemienregionId,
-      altersklasse,
-      franchise,
-      models: ALL_TARIFARTS,
-      unfalldeckung,
-      year,
-    });
-    const productsByInsurer = groupByInsurer(allProducts);
+    // Skipped entirely while PRODUCT_DETAIL_DROPDOWN_ENABLED is off: PlanRow doesn't render
+    // ProductList in that state, so this Map would just be discarded unread.
+    const productsByInsurer = PRODUCT_DETAIL_DROPDOWN_ENABLED
+      ? groupByInsurer(
+          filterPlans(ALL_PREMIUMS, {
+            praemienregionId,
+            altersklasse,
+            franchise,
+            models: ALL_TARIFARTS,
+            unfalldeckung,
+            year,
+          }),
+        )
+      : new Map<string, PremiumRow[]>();
 
     const current: SelfReportedPlan | null = currentPlanProvided
       ? {
