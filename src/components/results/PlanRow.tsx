@@ -48,6 +48,23 @@ export function PlanRow({
     isCurrentPlan ? "border-error bg-error-container" : "border-outline-variant bg-surface"
   }`;
 
+  // The member-count badge renders twice: a right-aligned column on wide screens,
+  // and inline in the model line below `sm` where the column has no room. Exactly
+  // one is visible at any width — see the `sm:` toggles at each call site.
+  const memberCountLabel =
+    memberCount != null ? formatMemberCountDetail(memberCount, memberCountAsOf, locale) : undefined;
+
+  const renderMemberBadge = (className: string) =>
+    memberCount != null ? (
+      <span
+        className={`${className} text-[11px] font-semibold px-1.5 py-px rounded bg-surface-variant text-on-surface-variant whitespace-nowrap`}
+        title={memberCountLabel}
+        aria-label={memberCountLabel}
+      >
+        <span aria-hidden="true">👥</span> {formatMemberCount(memberCount, locale)}
+      </span>
+    ) : null;
+
   const rowContent = (
     <>
       <div className={`w-5 text-center text-sm font-bold ${rank === 1 ? "text-primary" : "text-outline"}`}>
@@ -75,20 +92,11 @@ export function PlanRow({
               {t("results.discountBadge", { pct: discountPct.toFixed(1) })}
             </span>
           )}
+          {renderMemberBadge("sm:hidden")}
           <span>· {t(`copy.tarifart.${plan.tarifart}.description`)}</span>
         </div>
       </div>
-      {memberCount != null && (
-        <div
-          className="hidden sm:flex flex-col items-end gap-0.5 flex-shrink-0"
-          title={formatMemberCountDetail(memberCount, memberCountAsOf, locale)}
-          aria-label={formatMemberCountDetail(memberCount, memberCountAsOf, locale)}
-        >
-          <span className="text-[11px] font-semibold px-1.5 py-px rounded bg-surface-variant text-on-surface-variant whitespace-nowrap">
-            <span aria-hidden="true">👥</span> {formatMemberCount(memberCount, locale)}
-          </span>
-        </div>
-      )}
+      {renderMemberBadge("hidden sm:inline-block flex-shrink-0")}
       {yoy != null && (
         <div
           className={`text-xs font-semibold px-1.5 py-px rounded ${
