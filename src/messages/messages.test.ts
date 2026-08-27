@@ -3,6 +3,8 @@ import de from "./de.json";
 import en from "./en.json";
 import fr from "./fr.json";
 import itMessages from "./it.json";
+import pt from "./pt.json";
+import es from "./es.json";
 
 function collectKeys(value: unknown, prefix = ""): string[] {
   if (typeof value !== "object" || value === null) return [prefix];
@@ -29,6 +31,8 @@ describe("message catalogs", () => {
     ["en", en],
     ["fr", fr],
     ["it", itMessages],
+    ["pt", pt],
+    ["es", es],
   ])("%s.json has exactly the same keys and placeholders as de.json", (_locale, catalog) => {
     expect(collectKeys(catalog).sort()).toEqual(deKeys);
     expect(collectPlaceholders(catalog)).toEqual(dePlaceholders);

@@ -1,0 +1,156 @@
+{
+  "meta": {
+    "title": "Comparación de seguros de salud – Seguro básico Suiza",
+    "description": "Compara las primas del seguro básico de salud suizo: todas las aseguradoras, todos los modelos, datos oficiales de la autoridad sanitaria suiza (OFSP).",
+    "ogTitle": "Comparación de seguros de salud – Seguro básico Suiza",
+    "ogDescription": "Compara las primas del seguro básico de salud suizo: todas las aseguradoras, todos los modelos, datos oficiales de la autoridad sanitaria suiza (OFSP).",
+    "twitterTitle": "Comparación de seguros de salud – Seguro básico Suiza",
+    "twitterDescription": "Compara las primas del seguro básico de salud suizo: datos oficiales de la autoridad sanitaria suiza (OFSP).",
+    "howItWorksTitle": "Cómo funciona el seguro básico de salud suizo – Comparación de primas",
+    "howItWorksDescription": "¿Nuevo en Suiza? Cómo funciona el seguro básico obligatorio: plazos de inscripción, cambio de aseguradora, la franquicia y los modelos de seguro — explicado de forma sencilla."
+  },
+  "inputs": {
+    "title": "Comparación de primas",
+    "tagline": "Introduce tus datos: las aseguradoras más baratas aparecen al instante.",
+    "plzLabel": "Código postal (PLZ)",
+    "plzPlaceholder": "p. ej. 3001",
+    "plzNotFound": "Código postal no encontrado: compruébalo, por favor.",
+    "birthYearLabel": "Año de nacimiento",
+    "birthYearPlaceholder": "p. ej. 1985",
+    "birthYearHintDefault": "Determina el grupo de edad y los niveles de franquicia disponibles",
+    "birthYearHintResolved": "→ {altersklasse}, franquicia CHF {min}–{max}",
+    "deductibleLabel": "Franquicia",
+    "deductibleChoose": "Elegir…",
+    "deductibleNeedsBirthYear": "Introduce primero el año de nacimiento",
+    "gemeindeAmbiguous": "El código postal {plz} abarca varias regiones de prima. Elige tu municipio, por favor:",
+    "gemeindeConfirmed": "✓ Municipio: {name}",
+    "premiumsLoading": "Cargando los datos de primas…",
+    "premiumsError": "No se pudieron cargar los datos de primas. Inténtalo de nuevo, por favor.",
+    "retry": "Intentar de nuevo"
+  },
+  "validation": {
+    "invalidPlzFormat": "Código postal no válido: introduce un código postal suizo de 4 cifras.",
+    "invalidPremium": "Introduce una prima mensual válida, por favor.",
+    "nonPositivePremium": "La prima mensual debe ser mayor que CHF 0.",
+    "invalidBirthYear": "Introduce un año de nacimiento válido, por favor.",
+    "futureBirthYear": "El año de nacimiento está en el futuro.",
+    "unrealisticBirthYear": "Introduce un año de nacimiento realista (máx. ~120 años)."
+  },
+  "currentPlan": {
+    "summaryTitle": "¿Cuánto pagas actualmente?",
+    "summaryHint": "(opcional: muestra tu ahorro)",
+    "insurerLabel": "Aseguradora actual",
+    "premiumLabel": "Prima mensual",
+    "premiumPlaceholder": "p. ej. 350"
+  },
+  "filterBar": {
+    "yearLabel": "Año:",
+    "altModelsLabel": "Modelos alternativos: {state}",
+    "accidentLabel": "Accidente: {state}",
+    "stateOn": "activado",
+    "stateOff": "desactivado",
+    "included": "incluida",
+    "excluded": "excluida"
+  },
+  "results": {
+    "summary": "{count} aseguradoras · {model} · Cobertura de accidentes {coverage} · {year}",
+    "modelAlt": "modelo más barato por aseguradora",
+    "modelStandard": "oferta estándar más barata por aseguradora",
+    "emptyTitle": "No se han encontrado ofertas",
+    "emptyMessage": "No hay primas en los datos de la OFSP para esta combinación. Comprueba tus datos o ajusta los filtros.",
+    "discountBadge": "hasta −{pct}% frente al estándar",
+    "yourInsurerBadge": "Tu aseguradora",
+    "perMonth": "/mes",
+    "discountBadgeExact": "−{pct}% frente al estándar",
+    "shownAboveTag": "mostrada arriba"
+  },
+  "headline": {
+    "savingsCurrent": "Si no haces nada: {amount}/mes con {insurer}.",
+    "savingsCheapest": "Oferta más barata para tu perfil en {year}: {amount}/mes con {insurer} —",
+    "savingsAmount": "ahorra {amount}/año al cambiar.",
+    "alreadyCheapestExact": "Ya tienes la oferta más barata para tu perfil.",
+    "alreadyCheapestBelow": "Tu prima está por debajo de todas las ofertas para este perfil: comprueba si la franquicia y el modelo son comparables.",
+    "alreadyCheapestDetail": "{insurer} · {amount}/mes.",
+    "cheapestOnlyTitle": "Oferta más barata: {amount}/mes con {insurer}.",
+    "cheapestOnlyCta": "Introduce tu aseguradora actual para ver cuánto podrías ahorrar. ↓"
+  },
+  "footer": {
+    "dataNotice": "Datos: datos abiertos de la OFSP · Publicación {date} · Solo prestaciones obligatorias · Sin patrocinio, sin enlaces de intermediación",
+    "levyNotice": "Los precios incluyen la redistribución de la tasa sobre el CO₂/COV (CHF {amount}/mes, {year}): igual para todas las aseguradoras, sin efecto en la clasificación"
+  },
+  "help": {
+    "tip": {
+      "openLabel": "Mostrar explicación",
+      "fullLink": "Guía completa →"
+    },
+    "terms": {
+      "plz": {
+        "title": "Código postal y región de prima",
+        "oneLiner": "Define tu región de prima: las primas varían según el municipio, no solo según el cantón.",
+        "short": "Tu prima depende de dónde vivas. Muchos cantones están divididos en dos o tres regiones de prima, y la región que se aplica la determina el municipio, no solo el código postal. Si un código postal abarca varios municipios, eliges el tuyo."
+      },
+      "birthYear": {
+        "title": "Año de nacimiento y grupo de edad",
+        "short": "Las primas difieren en tres grupos de edad: niños (0–18), adultos jóvenes (19–25) y adultos (26+). Tu año de nacimiento define tu grupo de edad y, con él, los niveles de franquicia disponibles."
+      },
+      "franchise": {
+        "title": "Franquicia (Franchise)",
+        "oneLiner": "Una franquicia más alta reduce tu prima mensual.",
+        "short": "La franquicia es la parte de tus gastos sanitarios que pagas de tu bolsillo cada año antes de que la aseguradora empiece a pagar. Los adultos eligen entre CHF 300 y CHF 2500. Una franquicia alta significa una prima más baja, pero más riesgo de gastos propios si necesitas atención. La cobertura es idéntica en cualquier caso."
+      },
+      "unfalldeckung": {
+        "title": "Cobertura de accidentes",
+        "short": "El seguro básico normalmente también cubre los accidentes. Si trabajas al menos 8 horas por semana para un empleador, estás cubierto contra accidentes a través de él y puedes excluir la cobertura de accidentes de tu seguro de salud, lo que reduce ligeramente la prima. En caso de duda, déjala incluida."
+      },
+      "models": {
+        "title": "Modelos de seguro",
+        "short": "Eliges entre el modelo estándar (libre elección de médico) y un modelo alternativo más barato con un primer punto de contacto fijo. La cobertura es la misma en todos.",
+        "altGroup": "Modelos alternativos"
+      }
+    },
+    "banner": {
+      "text": "🇨🇭 ¿Nuevo en el seguro básico suizo?",
+      "cta": "Cómo funciona el sistema →"
+    },
+    "drawer": {
+      "title": "Cómo funciona el seguro básico suizo",
+      "close": "Cerrar",
+      "readFull": "Abrir la guía completa →"
+    },
+    "guide": {
+      "lead": "El seguro básico es obligatorio y, por ley, idéntico en todas las aseguradoras. Así que solo comparas precio, modelo y servicio, no el alcance de la cobertura.",
+      "back": "← Volver a la comparación",
+      "rules": {
+        "heading": "Las reglas que se aplican a todos",
+        "item1": "El seguro básico es obligatorio. Después de mudarte a Suiza tienes tres meses para contratarlo; la protección se aplica de forma retroactiva a la fecha de tu llegada.",
+        "item2": "Todas las aseguradoras deben aceptarte en el seguro básico. No hay preguntas de salud ni rechazos.",
+        "item3": "Puedes cambiar de aseguradora una vez al año. La baja debe llegar a tu aseguradora actual antes del 30 de noviembre; el cambio surte efecto el 1 de enero.",
+        "item4": "El alcance de la cobertura está fijado por ley y es el mismo en todas partes. Una aseguradora más barata no es menos seguro."
+      },
+      "terms": {
+        "heading": "Los términos del formulario",
+        "intro": "En resumen: encontrarás las mismas explicaciones junto a cada campo."
+      },
+      "models": {
+        "heading": "Modelo estándar o alternativo"
+      }
+    }
+  },
+  "copy": {
+    "tarifart": {
+      "standard": { "label": "Estándar", "description": "Libre elección de médico" },
+      "hausarzt": { "label": "Médico de familia", "description": "El primer punto de contacto es siempre el médico de familia elegido" },
+      "telmed": { "label": "Telmed", "description": "Hay que llamar a una línea de atención antes de cada visita al médico" },
+      "hmo": { "label": "HMO", "description": "El primer punto de contacto es siempre el centro HMO" },
+      "andere": { "label": "Modelo alternativo", "description": "Elección limitada del primer punto de contacto" }
+    },
+    "altersklasse": {
+      "kind": "Niño (0–18)",
+      "jung": "Adulto joven (19–25)",
+      "erwachsen": "Adulto (26+)"
+    }
+  },
+  "languageSwitcher": {
+    "menuLabel": "Elegir idioma"
+  }
+}
