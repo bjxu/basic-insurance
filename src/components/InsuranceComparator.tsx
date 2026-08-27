@@ -12,6 +12,8 @@ import { FilterBar } from "./results/FilterBar";
 import { PlanList } from "./results/PlanList";
 import { EmptyState } from "./results/EmptyState";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { NewcomerBanner } from "./help/NewcomerBanner";
+import { HowItWorksDrawer } from "./help/HowItWorksDrawer";
 import { getAltersklasse, getFranchiseTiers } from "@/lib/ageband";
 import { resolveGemeinden, needsDisambiguation } from "@/lib/location";
 import {
@@ -66,6 +68,10 @@ export function InsuranceComparator() {
   const [premiumsByYear, setPremiumsByYear] = useState<Record<number, PremiumRow[]>>({});
   const [premiumsLoading, setPremiumsLoading] = useState(false);
   const [premiumsError, setPremiumsError] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
+
+  const openGuide = useCallback(() => setGuideOpen(true), []);
+  const closeGuide = useCallback(() => setGuideOpen(false), []);
 
   const gemeinden = plz.length === 4 ? resolveGemeinden(plz) : [];
   const ambiguous = needsDisambiguation(gemeinden);
@@ -256,6 +262,7 @@ export function InsuranceComparator() {
   return (
     <main className="max-w-[860px] mx-auto my-8 px-4">
       <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-6">
+        <NewcomerBanner onOpenGuide={openGuide} />
         <div className="flex items-start justify-between gap-3 mb-1">
           <h1 className="text-title-large text-on-surface">{t("inputs.title")}</h1>
           <LanguageSwitcher />
@@ -375,6 +382,8 @@ export function InsuranceComparator() {
           </>
         )}
       </p>
+
+      <HowItWorksDrawer open={guideOpen} onClose={closeGuide} />
     </main>
   );
 }
