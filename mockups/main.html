@@ -172,6 +172,12 @@
       color: var(--md-sys-color-on-surface-variant);
       margin-bottom: 6px;
     }
+    /* The ⓘ is a flex sibling of <label>, never nested inside it (matches
+       src/components/inputs/*). align-items:flex-start so the trigger tracks the
+       first line of the label. */
+    .field-label-row { display: flex; align-items: flex-start; gap: 4px; margin-bottom: 6px; }
+    .field-label-row label { margin-bottom: 0; }
+    .field-label-row .help-i { margin-left: 0; }
     .field input, .field select {
       width: 100%;
       height: 40px;
@@ -836,22 +842,28 @@
 
     <div class="fields-row">
       <div class="field">
-        <label for="plz">Postleitzahl (PLZ)
-          <button type="button" class="help-i" aria-expanded="false" aria-label="Was bedeutet Postleitzahl / Prämienregion?">i</button></label>
+        <div class="field-label-row">
+          <label for="plz">Postleitzahl (PLZ)</label>
+          <button type="button" class="help-i" aria-expanded="false" aria-label="Erklärung anzeigen: Postleitzahl &amp; Prämienregion">i</button>
+        </div>
         <input id="plz" type="text" value="8044" maxlength="4" placeholder="z.B. 3001">
         <!-- Layer 1 — persistent one-liner -->
         <div class="hint">Bestimmt deine Prämienregion — Prämien unterscheiden sich nach Gemeinde, nicht nur Kanton.</div>
         <div class="resolved">&#10003; Zürich &amp; Dübendorf — bitte Gemeinde wählen</div>
       </div>
       <div class="field">
-        <label for="by">Jahrgang
-          <button type="button" class="help-i" aria-expanded="false" aria-label="Was bedeutet Jahrgang / Altersklasse?">i</button></label>
+        <div class="field-label-row">
+          <label for="by">Jahrgang</label>
+          <button type="button" class="help-i" aria-expanded="false" aria-label="Erklärung anzeigen: Jahrgang &amp; Altersklasse">i</button>
+        </div>
         <input id="by" type="number" value="1988" min="1900" max="2026" placeholder="z.B. 1985">
         <div class="hint">→ Erwachsen (26+), Franchise CHF 300–2500</div>
       </div>
       <div class="field">
-        <label for="fran">Franchise
-          <button type="button" class="help-i" aria-expanded="true" aria-label="Was bedeutet Franchise?">i</button></label>
+        <div class="field-label-row">
+          <label for="fran">Franchise</label>
+          <button type="button" class="help-i" aria-expanded="true" aria-label="Erklärung anzeigen: Franchise (Selbstbehalt)">i</button>
+        </div>
         <select id="fran">
           <option>CHF 300</option>
           <option selected>CHF 500</option>
@@ -862,12 +874,16 @@
         </select>
         <div class="hint">Eine höhere Franchise senkt deine monatliche Prämie.</div>
         <!-- Layer 2 — anchored popover (wide viewport, shown open here). The narrow-viewport
-             rendering is .help-disclosure, shown as its own mockup state further down. -->
-        <div class="help-pop" role="dialog" aria-label="Franchise erklärt">
+             rendering is .help-disclosure, shown as its own mockup state further down.
+             It's an unnamed disclosure panel (no role="dialog"/aria-label) — the <summary>
+             trigger carries the disclosure + expanded state. -->
+        <div class="help-pop">
           <p><strong>Franchise (Selbstbehalt)</strong></p>
           <p>Der Betrag deiner Gesundheitskosten, den du jedes Jahr selbst zahlst, bevor die Kasse übernimmt. Du wählst ihn: CHF 300 bis CHF 2500 (Erwachsene).</p>
           <p>Hohe Franchise = tiefere Prämie, mehr Eigenrisiko. Die Leistungen sind per Gesetz in jedem Fall identisch.</p>
-          <a href="#" class="help-more" data-opens="guide-drawer">Ganzer Leitfaden: So funktioniert das System →</a>
+          <!-- Layer-3 link: opens the standalone guide page (data-opens kept as a note;
+               the real target is the page URL, not the drawer). -->
+          <a href="/de/how-it-works#begriffe" class="help-more" data-opens="guide-page">Ganzer Leitfaden →</a>
         </div>
       </div>
     </div>
@@ -1004,7 +1020,7 @@
         <div class="name-row"><div class="name">Assura</div><span class="name-member"><span class="member-badge" title="682'061 Versicherte · Stand 2024" aria-label="682'061 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 682 Tsd.</span></span></div>
         <!-- Model badge carries the same three-layer help: existing one-line restriction note (Layer 1)
              + ⓘ opening the "insurance models" short form (Layer 2). -->
-        <div class="model-badge"><span class="model-tag">Standard</span> <button type="button" class="help-i" aria-expanded="false" aria-label="Was bedeuten die Versicherungsmodelle?">i</button> · Freie Arztwahl</div>
+        <div class="model-badge"><span class="model-tag">Standard</span> <button type="button" class="help-i" aria-expanded="false" aria-label="Erklärung anzeigen: Versicherungsmodelle">i</button> · Freie Arztwahl</div>
       </div>
       <div class="plan-yoy up">+4.2%</div>
       <div class="plan-price cheapest">
@@ -1378,15 +1394,17 @@
   <p class="mockup-label">Newcomer-Hilfe — ⓘ auf schmalem Viewport (Inline-Disclosure statt Popover)</p>
   <div class="card input-section" style="max-width:360px">
     <div class="field">
-      <label>Franchise
-        <button type="button" class="help-i" aria-expanded="true" aria-label="Was bedeutet Franchise?">i</button></label>
+      <div class="field-label-row">
+        <label>Franchise</label>
+        <button type="button" class="help-i" aria-expanded="true" aria-label="Erklärung anzeigen: Franchise (Selbstbehalt)">i</button>
+      </div>
       <select><option selected>CHF 500</option></select>
       <div class="hint">Eine höhere Franchise senkt deine monatliche Prämie.</div>
       <div class="help-disclosure">
         <p><strong>Franchise (Selbstbehalt)</strong></p>
         <p>Der Betrag, den du jedes Jahr selbst zahlst, bevor die Kasse übernimmt. CHF 300–2500 (Erwachsene).</p>
         <p>Hohe Franchise = tiefere Prämie, mehr Eigenrisiko. Leistungen sind per Gesetz identisch.</p>
-        <a href="#" class="help-more" data-opens="guide-drawer">Ganzer Leitfaden →</a>
+        <a href="/de/how-it-works#begriffe" class="help-more" data-opens="guide-page">Ganzer Leitfaden →</a>
       </div>
     </div>
   </div>
