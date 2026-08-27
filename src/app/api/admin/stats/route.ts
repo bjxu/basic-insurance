@@ -12,6 +12,9 @@ type AgeRow = { altersklasse: string; n: number };
 type FranchiseRow = { franchise: number; n: number };
 type ModelRow = { model: string; n: number };
 type AccidentRow = { accident: boolean; n: number };
+type LanguageRow = { locale: string; n: number };
+type CurrentInsurerRow = { insurerCode: string; n: number };
+type PremiumBandRow = { band: string; n: number };
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -34,6 +37,9 @@ export async function GET(request: NextRequest) {
       franchise: [],
       models: [],
       accident: [],
+      languages: [],
+      currentInsurers: [],
+      premiumBands: [],
     });
   }
 
@@ -46,10 +52,16 @@ export async function GET(request: NextRequest) {
   let franchiseRows: FranchiseRow[];
   let modelRows: ModelRow[];
   let accidentRows: AccidentRow[];
+  let languageRows: LanguageRow[];
+  let currentInsurerRows: CurrentInsurerRow[];
+  let premiumBandRows: PremiumBandRow[];
 
   try {
     const sql = getSql();
-    [totalRows, trendRows, regionRows, ageRows, franchiseRows, modelRows, accidentRows] = (await Promise.all([
+    [
+      totalRows, trendRows, regionRows, ageRows, franchiseRows, modelRows, accidentRows,
+      languageRows, currentInsurerRows, premiumBandRows,
+    ] = (await Promise.all([
       sql`SELECT COUNT(*)::int AS total FROM inquiry_log WHERE ts >= ${from} AND ts < ${to}`,
       sql`SELECT date_trunc(${granularity}, ts) AS bucket, COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1 ORDER BY 1`,
       sql`SELECT region_id AS "regionId", COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1 ORDER BY 2 DESC LIMIT 10`,
@@ -57,7 +69,13 @@ export async function GET(request: NextRequest) {
       sql`SELECT franchise, COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1 ORDER BY 1`,
       sql`SELECT unnest(models) AS model, COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1 ORDER BY 2 DESC`,
       sql`SELECT accident, COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1`,
-    ])) as [TotalRow[], TrendRow[], RegionRow[], AgeRow[], FranchiseRow[], ModelRow[], AccidentRow[]];
+      sql`SELECT COALESCE(locale, 'unbekannt') AS locale, COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} GROUP BY 1 ORDER BY 2 DESC`,
+      sql`SELECT current_insurer AS "insurerCode", COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} AND current_insurer IS NOT NULL GROUP BY 1 ORDER BY 2 DESC LIMIT 10`,
+      sql`SELECT current_premium_band AS band, COUNT(*)::int AS n FROM inquiry_log WHERE ts >= ${from} AND ts < ${to} AND current_premium_band IS NOT NULL GROUP BY 1`,
+    ])) as [
+      TotalRow[], TrendRow[], RegionRow[], AgeRow[], FranchiseRow[], ModelRow[], AccidentRow[],
+      LanguageRow[], CurrentInsurerRow[], PremiumBandRow[],
+    ];
   } catch {
     // DB unreachable or inquiry_log not migrated yet — surface a real error
     // rather than a well-formed-but-empty payload that would look identical
@@ -74,5 +92,8 @@ export async function GET(request: NextRequest) {
     franchise: franchiseRows,
     models: modelRows,
     accident: accidentRows,
+    languages: languageRows,
+    currentInsurers: currentInsurerRows,
+    premiumBands: premiumBandRows,
   });
 }

@@ -35,6 +35,9 @@ describe("GET /api/admin/stats", () => {
       franchise: [],
       models: [],
       accident: [],
+      languages: [],
+      currentInsurers: [],
+      premiumBands: [],
     });
   });
 
@@ -49,6 +52,9 @@ describe("GET /api/admin/stats", () => {
       if (text.includes("franchise")) return Promise.resolve([{ franchise: 300, n: 10 }]);
       if (text.includes("unnest(models)")) return Promise.resolve([{ model: "standard", n: 40 }]);
       if (text.includes("accident")) return Promise.resolve([{ accident: true, n: 35 }]);
+      if (text.includes("COALESCE(locale")) return Promise.resolve([{ locale: "de", n: 12 }]);
+      if (text.includes("current_insurer")) return Promise.resolve([{ insurerCode: "1542", n: 7 }]);
+      if (text.includes("current_premium_band")) return Promise.resolve([{ band: "250-349", n: 4 }]);
       return Promise.resolve([]);
     });
     vi.mocked(db.getSql).mockReturnValue(fakeSql as unknown as ReturnType<typeof db.getSql>);
@@ -74,6 +80,9 @@ describe("GET /api/admin/stats", () => {
       franchise: [{ franchise: 300, n: 10 }],
       models: [{ model: "standard", n: 40 }],
       accident: [{ accident: true, n: 35 }],
+      languages: [{ locale: "de", n: 12 }],
+      currentInsurers: [{ insurerCode: "1542", n: 7 }],
+      premiumBands: [{ band: "250-349", n: 4 }],
     });
   });
 
