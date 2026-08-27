@@ -304,9 +304,18 @@ CREATE TABLE inquiry_log (
   franchise   SMALLINT    NOT NULL,
   year        SMALLINT    NOT NULL,
   models      TEXT[]      NOT NULL,  -- e.g. '{standard,hmo}'
-  accident    BOOLEAN     NOT NULL
+  accident    BOOLEAN     NOT NULL,
+  locale      TEXT,                  -- 'de' | 'fr' | 'it' | 'en' | 'pt' | 'es' | NULL (unknown / pre-feature rows)
+  current_insurer      TEXT,         -- BAG insurer code; NULL when no current plan provided
+  current_premium_band TEXT          -- see below; NULL when no current plan provided
 );
 ```
+
+`current_premium_band` is one of `<250 | 250-349 | 350-449 | 450-549 | 550+`, bucketed
+client-side — the exact premium is never transmitted. All three new columns are nullable:
+`locale` is NULL for rows logged before the feature shipped, and `current_insurer` /
+`current_premium_band` are NULL for any inquiry where the optional current plan was not
+provided.
 
 No personal data is stored. No join key back to a user or session exists by design.
 
@@ -421,6 +430,24 @@ SELECT accident, COUNT(*) AS n
 FROM inquiry_log
 WHERE ts >= $1 AND ts < $2
 GROUP BY 1;
+
+-- 8. Language mix (COALESCE NULL -> 'unbekannt' so pre-feature rows still surface)
+SELECT COALESCE(locale, 'unbekannt') AS locale, COUNT(*) AS n
+FROM inquiry_log
+WHERE ts >= $1 AND ts < $2
+GROUP BY 1 ORDER BY 2 DESC;
+
+-- 9. Current insurer, top 10 (only inquiries where the current plan was provided)
+SELECT current_insurer, COUNT(*) AS n
+FROM inquiry_log
+WHERE ts >= $1 AND ts < $2 AND current_insurer IS NOT NULL
+GROUP BY 1 ORDER BY 2 DESC LIMIT 10;
+
+-- 10. Current premium band (only inquiries where the current plan was provided)
+SELECT current_premium_band AS band, COUNT(*) AS n
+FROM inquiry_log
+WHERE ts >= $1 AND ts < $2 AND current_premium_band IS NOT NULL
+GROUP BY 1 ORDER BY 1;
 ```
 
 ### 13.3 Page Layout
@@ -488,6 +515,21 @@ bookmarkable.
 │  │  Included  ████████████ 87%  │                              │
 │  │  Excluded  ██           13%  │                              │
 │  └──────────────────────────────┘                              │
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐ │
+│  │  Language                                                  │ │
+│  │  Deutsch    ████████████ 70%   Français  ███  17%         │ │
+│  │  Italiano   █  8%              English   ▌  4%   …        │ │
+│  └───────────────────────────────────────────────────────────┘ │
+│                                                                 │
+│  ┌──────────────────────────────┐  ┌──────────────────────────┐│
+│  │  Current insurer             │  │  Current premium         ││
+│  │  (current plan provided only)│  │  (current plan prov. only)││
+│  │  Assura   ████████████ 28%   │  │  CHF 250–349 ████████ 36%││
+│  │  CSS      ████████     20%   │  │  CHF 350–449 ██████████45%││
+│  │  Helsana  ██████       15%   │  │  CHF <250    ███      12%││
+│  │  …                           │  │  …                       ││
+│  └──────────────────────────────┘  └──────────────────────────┘│
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -502,11 +544,21 @@ bookmarkable.
   (HH:mm for hourly, DD MMM for daily, MMM YYYY for monthly), tooltip on hover.
 - **All breakdown charts:** Recharts `<BarChart layout="vertical">` with count + %
   label at the end of each bar. Bars all share the `blue-600` accent.
+- **Language panel:** one bar per UI locale — Deutsch / Français / Italiano / English /
+  Português / Español, plus **Unbekannt** for rows with no `locale` (query 8). Full-width
+  card below Accident Coverage.
+- **Current insurer panel:** top 10 BAG insurers by count (query 9); insurer names shown
+  verbatim (not translated). **Only counts inquiries where the current plan was provided**
+  — the panel subtitle states this, and the % is of that subset, not of all inquiries.
+- **Current premium panel:** the five fixed bands `CHF <250 / CHF 250–349 / CHF 350–449 /
+  CHF 450–549 / CHF 550+` in ascending order (query 10), band boundaries computed
+  client-side (§10.3). **Only counts inquiries where the current plan was provided**, same
+  subtitle + subset-% treatment as the current-insurer panel.
 - Loading state: skeleton shimmer over each panel while the fetch is in flight;
   stale data remains visible underneath to avoid layout shift.
 - Page is desktop-only (no mobile requirement for the admin tool).
-- No pagination — all result sets are small (≤ 10 rows for regions; ≤ 6 rows for
-  all other breakdowns).
+- No pagination — all result sets are small (≤ 10 rows for regions and current
+  insurers; ≤ 7 rows for language; ≤ 6 rows for all other breakdowns).
 
 ### 13.5 SEO / Discoverability
 
