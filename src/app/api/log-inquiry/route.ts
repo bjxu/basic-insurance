@@ -3,9 +3,15 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getSql } from "@/lib/db";
+import { routing } from "@/i18n/routing";
+import { PREMIUM_BANDS } from "@/lib/premiumBand";
+import insurersData from "@/data/insurers.json";
 
 const TARIFARTEN = ["standard", "hmo", "hausarzt", "telmed", "andere"];
 const ALTERSKLASSEN = ["kind", "jung", "erwachsen"];
+const LOCALES: readonly string[] = routing.locales;
+const INSURER_CODES = new Set(insurersData.map((i) => i.insurerCode));
+const BANDS: readonly string[] = PREMIUM_BANDS;
 
 type InquiryPayload = {
   regionId: string;
@@ -14,12 +20,16 @@ type InquiryPayload = {
   year: number;
   models: string[];
   accident: boolean;
+  locale: string;
+  currentInsurer?: string;
+  currentPremiumBand?: string;
 };
 
 function isValidPayload(body: unknown): body is InquiryPayload {
   if (typeof body !== "object" || body === null) return false;
   const b = body as Record<string, unknown>;
-  return (
+
+  const baseOk =
     typeof b.regionId === "string" &&
     b.regionId.length > 0 &&
     typeof b.altersklasse === "string" &&
@@ -28,8 +38,19 @@ function isValidPayload(body: unknown): body is InquiryPayload {
     typeof b.year === "number" &&
     Array.isArray(b.models) &&
     b.models.every((m) => typeof m === "string" && TARIFARTEN.includes(m)) &&
-    typeof b.accident === "boolean"
-  );
+    typeof b.accident === "boolean" &&
+    typeof b.locale === "string" &&
+    LOCALES.includes(b.locale);
+
+  if (!baseOk) return false;
+
+  if (b.currentInsurer !== undefined) {
+    if (typeof b.currentInsurer !== "string" || !INSURER_CODES.has(b.currentInsurer)) return false;
+  }
+  if (b.currentPremiumBand !== undefined) {
+    if (typeof b.currentPremiumBand !== "string" || !BANDS.includes(b.currentPremiumBand)) return false;
+  }
+  return true;
 }
 
 export async function POST(request: NextRequest) {
@@ -51,8 +72,11 @@ export async function POST(request: NextRequest) {
 
   try {
     const sql = getSql();
-    await sql`INSERT INTO inquiry_log (region_id, altersklasse, franchise, year, models, accident)
-              VALUES (${body.regionId}, ${body.altersklasse}, ${body.franchise}, ${body.year}, ${body.models}, ${body.accident})`;
+    await sql`INSERT INTO inquiry_log
+              (region_id, altersklasse, franchise, year, models, accident, locale, current_insurer, current_premium_band)
+              VALUES (${body.regionId}, ${body.altersklasse}, ${body.franchise}, ${body.year},
+                      ${body.models}, ${body.accident}, ${body.locale},
+                      ${body.currentInsurer ?? null}, ${body.currentPremiumBand ?? null})`;
     return new NextResponse(null, { status: 204 });
   } catch {
     // Logging failures must never surface to the user.

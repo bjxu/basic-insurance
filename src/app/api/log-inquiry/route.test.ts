@@ -20,6 +20,7 @@ const validPayload = {
   year: 2026,
   models: ["standard"],
   accident: true,
+  locale: "de",
 };
 
 describe("POST /api/log-inquiry", () => {
@@ -52,7 +53,45 @@ describe("POST /api/log-inquiry", () => {
     expect(fakeSql).toHaveBeenCalledTimes(1);
     const [strings, ...values] = fakeSql.mock.calls[0];
     expect(strings.join("?")).toContain("INSERT INTO inquiry_log");
-    expect(values).toEqual(["ZH-1", "erwachsen", 300, 2026, ["standard"], true]);
+    expect(values).toEqual(["ZH-1", "erwachsen", 300, 2026, ["standard"], true, "de", null, null]);
+  });
+
+  it("returns 400 when locale is missing", async () => {
+    const { locale, ...noLocale } = validPayload;
+    void locale;
+    const res = await POST(makeRequest(noLocale));
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 400 on an unknown locale", async () => {
+    const res = await POST(makeRequest({ ...validPayload, locale: "xx" }));
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 400 on an unknown current insurer code", async () => {
+    const res = await POST(makeRequest({ ...validPayload, currentInsurer: "not-a-code" }));
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 400 on an unknown premium band", async () => {
+    const res = await POST(makeRequest({ ...validPayload, currentPremiumBand: "999+" }));
+    expect(res.status).toBe(400);
+  });
+
+  it("stores current insurer and premium band when valid", async () => {
+    process.env.POSTGRES_URL = "postgres://test";
+    const fakeSql = vi.fn().mockResolvedValue([]);
+    vi.mocked(db.getSql).mockReturnValue(fakeSql as unknown as ReturnType<typeof db.getSql>);
+
+    const res = await POST(
+      makeRequest({ ...validPayload, currentInsurer: "1542", currentPremiumBand: "350-449" }),
+    );
+
+    expect(res.status).toBe(204);
+    const [, ...values] = fakeSql.mock.calls[0];
+    expect(values).toEqual([
+      "ZH-1", "erwachsen", 300, 2026, ["standard"], true, "de", "1542", "350-449",
+    ]);
   });
 
   it("still returns 204 if the insert throws", async () => {
