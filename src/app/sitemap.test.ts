@@ -24,9 +24,22 @@ describe("sitemap", () => {
     expect(urls.every((u) => !u.includes("?"))).toBe(true);
   });
 
-  it("every entry carries hreflang alternates for all four locales", () => {
+  it("every entry carries hreflang alternates for all four locales with correct per-path targeting", () => {
     for (const entry of entries) {
-      expect(Object.keys(entry.alternates?.languages ?? {}).sort()).toEqual(["de", "en", "fr", "it"]);
+      const languages = entry.alternates?.languages ?? {};
+      expect(Object.keys(languages).sort()).toEqual(["de", "en", "fr", "it"]);
+
+      // Extract the path from the entry URL (e.g., "/de/how-it-works" or "/de")
+      const entryPath = entry.url.replace("https://example.com", "");
+      const isHowItWorksPath = entryPath.endsWith("/how-it-works");
+
+      // Each hreflang alternate must target the same path on the correct locale
+      for (const locale of ["de", "en", "fr", "it"]) {
+        const expectedAlternate = isHowItWorksPath
+          ? `https://example.com/${locale}/how-it-works`
+          : `https://example.com/${locale}`;
+        expect(languages[locale as keyof typeof languages]).toBe(expectedAlternate);
+      }
     }
   });
 });
