@@ -28,6 +28,7 @@ import {
 import { encodeState, decodeState } from "@/lib/url-state";
 import { validateCurrentPremium } from "@/lib/validate";
 import { buildInquiryLogPayload } from "@/lib/inquiryLog";
+import { normalizeGuideSection } from "@/lib/help";
 import { PRODUCT_DETAIL_DROPDOWN_ENABLED } from "@/lib/featureFlags";
 import type { CurrentPlan, Insurer, SelfReportedPlan } from "@/lib/types";
 import type { Locale } from "@/i18n/routing";
@@ -72,7 +73,7 @@ export function InsuranceComparator() {
   const [guideSection, setGuideSection] = useState<string | undefined>(undefined);
 
   const openGuide = useCallback((section?: string) => {
-    setGuideSection(section);
+    setGuideSection(normalizeGuideSection(section));
     setGuideOpen(true);
   }, []);
   const closeGuide = useCallback(() => setGuideOpen(false), []);
