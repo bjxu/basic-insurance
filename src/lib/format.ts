@@ -14,13 +14,15 @@ export function formatChf(amount: number): string {
 // Local to this module rather than imported from @/i18n/routing: src/lib is a
 // dependency-free layer today (no imports from src/i18n or src/components), and
 // these lookup maps only need the literal set of codes, not the routing config.
-type Locale = "de" | "fr" | "it" | "en";
+type Locale = "de" | "fr" | "it" | "en" | "pt" | "es";
 
 const MEMBER_COUNT_UNITS: Record<Locale, { million: string; thousand: string }> = {
   de: { million: "Mio.", thousand: "Tsd." },
   fr: { million: "mio", thousand: "k" },
   it: { million: "mio", thousand: "mila" },
   en: { million: "M", thousand: "k" },
+  pt: { million: "mi.", thousand: "mil" },
+  es: { million: "M", thousand: "mil" },
 };
 
 // Abbreviated OKP enrollment count for the member-count badge (PlanRow). Real BAG 2024
@@ -48,6 +50,8 @@ const INSURED_WORD: Record<Locale, string> = {
   fr: "assurés",
   it: "assicurati",
   en: "insured",
+  pt: "segurados",
+  es: "asegurados",
 };
 
 const AS_OF_WORD: Record<Locale, string> = {
@@ -55,6 +59,8 @@ const AS_OF_WORD: Record<Locale, string> = {
   fr: "en",
   it: "nel",
   en: "as of",
+  pt: "em",
+  es: "en",
 };
 
 // Exact count + the enrollment data's own publication year, for the badge's tooltip
