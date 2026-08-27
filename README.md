@@ -34,7 +34,9 @@ site against the official BAG calculator, priminfo.ch, for correctness. It:
   prixio's displayed monthly premium against priminfo's net "Total" column (the figure
   after priminfo's CO₂-/VOC-levy credit — the same basis prixio displays).
 - Prints a pass/fail summary to the console and writes a full per-case, per-insurer
-  JSON report to the OS temp dir (path printed at the end of the run).
+  JSON report, plus a full-page screenshot of each site's results for every case, to a
+  timestamped directory under the OS temp dir (path printed at the end of the run) — so
+  a mismatch (or the data in general) can be eyeballed directly, not just diffed.
 - Exits non-zero if there's any price mismatch or any case errors out.
 
 ```bash

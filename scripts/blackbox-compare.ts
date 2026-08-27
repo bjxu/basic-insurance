@@ -16,7 +16,7 @@
 // for a row, that row is reported as an error rather than silently compared.
 
 import { chromium, type Page } from "playwright";
-import { writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import plzMap from "../src/data/plz-map.json";
@@ -49,6 +49,8 @@ type CaseResult = {
   onlyOnPriminfo: SiteRow[];
   unrecognizedPriminfoNames: string[];
   mismatches: MatchedRow[];
+  prixioScreenshot?: string;
+  priminfoScreenshot?: string;
 };
 
 // ---------- 1. Region sampling ----------
@@ -84,6 +86,7 @@ const INSURERS = insurers as Insurer[];
 const EXPLICIT_ALIASES: Record<string, string> = {
   kklh: "Krankenkasse Luzerner Hinterland",
   einsiedeln: "Einsiedler Krankenkasse",
+  cmveo: "Caisse-maladie de la vallée d'Entremont",
 };
 
 function normalize(s: string): string {
@@ -114,12 +117,13 @@ function matchInsurer(priminfoName: string): Insurer | null {
 
 // ---------- 3. prixio adapter ----------
 
-async function fetchPrixio(page: Page, c: Case): Promise<SiteRow[]> {
+async function fetchPrixio(page: Page, c: Case, screenshotPath?: string): Promise<SiteRow[]> {
   const url =
     `${PRIXIO_BASE}?plz=${c.plz}&by=${FIXED_BIRTH_YEAR}&fran=${c.franchise}` +
     `&year=${YEAR}&acc=1&models=standard`;
   await page.goto(url, { waitUntil: "networkidle", timeout: 45000 });
   await page.waitForSelector('[role="listitem"]', { timeout: 15000 });
+  if (screenshotPath) await page.screenshot({ path: screenshotPath, fullPage: true });
   const rows = await page.locator('[role="listitem"]').evaluateAll((els) =>
     els.map((el) => el.textContent ?? ""),
   );
@@ -139,7 +143,7 @@ async function fetchPrixio(page: Page, c: Case): Promise<SiteRow[]> {
 
 // ---------- 4. priminfo adapter ----------
 
-async function fetchPriminfo(page: Page, c: Case): Promise<SiteRow[]> {
+async function fetchPriminfo(page: Page, c: Case, screenshotPath?: string): Promise<SiteRow[]> {
   await page.goto(PRIMINFO_BASE, { waitUntil: "networkidle", timeout: 45000 });
 
   const locInput = page.locator("#form-typeahead-input");
@@ -188,6 +192,7 @@ async function fetchPriminfo(page: Page, c: Case): Promise<SiteRow[]> {
   if (rows.length === 0) {
     throw new Error("priminfo results table rendered but had 0 matching rows — selector likely broke");
   }
+  if (screenshotPath) await page.screenshot({ path: screenshotPath, fullPage: true });
 
   const out: SiteRow[] = [];
   for (const { insurerRaw, monthly } of rows) {
@@ -293,22 +298,33 @@ async function main() {
   for (const c of cases) console.log(`  ${c.regionId}  PLZ ${c.plz}  franchise CHF ${c.franchise}`);
   console.log("");
 
+  const runDir = join(tmpdir(), `blackbox-compare-${Date.now()}`);
+  await mkdir(runDir, { recursive: true });
+
   const browser = await chromium.launch();
   const results: CaseResult[] = [];
 
-  for (const c of cases) {
+  for (const [i, c] of cases.entries()) {
     process.stdout.write(`→ ${c.regionId} / CHF ${c.franchise} ... `);
+    const slug = `${String(i + 1).padStart(2, "0")}-${c.regionId}-${c.franchise}`;
+    const prixioScreenshot = join(runDir, `${slug}-prixio.png`);
+    const priminfoScreenshot = join(runDir, `${slug}-priminfo.png`);
     const page = await browser.newPage();
     try {
-      const prixioRows = await withRetry(() => fetchPrixio(page, c));
-      const priminfoRows = await withRetry(() => fetchPriminfo(page, c));
+      const prixioRows = await withRetry(() => fetchPrixio(page, c, prixioScreenshot));
+      const priminfoRows = await withRetry(() => fetchPriminfo(page, c, priminfoScreenshot));
       const result = compareCase(c, prixioRows, priminfoRows);
+      result.prixioScreenshot = prixioScreenshot;
+      result.priminfoScreenshot = priminfoScreenshot;
       results.push(result);
       console.log(
         `${result.mismatches.length === 0 ? "OK" : "MISMATCH"} ` +
           `(${result.rows.length} matched, ${result.onlyOnPrixio.length} prixio-only, ${result.onlyOnPriminfo.length} priminfo-only)`,
       );
     } catch (err) {
+      // Paths are recorded even on failure: whichever site's fetch got far
+      // enough to screenshot before the other one failed will have a real
+      // file here — harmless if a path never actually got written to.
       results.push({
         case: c,
         status: "error",
@@ -318,6 +334,8 @@ async function main() {
         onlyOnPriminfo: [],
         unrecognizedPriminfoNames: [],
         mismatches: [],
+        prixioScreenshot,
+        priminfoScreenshot,
       });
       console.log(`ERROR: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
@@ -356,9 +374,10 @@ async function main() {
     for (const r of errored) console.log(`${r.case.regionId} (PLZ ${r.case.plz}): ${r.error}`);
   }
 
-  const reportPath = join(tmpdir(), `blackbox-compare-${Date.now()}.json`);
+  const reportPath = join(runDir, "report.json");
   await writeFile(reportPath, JSON.stringify({ generatedAt: new Date().toISOString(), year: YEAR, results }, null, 2));
   console.log(`\nFull report written to ${reportPath}`);
+  console.log(`Screenshots (full-page, one prixio + one priminfo per case) written to ${runDir}`);
 
   if (totalMismatches > 0 || errored.length > 0) process.exitCode = 1;
 }
