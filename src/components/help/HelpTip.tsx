@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { HELP_ANCHORS, type TermKey } from "@/lib/help";
+import { ModelList } from "./ModelList";
 
 // Layer 2 of the newcomer help (spec §"Inline help"). One <details> element:
 // - the <summary> is the ⓘ button (keyboard-operable, toggles [open], which the
@@ -56,6 +57,7 @@ export function HelpTip({ term, onOpenGuide }: { term: TermKey; onOpenGuide: (se
       >
         <p className="text-[12.5px] font-bold text-on-surface">{t(`terms.${term}.title`)}</p>
         <p className="mt-1 text-xs leading-relaxed text-on-surface-variant">{t(`terms.${term}.short`)}</p>
+        {term === "models" && <ModelList className="mt-2" />}
         <button
           type="button"
           onClick={() => {

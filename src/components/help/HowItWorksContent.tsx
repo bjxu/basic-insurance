@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { GUIDE_TERM_KEYS } from "@/lib/help";
+import { ModelList } from "./ModelList";
 
 // Shared body for the drawer (full=false) and the standalone /how-it-works page
 // (full=true: <h1> + the "same as next to each field" intro line). Section ids
@@ -51,7 +52,7 @@ export function HowItWorksContent({ full = false }: { full?: boolean }) {
 
       <section id="modelle" className="mt-4 border-t border-outline-variant pt-4">
         <Heading className="text-label-large text-on-surface">{t("guide.models.heading")}</Heading>
-        <p className="mt-2 text-body-small text-on-surface-variant">{t("guide.models.body")}</p>
+        <ModelList className="mt-2" />
       </section>
     </div>
   );

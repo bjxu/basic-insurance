@@ -104,7 +104,7 @@
       },
       "models": {
         "title": "Versicherungsmodelle",
-        "short": "Im Standardmodell gehst du zu jedem Arzt deiner Wahl. Alternative Modelle (Hausarzt, HMO, Telmed) verlangen, dass du bei gesundheitlichen Fragen zuerst eine bestimmte Stelle kontaktierst — deinen Hausarzt, ein Gesundheitszentrum oder eine telefonische Beratung. Dafür ist die Prämie tiefer. Der Leistungsumfang bleibt gleich."
+        "short": "Du wählst zwischen dem Standardmodell (freie Arztwahl) und einem günstigeren Alternativmodell mit fester erster Anlaufstelle. Die Leistungen sind überall gleich."
       }
     },
     "banner": {
@@ -131,8 +131,7 @@
         "intro": "Kurz erklärt — dieselben Erläuterungen findest du auch neben jedem Eingabefeld."
       },
       "models": {
-        "heading": "Standard oder alternatives Modell",
-        "body": "Im Standardmodell wählst du deinen Arzt frei. Alternative Modelle (Hausarzt, HMO, Telmed) senken deine Prämie, dafür kontaktierst du bei gesundheitlichen Fragen zuerst eine festgelegte Stelle. Die Leistungen sind dieselben."
+        "heading": "Standard oder alternatives Modell"
       }
     }
   },

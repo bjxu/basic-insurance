@@ -104,7 +104,7 @@
       },
       "models": {
         "title": "Modèles d'assurance",
-        "short": "Dans le modèle standard, vous consultez le médecin de votre choix. Les modèles alternatifs (médecin de famille, HMO, Telmed) exigent qu'en cas de problème de santé vous contactiez d'abord un point de contact défini — votre médecin de famille, un centre de santé ou un conseil téléphonique. En échange, la prime est plus basse. L'étendue des prestations reste la même."
+        "short": "Vous choisissez entre le modèle standard (libre choix du médecin) et un modèle alternatif meilleur marché avec un premier point de contact défini. Les prestations sont partout identiques."
       }
     },
     "banner": {
@@ -131,8 +131,7 @@
         "intro": "En bref — vous trouvez les mêmes explications à côté de chaque champ de saisie."
       },
       "models": {
-        "heading": "Modèle standard ou alternatif",
-        "body": "Dans le modèle standard, vous choisissez librement votre médecin. Les modèles alternatifs (médecin de famille, HMO, Telmed) réduisent votre prime ; en échange, vous contactez d'abord un point de contact défini en cas de problème de santé. Les prestations sont les mêmes."
+        "heading": "Modèle standard ou alternatif"
       }
     }
   },
