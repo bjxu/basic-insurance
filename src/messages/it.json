@@ -104,7 +104,8 @@
       },
       "models": {
         "title": "Modelli assicurativi",
-        "short": "Scegli tra il modello standard (libera scelta del medico) e un modello alternativo più conveniente con un primo punto di contatto definito. Le prestazioni sono ovunque le stesse."
+        "short": "Scegli tra il modello standard (libera scelta del medico) e un modello alternativo più conveniente con un primo punto di contatto definito. Le prestazioni sono ovunque le stesse.",
+        "altGroup": "Modelli alternativi"
       }
     },
     "banner": {

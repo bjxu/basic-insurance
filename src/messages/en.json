@@ -104,7 +104,8 @@
       },
       "models": {
         "title": "Insurance models",
-        "short": "You choose between the standard model (free choice of doctor) and a cheaper alternative model with a set first point of contact. The coverage is the same everywhere."
+        "short": "You choose between the standard model (free choice of doctor) and a cheaper alternative model with a set first point of contact. The coverage is the same everywhere.",
+        "altGroup": "Alternative models"
       }
     },
     "banner": {

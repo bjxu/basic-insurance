@@ -199,8 +199,9 @@ birth-year field already does this), and an ⓘ trigger — by each input's labe
 next to the "alternative models" filter toggle (not repeated on every result row) —
 that opens the short-form explainer (an anchored popover on wide viewports, an inline
 disclosure that expands in place on narrow ones). The models explainer additionally
-lists each BAG Tarifart with its one-line restriction (Standard, Hausarzt, Telmed, HMO,
-other), reusing the same `copy.tarifart.*` text the result rows carry. Each explainer
+lists each BAG Tarifart with its one-line restriction — Standard on top, then Hausarzt /
+Telmed / HMO grouped under an "alternative models" label — reusing the same
+`copy.tarifart.*` text the result rows carry. Each explainer
 ends with a link that opens the guide drawer scrolled to the matching section. All
 keyboard-operable and screen-reader-labelled per concept (REQ-17).
 

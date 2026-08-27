@@ -106,10 +106,10 @@ Both renderings are keyboard-operable: the trigger is a `<summary>` (implicit bu
 role + `aria-expanded`); Esc or re-activating the trigger closes it and focus stays on
 the trigger. The popover is dismissed on outside click; the disclosure is not modal.
 
-The **models** popover additionally renders a grouped breakdown — one line per BAG
-Tarifart (`Standard: …`, `Hausarzt: …`, `Telmed: …`, `HMO: …`, `Alternativmodell: …`)
-from the shared `copy.tarifart.*` catalog (`ModelList` component, reused by the guide's
-models section). The generic `help.terms.models.short` above it is trimmed to a
+The **models** popover additionally renders a grouped breakdown — `Standard` on top,
+then `Hausarzt` / `Telmed` / `HMO` nested under an "Alternative models" label — one line
+each from the shared `copy.tarifart.*` catalog (`ModelList` component, reused by the
+guide's models section). The generic `help.terms.models.short` above it is trimmed to a
 one-sentence framing.
 
 ### Layer 3 — "Full explainer →" link

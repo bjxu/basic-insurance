@@ -104,7 +104,8 @@
       },
       "models": {
         "title": "Versicherungsmodelle",
-        "short": "Du wählst zwischen dem Standardmodell (freie Arztwahl) und einem günstigeren Alternativmodell mit fester erster Anlaufstelle. Die Leistungen sind überall gleich."
+        "short": "Du wählst zwischen dem Standardmodell (freie Arztwahl) und einem günstigeren Alternativmodell mit fester erster Anlaufstelle. Die Leistungen sind überall gleich.",
+        "altGroup": "Alternativmodelle"
       }
     },
     "banner": {

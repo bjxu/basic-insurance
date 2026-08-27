@@ -1426,14 +1426,17 @@
       <div class="guide-sec">
         <h3>Standard oder alternatives Modell</h3>
         <!-- Grouped model breakdown — same list shown in the "Versicherungsmodelle" ⓘ popover
-             next to the filter toggle (src/components/help/ModelList.tsx; copy from copy.tarifart.*). -->
-        <dl style="margin:6px 0 0;font-size:12px;line-height:1.5">
-          <div><strong>Standard:</strong> Freie Arztwahl</div>
-          <div><strong>Hausarzt:</strong> Erstbehandlung immer beim gewählten Hausarzt</div>
-          <div><strong>Telmed:</strong> Anruf bei Hotline erforderlich vor jedem Arztbesuch</div>
-          <div><strong>HMO:</strong> Erstanlaufstelle immer beim HMO-Zentrum</div>
-          <div><strong>Alternativmodell:</strong> Eingeschränkte Wahl des Erstanlaufpunkts</div>
-        </dl>
+             next to the filter toggle (src/components/help/ModelList.tsx; copy from copy.tarifart.*).
+             Standard on top; Hausarzt / Telmed / HMO nested under "Alternativmodelle". -->
+        <div style="margin:6px 0 0;font-size:12px;line-height:1.5">
+          <p><strong>Standard:</strong> Freie Arztwahl</p>
+          <p style="font-weight:600;margin-top:6px">Alternativmodelle</p>
+          <div style="margin-top:2px;padding-left:10px;border-left:1px solid var(--md-sys-color-outline-variant)">
+            <p><strong>Hausarzt:</strong> Erstbehandlung immer beim gewählten Hausarzt</p>
+            <p><strong>Telmed:</strong> Anruf bei Hotline erforderlich vor jedem Arztbesuch</p>
+            <p><strong>HMO:</strong> Erstanlaufstelle immer beim HMO-Zentrum</p>
+          </div>
+        </div>
       </div>
       <a href="#" class="guide-fulllink">Ganzen Leitfaden öffnen — /de/how-it-works →</a>
     </div>

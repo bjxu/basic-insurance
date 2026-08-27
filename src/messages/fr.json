@@ -104,7 +104,8 @@
       },
       "models": {
         "title": "Modèles d'assurance",
-        "short": "Vous choisissez entre le modèle standard (libre choix du médecin) et un modèle alternatif meilleur marché avec un premier point de contact défini. Les prestations sont partout identiques."
+        "short": "Vous choisissez entre le modèle standard (libre choix du médecin) et un modèle alternatif meilleur marché avec un premier point de contact défini. Les prestations sont partout identiques.",
+        "altGroup": "Modèles alternatifs"
       }
     },
     "banner": {
