@@ -50,9 +50,11 @@ export function decodeState(params: URLSearchParams): ComparisonState {
     franchise: franRaw && /^\d+$/.test(franRaw) ? Number(franRaw) : null,
     year: yearRaw && /^\d{4}$/.test(yearRaw) ? Number(yearRaw) : null,
     unfalldeckung: params.get("acc") !== "0", // included by default (§5.3)
+    // No models param → alternative models are on by default (all tarifarten).
+    // An explicit models=standard from a shared link still restricts to standard.
     models: modelsRaw
       ? (modelsRaw.split(",").filter((m): m is Tarifart => VALID_TARIFARTEN.includes(m as Tarifart)))
-      : ["standard"],
+      : [...VALID_TARIFARTEN],
     currentInsurerCode: params.get("ci") || null,
     currentMonthlyPremium: cpRaw && /^\d+(\.\d{1,2})?$/.test(cpRaw) && Number(cpRaw) > 0 ? Number(cpRaw) : null,
   };
