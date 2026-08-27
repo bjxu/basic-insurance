@@ -12,6 +12,9 @@ const BASE_INPUT = {
   year: 2026,
   altModelsActive: false,
   unfalldeckung: true,
+  locale: "de",
+  currentInsurerCode: null,
+  currentMonthlyPremium: null,
 };
 
 describe("buildInquiryLogPayload", () => {
@@ -23,6 +26,7 @@ describe("buildInquiryLogPayload", () => {
       year: 2026,
       models: ["standard"],
       accident: true,
+      locale: "de",
     });
   });
 
@@ -46,5 +50,37 @@ describe("buildInquiryLogPayload", () => {
 
   it("returns null when franchise is not selected yet", () => {
     expect(buildInquiryLogPayload({ ...BASE_INPUT, franchise: null })).toBeNull();
+  });
+
+  it("carries the locale through unchanged", () => {
+    expect(buildInquiryLogPayload({ ...BASE_INPUT, locale: "fr" })?.locale).toBe("fr");
+  });
+
+  it("includes currentInsurer only when an insurer code is set", () => {
+    expect(buildInquiryLogPayload(BASE_INPUT)).not.toHaveProperty("currentInsurer");
+    expect(
+      buildInquiryLogPayload({ ...BASE_INPUT, currentInsurerCode: "1542" })?.currentInsurer,
+    ).toBe("1542");
+  });
+
+  it("includes currentPremiumBand only when a usable premium is given", () => {
+    expect(buildInquiryLogPayload(BASE_INPUT)).not.toHaveProperty("currentPremiumBand");
+    expect(
+      buildInquiryLogPayload({ ...BASE_INPUT, currentMonthlyPremium: 372.4 })?.currentPremiumBand,
+    ).toBe("350-449");
+    expect(
+      buildInquiryLogPayload({ ...BASE_INPUT, currentMonthlyPremium: 0 }),
+    ).not.toHaveProperty("currentPremiumBand");
+  });
+
+  it("returns null (no current-plan fields consulted) when required inputs are missing", () => {
+    expect(
+      buildInquiryLogPayload({
+        ...BASE_INPUT,
+        praemienregionId: null,
+        currentInsurerCode: "1542",
+        currentMonthlyPremium: 400,
+      }),
+    ).toBeNull();
   });
 });
