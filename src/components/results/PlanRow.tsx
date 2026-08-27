@@ -48,17 +48,30 @@ export function PlanRow({
     isCurrentPlan ? "border-error bg-error-container" : "border-outline-variant bg-surface"
   }`;
 
+  // The member-count badge sits beside the insurer name; on narrow screens the
+  // `w-full` wrapper drops it onto its own line directly under the name, while the
+  // inner pill always shrinks to its content.
+  const memberCountLabel =
+    memberCount != null ? formatMemberCountDetail(memberCount, memberCountAsOf, locale) : undefined;
+
   const rowContent = (
     <>
       <div className={`w-5 text-center text-sm font-bold ${rank === 1 ? "text-primary" : "text-outline"}`}>
         {rank}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 min-w-0">
+        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 min-w-0">
           <div className="font-semibold text-[15px] truncate min-w-0">{plan.insurerName}</div>
           {isCurrentPlan && (
             <span className="text-[11px] font-semibold px-1.5 py-px rounded bg-error-container text-error flex-shrink-0">
               {t("results.yourInsurerBadge")}
+            </span>
+          )}
+          {memberCount != null && (
+            <span className="w-full sm:w-auto" title={memberCountLabel} aria-label={memberCountLabel}>
+              <span className="inline-block text-[11px] font-semibold px-1.5 py-px rounded bg-surface-variant text-on-surface-variant whitespace-nowrap">
+                <span aria-hidden="true">👥</span> {formatMemberCount(memberCount, locale)}
+              </span>
             </span>
           )}
         </div>
@@ -78,17 +91,6 @@ export function PlanRow({
           <span>· {t(`copy.tarifart.${plan.tarifart}.description`)}</span>
         </div>
       </div>
-      {memberCount != null && (
-        <div
-          className="hidden sm:flex flex-col items-end gap-0.5 flex-shrink-0"
-          title={formatMemberCountDetail(memberCount, memberCountAsOf, locale)}
-          aria-label={formatMemberCountDetail(memberCount, memberCountAsOf, locale)}
-        >
-          <span className="text-[11px] font-semibold px-1.5 py-px rounded bg-surface-variant text-on-surface-variant whitespace-nowrap">
-            <span aria-hidden="true">👥</span> {formatMemberCount(memberCount, locale)}
-          </span>
-        </div>
-      )}
       {yoy != null && (
         <div
           className={`text-xs font-semibold px-1.5 py-px rounded ${
