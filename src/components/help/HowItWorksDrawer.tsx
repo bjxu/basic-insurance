@@ -9,15 +9,30 @@ import { HowItWorksContent } from "./HowItWorksContent";
 // Esc / scrim / ✕ close it; body scroll is locked while open; focus moves to ✕
 // on open and returns to the opener on close. Not a full focus trap — a known
 // v1 simplification noted in the spec's Testing section.
-export function HowItWorksDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function HowItWorksDrawer({
+  open,
+  section,
+  onClose,
+}: {
+  open: boolean;
+  section?: string;
+  onClose: () => void;
+}) {
   const t = useTranslations("help");
   const closeRef = useRef<HTMLButtonElement>(null);
   const openerRef = useRef<HTMLElement | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
     openerRef.current = (document.activeElement as HTMLElement) ?? null;
     closeRef.current?.focus();
+
+    // Jump the panel to the requested section when opened from an ⓘ's "full
+    // explainer" link; the top otherwise.
+    if (section) {
+      panelRef.current?.querySelector(`#${section}`)?.scrollIntoView({ block: "start" });
+    }
 
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -32,7 +47,7 @@ export function HowItWorksDrawer({ open, onClose }: { open: boolean; onClose: ()
       document.body.style.overflow = prevOverflow;
       openerRef.current?.focus?.();
     };
-  }, [open, onClose]);
+  }, [open, section, onClose]);
 
   if (!open) return null;
 
@@ -44,6 +59,7 @@ export function HowItWorksDrawer({ open, onClose }: { open: boolean; onClose: ()
         onClick={onClose}
       />
       <div
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label={t("drawer.title")}

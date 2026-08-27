@@ -9,7 +9,6 @@ import metadata from "@/data/metadata.json";
 import { MODEL_TAG_CLASSES, DEFAULT_MODEL_TAG_CLASSES } from "@/lib/tarifart-style";
 import { ProductList } from "./ProductList";
 import { PRODUCT_DETAIL_DROPDOWN_ENABLED } from "@/lib/featureFlags";
-import { HelpTip } from "@/components/help/HelpTip";
 
 const ENVIRONMENTAL_LEVY_PER_MONTH: Record<string, number> = metadata.environmentalLevyPerMonth;
 
@@ -76,7 +75,7 @@ export function PlanRow({
             </span>
           )}
         </div>
-        <div className="relative text-xs text-on-surface-variant mt-0.5 flex flex-wrap items-center gap-1">
+        <div className="text-xs text-on-surface-variant mt-0.5 flex flex-wrap items-center gap-1">
           <span
             className={`inline-block px-1.5 py-px rounded text-[11px] font-semibold ${
               MODEL_TAG_CLASSES[plan.tarifart] ?? DEFAULT_MODEL_TAG_CLASSES
@@ -84,10 +83,6 @@ export function PlanRow({
           >
             {t(`copy.tarifart.${plan.tarifart}.label`)}
           </span>
-          {/* Flag-off only: under PRODUCT_DETAIL_DROPDOWN_ENABLED this row renders
-              inside <summary>, and a <details> HelpTip there is invalid + would
-              toggle the row. See @/lib/featureFlags. */}
-          {!PRODUCT_DETAIL_DROPDOWN_ENABLED && <HelpTip term="models" />}
           {discountPct != null && discountPct > 0 && (
             <span className="inline-block px-1.5 py-px rounded text-[11px] font-bold bg-primary-container text-on-primary-container whitespace-nowrap">
               {t("results.discountBadge", { pct: discountPct.toFixed(1) })}

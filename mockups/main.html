@@ -738,8 +738,6 @@
       background: var(--md-sys-color-primary); border-color: var(--md-sys-color-primary);
       color: var(--md-sys-color-on-primary);
     }
-    .model-badge .help-i { width: 14px; height: 14px; margin-left: 0; }
-
     /* Layer 2 — anchored popover (wide viewport). .field is the positioning context. */
     .field { position: relative; }
     .help-pop {
@@ -761,9 +759,12 @@
     }
     .help-pop p, .help-disclosure p { font-size: 12px; line-height: 1.45; margin: 0 0 8px; }
     .help-pop p strong, .help-disclosure p strong { font-size: 12.5px; }
-    .help-more { font-size: 11.5px; color: var(--md-sys-color-primary); font-weight: 600; text-decoration: none; }
+    .help-more {
+      display: inline-block; margin-top: 4px; padding: 0; border: none; background: none;
+      font-size: 11.5px; font-weight: 600; color: var(--md-sys-color-primary); cursor: pointer;
+    }
 
-    /* Layer 3 target — the how-it-works drawer (opened by banner / first-run card / popover link) */
+    /* Layer 3 target — the how-it-works drawer (opened by the banner or a popover's "Ganzer Leitfaden" link) */
     .guide-scrim { inset: 0; background: rgba(0,0,0,.32); z-index: 40; }
     .guide-drawer {
       top: 0; right: 0; bottom: 0; width: min(420px, 92vw); z-index: 41;
@@ -863,9 +864,10 @@
           <p><strong>Franchise (Selbstbehalt)</strong></p>
           <p>Der Betrag deiner Gesundheitskosten, den du jedes Jahr selbst zahlst, bevor die Kasse übernimmt. Du wählst ihn: CHF 300 bis CHF 2500 (Erwachsene).</p>
           <p>Hohe Franchise = tiefere Prämie, mehr Eigenrisiko. Die Leistungen sind per Gesetz in jedem Fall identisch.</p>
-          <!-- Layer-3 link: opens the standalone guide page (data-opens kept as a note;
-               the real target is the page URL, not the drawer). -->
-          <a href="/de/how-it-works#begriffe" class="help-more" data-opens="guide-page">Ganzer Leitfaden →</a>
+          <!-- Layer-3 link: opens the how-it-works drawer scrolled to the matching section
+               (src/components/help/HelpTip.tsx → onOpenGuide). The standalone /how-it-works
+               page still exists and is linked from the drawer's own footer. -->
+          <button type="button" class="help-more" data-opens="guide-drawer">Ganzer Leitfaden →</button>
         </div>
       </div>
     </div>
@@ -983,9 +985,14 @@
       <button>2027</button>
     </div>
     <div class="filter-sep"></div>
-    <div class="chip-toggle" role="button" tabindex="0" aria-pressed="false">
-      <span class="dot"></span> Alternative Modelle: aus
-    </div>
+    <!-- The "insurance models" ⓘ lives here, once, next to the Alternative-models toggle —
+         not repeated on every result row (src/components/results/FilterBar.tsx). -->
+    <span style="position:relative;display:inline-flex;align-items:center;gap:4px">
+      <div class="chip-toggle" role="button" tabindex="0" aria-pressed="false">
+        <span class="dot"></span> Alternative Modelle: aus
+      </div>
+      <button type="button" class="help-i" aria-expanded="false" aria-label="Erklärung anzeigen: Versicherungsmodelle">i</button>
+    </span>
     <!-- Chip label reflects CURRENT VALUE, not the action, to avoid ambiguity (REQ-5) -->
     <div class="chip-toggle active" role="button" tabindex="0" aria-pressed="true">
       <span class="dot"></span> Unfall: eingeschlossen
@@ -1000,9 +1007,7 @@
       <div class="plan-rank first">1</div>
       <div class="plan-insurer">
         <div class="name-row"><div class="name">Assura</div><span class="name-member"><span class="member-badge" title="682'061 Versicherte · Stand 2024" aria-label="682'061 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 682 Tsd.</span></span></div>
-        <!-- Model badge carries the same three-layer help: existing one-line restriction note (Layer 1)
-             + ⓘ opening the "insurance models" short form (Layer 2). -->
-        <div class="model-badge"><span class="model-tag">Standard</span> <button type="button" class="help-i" aria-expanded="false" aria-label="Erklärung anzeigen: Versicherungsmodelle">i</button> · Freie Arztwahl</div>
+        <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
       </div>
       <div class="plan-yoy up">+4.2%</div>
       <div class="plan-price cheapest">
@@ -1386,13 +1391,14 @@
         <p><strong>Franchise (Selbstbehalt)</strong></p>
         <p>Der Betrag, den du jedes Jahr selbst zahlst, bevor die Kasse übernimmt. CHF 300–2500 (Erwachsene).</p>
         <p>Hohe Franchise = tiefere Prämie, mehr Eigenrisiko. Leistungen sind per Gesetz identisch.</p>
-        <a href="/de/how-it-works#begriffe" class="help-more" data-opens="guide-page">Ganzer Leitfaden →</a>
+        <button type="button" class="help-more" data-opens="guide-drawer">Ganzer Leitfaden →</button>
       </div>
     </div>
   </div>
 
-  <!-- ══ Newcomer help — the how-it-works drawer (opened by the banner, first-run card, or a Layer-2 link).
-       Comparator stays mounted underneath; footer link goes to the standalone /[locale]/how-it-works page. ══ -->
+  <!-- ══ Newcomer help — the how-it-works drawer (opened by the banner or a popover's "Ganzer Leitfaden" link,
+       scrolled to the matching section). Comparator stays mounted underneath; the drawer's own footer link
+       goes to the standalone /[locale]/how-it-works page. ══ -->
   <p class="mockup-label">Newcomer-Hilfe — Leitfaden-Drawer (Vergleich bleibt darunter erhalten)</p>
   <div style="position:relative;height:540px;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--radius);overflow:hidden;background:var(--md-sys-color-surface-variant)">
     <div class="guide-scrim" style="position:absolute"></div>

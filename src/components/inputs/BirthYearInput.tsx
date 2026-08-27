@@ -9,9 +9,10 @@ type Props = {
   value: string;
   onChange: (value: string) => void;
   calendarYear: number;
+  onOpenGuide: (section?: string) => void;
 };
 
-export function BirthYearInput({ value, onChange, calendarYear }: Props) {
+export function BirthYearInput({ value, onChange, calendarYear, onOpenGuide }: Props) {
   const t = useTranslations();
   const parsed = value ? Number(value) : null;
   const result = parsed != null ? validateBirthYear(parsed) : { valid: true as const };
@@ -24,7 +25,7 @@ export function BirthYearInput({ value, onChange, calendarYear }: Props) {
         <label htmlFor="by" className="text-label-large text-on-surface-variant">
           {t("inputs.birthYearLabel")}
         </label>
-        <HelpTip term="birthYear" />
+        <HelpTip term="birthYear" onOpenGuide={onOpenGuide} />
       </div>
       <input
         id="by"

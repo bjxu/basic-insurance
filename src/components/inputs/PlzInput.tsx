@@ -9,9 +9,10 @@ type Props = {
   onChange: (value: string) => void;
   /** True when the PLZ has valid format but doesn't resolve to any known Gemeinde (REQ-13). */
   notFound?: boolean;
+  onOpenGuide: (section?: string) => void;
 };
 
-export function PlzInput({ value, onChange, notFound }: Props) {
+export function PlzInput({ value, onChange, notFound, onOpenGuide }: Props) {
   const t = useTranslations();
   const formatResult = value ? validatePlz(value) : { valid: true as const };
   const invalid = !formatResult.valid || Boolean(notFound);
@@ -27,7 +28,7 @@ export function PlzInput({ value, onChange, notFound }: Props) {
         <label htmlFor="plz" className="text-label-large text-on-surface-variant">
           {t("inputs.plzLabel")}
         </label>
-        <HelpTip term="plz" />
+        <HelpTip term="plz" onOpenGuide={onOpenGuide} />
       </div>
       <input
         id="plz"

@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
 import { HELP_ANCHORS, type TermKey } from "@/lib/help";
 
 // Layer 2 of the newcomer help (spec §"Inline help"). One <details> element:
@@ -11,7 +10,9 @@ import { HELP_ANCHORS, type TermKey } from "@/lib/help";
 // - the panel is an anchored popover from the `sm` breakpoint up, and an inline
 //   disclosure (normal block flow, pushes content down) on narrow viewports.
 // Esc and outside-click close it on all sizes.
-export function HelpTip({ term }: { term: TermKey }) {
+// The "full explainer" link opens the how-it-works drawer (not a page nav),
+// scrolled to this term's section.
+export function HelpTip({ term, onOpenGuide }: { term: TermKey; onOpenGuide: (section?: string) => void }) {
   const t = useTranslations("help");
   const ref = useRef<HTMLDetailsElement>(null);
   const [open, setOpen] = useState(false);
@@ -55,12 +56,16 @@ export function HelpTip({ term }: { term: TermKey }) {
       >
         <p className="text-[12.5px] font-bold text-on-surface">{t(`terms.${term}.title`)}</p>
         <p className="mt-1 text-xs leading-relaxed text-on-surface-variant">{t(`terms.${term}.short`)}</p>
-        <Link
-          href={`/how-it-works#${HELP_ANCHORS[term]}`}
+        <button
+          type="button"
+          onClick={() => {
+            if (ref.current) ref.current.open = false;
+            onOpenGuide(HELP_ANCHORS[term]);
+          }}
           className="mt-2 inline-block text-[11.5px] font-semibold text-primary"
         >
           {t("tip.fullLink")}
-        </Link>
+        </button>
       </div>
     </details>
   );

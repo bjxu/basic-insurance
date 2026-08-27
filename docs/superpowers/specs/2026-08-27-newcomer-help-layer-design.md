@@ -22,11 +22,18 @@ Spec B, deferred.
 Ranked gaps this closes (from brainstorming): vocabulary first, system mechanics
 second, decision confidence third.
 
-> **Amendment (2026-08-27, post-implementation):** the dismissible first-run card was
-> dropped after review — on a first visit it stacked with the always-present banner and
-> both opened the same guide. The quiet always-present banner is now the sole newcomer
-> entry point; the `localStorage` first-run tracking is gone. Sections below are updated
-> to match.
+> **Amendment (2026-08-27, post-implementation):**
+> 1. The dismissible first-run card was dropped after review — on a first visit it
+>    stacked with the always-present banner and both opened the same guide. The quiet
+>    always-present banner is now the sole newcomer entry point; the `localStorage`
+>    first-run tracking is gone.
+> 2. The insurance-model ⓘ moved from every result row to a single trigger next to the
+>    "alternative models" filter toggle (it was redundant on ~30 rows).
+> 3. The Layer-3 "full explainer" link opens the guide drawer scrolled to the section
+>    (as this spec's Layer 3 always described) — an interim implementation had it
+>    navigate to the standalone page instead.
+>
+> Sections below are updated to match.
 
 ## Constraints
 
@@ -85,18 +92,19 @@ Franchise CHF 300–2500"); this generalises the pattern:
 
 ### Layer 2 — ⓘ trigger → short form
 
-A small ⓘ button next to each field label and on each model badge. Activating it shows
-that concept's short-form explainer. Responsive rendering:
+A small ⓘ button next to each field label, plus one next to the "alternative models"
+filter toggle for the insurance-model concept (one ⓘ, not one per result row — the
+per-row model badge keeps only its Layer-1 restriction note). Activating it shows that
+concept's short-form explainer. Responsive rendering:
 
 - **Wide viewport (≥ the existing `sm` breakpoint):** an anchored **popover** —
   dismiss on tap-away, Esc, or re-activating the trigger; does not shift layout.
 - **Narrow viewport:** an **inline disclosure** — the explainer expands in place under
   the field, pushing subsequent content down, like a native `<details>`.
 
-Both renderings are keyboard-operable: the trigger is a real `<button>` with
-`aria-expanded`; on open, focus moves into the panel; on close, focus returns to the
-trigger; Esc closes. The popover is dismissed on outside click; the disclosure is not
-modal.
+Both renderings are keyboard-operable: the trigger is a `<summary>` (implicit button
+role + `aria-expanded`); Esc or re-activating the trigger closes it and focus stays on
+the trigger. The popover is dismissed on outside click; the disclosure is not modal.
 
 ### Layer 3 — "Full explainer →" link
 
@@ -151,8 +159,9 @@ standalone page.
 - `src/lib/help.ts` — content-key list / helpers if needed; the copy itself is in the
   message files.
 - `HelpTip` is consumed by `PlzInput`, `BirthYearInput`, `DeductibleSelect`, and
-  `PlanRow`'s model badge; `NewcomerBanner` and `HowItWorksDrawer` are mounted by
-  `InsuranceComparator`.
+  `FilterBar` (the alternative-models toggle); `NewcomerBanner` and `HowItWorksDrawer`
+  are mounted by `InsuranceComparator`, which owns the drawer open/section state and
+  passes an `onOpenGuide(section?)` callback down to every `HelpTip`.
 
 ## requirement.md changes (in this branch, alongside the reconciliation pass)
 

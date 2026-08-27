@@ -69,8 +69,12 @@ export function InsuranceComparator() {
   const [premiumsLoading, setPremiumsLoading] = useState(false);
   const [premiumsError, setPremiumsError] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
+  const [guideSection, setGuideSection] = useState<string | undefined>(undefined);
 
-  const openGuide = useCallback(() => setGuideOpen(true), []);
+  const openGuide = useCallback((section?: string) => {
+    setGuideSection(section);
+    setGuideOpen(true);
+  }, []);
   const closeGuide = useCallback(() => setGuideOpen(false), []);
 
   const gemeinden = plz.length === 4 ? resolveGemeinden(plz) : [];
@@ -270,9 +274,9 @@ export function InsuranceComparator() {
         <p className="text-body-medium text-on-surface-variant mb-5">{t("inputs.tagline")}</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <PlzInput value={plz} onChange={handlePlzChange} notFound={plzNotFound} />
-          <BirthYearInput value={birthYear} onChange={setBirthYear} calendarYear={year} />
-          <DeductibleSelect altersklasse={altersklasse} value={franchise} onChange={setFranchise} />
+          <PlzInput value={plz} onChange={handlePlzChange} notFound={plzNotFound} onOpenGuide={openGuide} />
+          <BirthYearInput value={birthYear} onChange={setBirthYear} calendarYear={year} onOpenGuide={openGuide} />
+          <DeductibleSelect altersklasse={altersklasse} value={franchise} onChange={setFranchise} onOpenGuide={openGuide} />
         </div>
 
         {ambiguous && (
@@ -341,6 +345,7 @@ export function InsuranceComparator() {
             onToggleAltModels={() => setAltModelsActive((v) => !v)}
             unfalldeckung={unfalldeckung}
             onToggleUnfalldeckung={() => setUnfalldeckung((v) => !v)}
+            onOpenGuide={openGuide}
           />
 
           <p className="text-sm text-on-surface-variant mt-4 mb-2">
@@ -383,7 +388,7 @@ export function InsuranceComparator() {
         )}
       </p>
 
-      <HowItWorksDrawer open={guideOpen} onClose={closeGuide} />
+      <HowItWorksDrawer open={guideOpen} section={guideSection} onClose={closeGuide} />
     </main>
   );
 }

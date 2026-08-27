@@ -9,9 +9,10 @@ type Props = {
   altersklasse: Altersklasse | null;
   value: number | null;
   onChange: (value: number) => void;
+  onOpenGuide: (section?: string) => void;
 };
 
-export function DeductibleSelect({ altersklasse, value, onChange }: Props) {
+export function DeductibleSelect({ altersklasse, value, onChange, onOpenGuide }: Props) {
   const t = useTranslations("inputs");
   const th = useTranslations("help");
   const tiers = altersklasse ? getFranchiseTiers(altersklasse) : [];
@@ -22,7 +23,7 @@ export function DeductibleSelect({ altersklasse, value, onChange }: Props) {
         <label htmlFor="fran" className="text-label-large text-on-surface-variant">
           {t("deductibleLabel")}
         </label>
-        <HelpTip term="franchise" />
+        <HelpTip term="franchise" onOpenGuide={onOpenGuide} />
       </div>
       <select
         id="fran"

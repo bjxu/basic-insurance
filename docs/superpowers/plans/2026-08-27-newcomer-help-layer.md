@@ -1365,7 +1365,13 @@ git commit -m "feat(help): add /how-it-works guide pages to the sitemap"
 
 ## Deviations from the spec (intentional, for review)
 
-1. **Layer-3 "full explainer" link opens the standalone page (`/how-it-works#anchor`), not the drawer.** The spec says it "opens the drawer scrolled to the matching section." Opening the drawer from `HelpTip` would require lifting drawer state to `InsuranceComparator` and threading an opener callback down through `PlzInput` / `BirthYearInput` / `DeductibleSelect` / `PlanList` / `PlanRow`. A locale-aware `Link` to the page's `#begriffe` / `#modelle` anchors gets the user to the same content with no cross-tree coupling. Flagged for the spec review gate.
+1. ~~Layer-3 "full explainer" link opens the standalone page, not the drawer.~~
+   **Reverted post-PR** (see the spec's amendment note): the link now opens the guide
+   drawer scrolled to the matching section, as the spec's Layer 3 always described.
+   `InsuranceComparator` owns the drawer open/section state and passes
+   `onOpenGuide(section?)` down to every `HelpTip` (via `PlzInput` / `BirthYearInput` /
+   `DeductibleSelect` / `FilterBar`). At the same time the model ⓘ moved from every
+   result row to a single trigger beside the "alternative models" filter toggle.
 2. **Drawer focus handling is "focus the close button + Esc + restore on close", not a full Tab focus trap.** The spec's Testing section already lists a full trap as the intent; this is the v1 simplification. A trap can be added later without an API change.
 3. **`HelpTip` does not move focus into the popover on open** (spec §"Layer 2" says "on open, focus moves into the panel"). It's a `<details>`/`<summary>` disclosure: opening keeps focus on the ⓘ trigger, Esc/outside-click closes, and the panel's link is reachable by Tab. Moving focus into a small on-hover-style explainer is unusual and fights the `<details>` model; keeping focus on the trigger is the lower-surprise behavior. Flag for the review gate — if the spec's wording is firm, add an on-open `panelRef.current?.focus()` with `tabIndex={-1}` on the panel.
 4. **No component-render tests.** This repo's Vitest runs in the `node` environment with no jsdom/RTL, and every prior feature verified components manually. Testable logic is extracted to `src/lib/help.ts`; components get lint + build + a manual checklist. Introducing jsdom is out of scope for this feature.
