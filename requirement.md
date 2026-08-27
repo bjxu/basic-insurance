@@ -72,8 +72,8 @@ during implementation:
 4. **Minimal friction.** One page, no wizard, no required navigation between input and
    results, no explicit "submit" step once inputs are valid (§5.1). The newcomer help
    layer (§5.5) is consistent with this: it is ambient (a persistent one-liner per
-   input) or opt-in (an ⓘ explainer, a "how it works" guide, a dismissible first-run
-   card) — it never adds a required step and never blocks the input→results flow.
+   input, a quiet always-present banner) or opt-in (an ⓘ explainer, a "how it works"
+   guide) — it never adds a required step and never blocks the input→results flow.
 
 ## 5. User Flow
 
@@ -200,16 +200,13 @@ that opens the short-form explainer (an anchored popover on wide viewports, an i
 disclosure that expands in place on narrow ones); and a link from that explainer into
 the guide. All keyboard-operable and screen-reader-labelled (REQ-17).
 
-**Guide.** A banner at the top of the input card ("New to Swiss basic insurance? — How
-the system works") opens an on-page drawer with the essentials, the comparator staying
-mounted underneath. The drawer links to a standalone guide page at
-`/[locale]/how-it-works` (§10) with the full content and a "back to comparison" link
-that preserves the user's in-progress inputs.
-
-**First run.** On a first visit (tracked in `localStorage`), a dismissible slim card
-above the inputs points to the guide. It never auto-opens the drawer or the page;
-after dismissal only the always-present banner remains. If `localStorage` is
-unavailable the card simply always shows.
+**Guide.** A quiet, always-present banner at the top of the input card ("New to Swiss
+basic insurance? — How the system works") opens an on-page drawer with the essentials,
+the comparator staying mounted underneath. The drawer links to a standalone guide page
+at `/[locale]/how-it-works` (§10) with the full content and a "back to comparison" link
+that preserves the user's in-progress inputs. Nothing auto-opens — the guide is only
+ever reached by the user activating the banner, a drawer link, or an ⓘ's "full
+explainer" link.
 
 ## 6. Data Requirements
 
@@ -289,7 +286,7 @@ figure, premiums are displayed unadjusted and the declaration is omitted for tha
 | REQ-26 | Each locale emits its own translated `<title>`, meta description, and Open Graph / Twitter Card tags, plus `hreflang` alternates for all locales including `x-default` (pointing at the German version). The sitemap lists one URL per locale. |
 | REQ-27 | Every displayed absolute premium (results list, headline, current-insurer row) is shown net of the year's flat federal CO₂/VOC levy credit (§6.4). Relative figures — the REQ-23 discount badge and the year-over-year change — are not adjusted. The adjustment, its amount, and the fact that it does not affect ranking are stated on-page. A year with no published levy figure shows unadjusted premiums and omits the declaration. |
 | REQ-28 | Each of the three required inputs, and each result row's model badge, carries a persistent one-line plain-language hint and an ⓘ trigger that opens a short-form explainer (§5.5) — an anchored popover on wide viewports, an inline disclosure on narrow ones. Triggers are keyboard-operable and screen-reader-labelled per concept (REQ-17). The explainer links into the guide (REQ-29). |
-| REQ-29 | A persistent banner at the top of the input card opens an on-page drawer summarising how the Swiss basic-insurance system works (§5.5), with the comparator still mounted underneath; the drawer links to a standalone guide at `/[locale]/how-it-works` carrying the full content and a "back to comparison" link that preserves the current query state. On a first visit (tracked in `localStorage`), a dismissible slim card above the inputs also points to the guide; it never auto-opens the drawer or page, and degrades to always-shown if `localStorage` is unavailable. |
+| REQ-29 | A quiet, always-present banner at the top of the input card opens an on-page drawer summarising how the Swiss basic-insurance system works (§5.5), with the comparator still mounted underneath; the drawer links to a standalone guide at `/[locale]/how-it-works` carrying the full content and a "back to comparison" link that preserves the current query state. Nothing auto-opens — the guide is reached only by user action (the banner, a drawer link, or an ⓘ's "full explainer" link). |
 | REQ-30 | The newcomer help content explains the system and the domain terms only. It contains no insurer-specific advice and no recommendation to choose a particular plan or insurer (§4, Principle #2). |
 
 ## 8. Edge Cases & Error Handling

@@ -22,11 +22,17 @@ Spec B, deferred.
 Ranked gaps this closes (from brainstorming): vocabulary first, system mechanics
 second, decision confidence third.
 
+> **Amendment (2026-08-27, post-implementation):** the dismissible first-run card was
+> dropped after review — on a first visit it stacked with the always-present banner and
+> both opened the same guide. The quiet always-present banner is now the sole newcomer
+> entry point; the `localStorage` first-run tracking is gone. Sections below are updated
+> to match.
+
 ## Constraints
 
 `requirement.md` Core Principle #4 (minimal friction — one page, no wizard, no required
 navigation, no submit step) stands. Everything here is ambient or opt-in: a persistent
-one-liner, an opt-in ⓘ, an opt-in guide, a dismissible first-run card. Nothing adds a
+one-liner, a quiet always-present banner, an opt-in ⓘ, an opt-in guide. Nothing adds a
 required step or blocks the input→results flow.
 
 `requirement.md` Core Principle #2 (pure comparison tool) also stands: the help
@@ -130,23 +136,16 @@ close. Holds the essentials of all three content areas (§Content core). Footer 
 
 ### First-run
 
-On first visit, when a `localStorage` key (e.g. `prixio.help.seen`) is absent, a
-**slim dismissible card** renders above the inputs:
-
-> New to the Swiss system? Here's the 30-second version →
-
-Activating it opens the drawer. The ✕ dismisses the card and sets the key; thereafter
-only the always-present banner shows. The drawer and the standalone page never
-auto-open. `localStorage` access is wrapped in try/catch — if it throws or is
-unavailable, the card simply always shows (a safe default, not an error).
+*Cut (see amendment at the top).* There is no first-run treatment: the always-present
+banner is the only newcomer entry point, and nothing auto-opens the drawer or the
+standalone page.
 
 ## Components (indicative, follows existing structure)
 
 - `src/components/help/HelpTip.tsx` — the ⓘ trigger + responsive popover/disclosure,
   parameterised by content key.
 - `src/components/help/HowItWorksDrawer.tsx` — the slide-over.
-- `src/components/help/NewcomerBanner.tsx` — banner + first-run slim card (one
-  component, `localStorage`-gated variant).
+- `src/components/help/NewcomerBanner.tsx` — the always-present banner.
 - `src/app/[locale]/how-it-works/page.tsx` — the standalone guide + its
   `generateMetadata`.
 - `src/lib/help.ts` — content-key list / helpers if needed; the copy itself is in the
@@ -162,10 +161,10 @@ unavailable, the card simply always shows (a safe default, not an error).
 - **§4 Principle #4** — qualifying sentence: newcomer help (§5.5) is ambient and
   opt-in and never adds a required step or blocks the input→results flow.
 - **New §5.5 Newcomer help** — the three inline layers, the banner/drawer/standalone
-  page, the first-run card.
+  page.
 - **§7** — REQ-28 (three-layer inline help), REQ-29 (banner → drawer → standalone
-  `/how-it-works` + first-run card), REQ-30 (help content is real and plain-language;
-  no insurer-specific advice or recommendation, per Principle #2).
+  `/how-it-works`), REQ-30 (help content is real and plain-language; no insurer-specific
+  advice or recommendation, per Principle #2).
 - **§10** — `/[locale]/how-it-works` is indexable, one per locale, in the sitemap
   with `hreflang` alternates.
 
@@ -174,10 +173,9 @@ unavailable, the card simply always shows (a safe default, not an error).
 - `HelpTip`: renders the one-liner anchor; ⓘ toggles the panel; `aria-expanded`
   tracks state; Esc closes and restores focus; wide vs. narrow rendering switches at
   the breakpoint (jsdom matchMedia mock).
-- `HowItWorksDrawer`: opens from the banner and the first-run card and the Layer-3
-  link; closes on Esc / scrim; focus trap; scrolls to the requested section.
-- `NewcomerBanner`: slim card shows when the key is absent, hides after dismiss, key
-  persists; banner always renders; `localStorage` throwing does not break render.
+- `HowItWorksDrawer`: opens from the banner and the Layer-3 link; closes on Esc /
+  scrim; focus trap; scrolls to the requested section.
+- `NewcomerBanner`: the banner always renders and its CTA opens the drawer.
 - `how-it-works/page.tsx`: renders all three content areas; `generateMetadata`
   produces per-locale title/description + `hreflang`; "back to comparison" preserves
   the query string.

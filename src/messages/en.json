@@ -111,11 +111,6 @@
       "text": "🇨🇭 New to Swiss basic insurance?",
       "cta": "How the system works →"
     },
-    "firstRun": {
-      "text": "New to the Swiss system?",
-      "cta": "Here's the 30-second version →",
-      "dismiss": "Dismiss"
-    },
     "drawer": {
       "title": "How Swiss basic insurance works",
       "close": "Close",

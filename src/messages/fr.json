@@ -111,11 +111,6 @@
       "text": "🇨🇭 Nouveau dans l'assurance de base suisse ?",
       "cta": "Comment fonctionne le système →"
     },
-    "firstRun": {
-      "text": "Nouveau dans le système suisse ?",
-      "cta": "La version en 30 secondes →",
-      "dismiss": "Masquer"
-    },
     "drawer": {
       "title": "Comment fonctionne l'assurance de base suisse",
       "close": "Fermer",

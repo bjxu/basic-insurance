@@ -717,27 +717,14 @@
     .data-notice a { color: var(--md-sys-color-primary); text-decoration: none; }
 
     /* ── Newcomer help layer (Design: docs/superpowers/specs/2026-08-27-newcomer-help-layer-design.md) ── */
-    /* Banner (always present) + first-run slim card (localStorage-gated) at the top of the input card */
-    .newcomer-firstrun {
-      display: flex; align-items: flex-start; gap: 10px;
-      background: var(--md-sys-color-primary-container);
-      color: var(--md-sys-color-on-primary-container);
-      border-radius: var(--radius); padding: 12px 14px; font-size: 13px; margin-bottom: 12px;
-    }
-    .newcomer-firstrun .fr-text { flex: 1; }
-    .newcomer-firstrun .fr-text a,
-    .newcomer-banner a { color: var(--md-sys-color-primary); font-weight: 600; text-decoration: none; }
-    .newcomer-firstrun .fr-dismiss {
-      background: none; border: none; cursor: pointer; font-size: 14px; line-height: 1;
-      color: var(--md-sys-color-on-surface-variant); padding: 2px;
-    }
+    /* Always-present banner at the top of the input card */
     .newcomer-banner {
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
       background: var(--md-sys-color-primary-container);
       color: var(--md-sys-color-on-primary-container);
       border-radius: 6px; padding: 8px 12px; font-size: 13px; margin-bottom: 16px;
     }
-    .newcomer-banner a { white-space: nowrap; }
+    .newcomer-banner a { color: var(--md-sys-color-primary); font-weight: 600; text-decoration: none; white-space: nowrap; }
 
     /* Layer 1 is the existing .hint line. Layer 2 — the ⓘ trigger next to a label / model badge. */
     .help-i {
@@ -816,13 +803,8 @@
   <!-- ── Input card ── -->
   <div class="card input-section">
 
-    <!-- ══ Newcomer help — first-run slim card (localStorage-gated) + always-present banner
+    <!-- ══ Newcomer help — always-present banner
          (Design: 2026-08-27-newcomer-help-layer; src/components/help/NewcomerBanner.tsx) ══ -->
-    <div class="newcomer-firstrun">
-      <div class="fr-text">Neu im Schweizer System? <a href="#" data-opens="guide-drawer">Hier die 30-Sekunden-Version →</a></div>
-      <button class="fr-dismiss" aria-label="Ausblenden">✕</button>
-    </div>
-    <!-- After the card is dismissed, only this banner remains: -->
     <div class="newcomer-banner">
       <span>🇨🇭 Neu in der Schweizer Grundversicherung?</span>
       <a href="#" data-opens="guide-drawer">So funktioniert das System →</a>
