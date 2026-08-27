@@ -14,6 +14,8 @@ import { BreakdownBar } from "./BreakdownBar";
 import { formatRangeLabel, type PresetKey } from "@/lib/adminRanges";
 import { formatCount } from "@/lib/format";
 import type { Granularity } from "@/lib/adminStats";
+import insurersData from "@/data/insurers.json";
+import { PREMIUM_BANDS } from "@/lib/premiumBand";
 
 type Stats = {
   total: number;
@@ -24,6 +26,9 @@ type Stats = {
   franchise: { franchise: number; n: number }[];
   models: { model: string; n: number }[];
   accident: { accident: boolean; n: number }[];
+  languages: { locale: string; n: number }[];
+  currentInsurers: { insurerCode: string; n: number }[];
+  premiumBands: { band: string; n: number }[];
 };
 
 const fetcher = async (url: string) => {
@@ -45,6 +50,36 @@ const MODEL_LABEL: Record<string, string> = {
   telmed: "Telmed",
   andere: "Andere",
 };
+
+const LOCALE_LABEL: Record<string, string> = {
+  de: "Deutsch",
+  fr: "Français",
+  it: "Italiano",
+  en: "English",
+  pt: "Português",
+  es: "Español",
+  unbekannt: "Unbekannt",
+};
+
+const INSURER_NAME: Record<string, string> = Object.fromEntries(
+  insurersData.map((i) => [i.insurerCode, i.insurerName]),
+);
+
+const PREMIUM_BAND_LABEL: Record<string, string> = {
+  "<250": "CHF <250",
+  "250-349": "CHF 250–349",
+  "350-449": "CHF 350–449",
+  "450-549": "CHF 450–549",
+  "550+": "CHF 550+",
+};
+
+function orderedBandRows(rows: { band: string; n: number }[]): { label: string; value: number }[] {
+  const byBand = new Map(rows.map((r) => [r.band, r.n]));
+  return PREMIUM_BANDS.filter((b) => byBand.has(b)).map((b) => ({
+    label: PREMIUM_BAND_LABEL[b] ?? b,
+    value: byBand.get(b) ?? 0,
+  }));
+}
 
 type Range = { from: string; to: string; preset: PresetKey | null };
 
@@ -141,6 +176,45 @@ export function Dashboard({
                 labelWidth="short"
                 rows={(stats?.models ?? []).map((r) => ({ label: MODEL_LABEL[r.model] ?? r.model, value: r.n }))}
               />
+            </div>
+          </div>
+
+          <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-5 mt-4">
+            <h2 className="text-title-medium text-on-surface-variant uppercase tracking-wide mb-4">
+              Anfragen pro Sprache
+            </h2>
+            <BreakdownBar
+              rows={(stats?.languages ?? []).map((r) => ({
+                label: LOCALE_LABEL[r.locale] ?? r.locale,
+                value: r.n,
+              }))}
+              total={stats?.total}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mt-4">
+            <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-5">
+              <h2 className="text-title-medium text-on-surface-variant uppercase tracking-wide mb-1">
+                Aktuelle Krankenkasse
+              </h2>
+              <p className="text-body-small text-outline mb-4">
+                nur Anfragen mit angegebenem aktuellem Plan
+              </p>
+              <BreakdownBar
+                rows={(stats?.currentInsurers ?? []).map((r) => ({
+                  label: INSURER_NAME[r.insurerCode] ?? r.insurerCode,
+                  value: r.n,
+                }))}
+              />
+            </div>
+            <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-5">
+              <h2 className="text-title-medium text-on-surface-variant uppercase tracking-wide mb-1">
+                Aktuelle Prämie
+              </h2>
+              <p className="text-body-small text-outline mb-4">
+                nur Anfragen mit angegebener aktueller Prämie
+              </p>
+              <BreakdownBar labelWidth="short" rows={orderedBandRows(stats?.premiumBands ?? [])} />
             </div>
           </div>
         </div>
