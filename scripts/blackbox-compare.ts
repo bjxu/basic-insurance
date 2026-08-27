@@ -173,18 +173,25 @@ async function fetchPriminfo(page: Page, c: Case): Promise<SiteRow[]> {
   const resultsTable = page.locator("table").filter({ has: page.locator("th", { hasText: "Krankenkasse" }) });
   await resultsTable.waitFor({ state: "visible", timeout: 20000 });
 
+  // Each row always carries BOTH monthly and yearly figures (the Monat/Jahr
+  // radio just toggles a `hiddenCell` CSS class — the yearly `td`s stay in
+  // the DOM either way), so cell count/position isn't a safe way to find the
+  // monthly Prämie/Vergütung/Total; the "monthlyCell" class is.
   const rows = await resultsTable.locator("tbody tr").evaluateAll((trs) =>
     trs
-      .map((tr) => Array.from(tr.querySelectorAll("th, td")).map((c) => c.textContent?.trim() ?? ""))
-      .filter((cells) => cells.length === 5 && /^[\d'.,]+$/.test(cells[4])), // Krankenkasse/Modell/Prämie/Vergütung/Total
+      .map((tr) => ({
+        insurerRaw: tr.querySelector("th")?.textContent?.trim() ?? "",
+        monthly: Array.from(tr.querySelectorAll("td.monthlyCell")).map((c) => c.textContent?.trim() ?? ""),
+      }))
+      .filter((r) => r.insurerRaw && r.monthly.length === 3 && /^[\d'.,]+$/.test(r.monthly[2])),
   );
   if (rows.length === 0) {
     throw new Error("priminfo results table rendered but had 0 matching rows — selector likely broke");
   }
 
   const out: SiteRow[] = [];
-  for (const cells of rows) {
-    const [insurerRaw, , praemieRaw, verguetungRaw, totalRaw] = cells;
+  for (const { insurerRaw, monthly } of rows) {
+    const [praemieRaw, verguetungRaw, totalRaw] = monthly;
     const praemie = Number(praemieRaw.replace(/'/g, ""));
     const verguetung = Number(verguetungRaw.replace(/'/g, ""));
     const total = Number(totalRaw.replace(/'/g, ""));
