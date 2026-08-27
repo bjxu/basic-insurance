@@ -25,10 +25,15 @@ option and see what switching would save them.
 **In scope (v1):**
 - Comparing current-year (and next-year, once published) premiums for one person.
 - A "switch & save" comparison against the user's current plan.
+- The comparator UI in German, French, Italian, and English, each on its own
+  locale-prefixed URL (§5.4).
+- Plain-language help for people new to the Swiss basic-insurance system: inline
+  explainers on the inputs and badges, and a standalone "how the system works" guide
+  (§5.5).
 
 **Out of scope (v1):** see §12 for the full list and rationale (household comparison,
-non-German languages, subsidy calculations, peer/percentile and trend-flag features, and
-any accounts, forms, or switching workflow).
+subsidy calculations, peer/percentile and trend-flag features, and any accounts, forms,
+or switching workflow).
 
 ## 3. Domain Glossary
 
@@ -57,11 +62,18 @@ during implementation:
 3. **Real data only.** Every premium shown — the results list, and the discount badges
    (§5.3) — must trace back to officially published data (BAG / *Bundesamt für Gesundheit*
    open data) via an exact match on all premium-determining fields. Nothing is estimated,
-   defaulted from an unrelated toggle, or synthesized. The one deliberate exception is the
-   current-plan premium (§5.1): it's what the user says they pay, entered directly and used
-   as-is for the savings comparison, not verified against the dataset — see §5.1 for why.
+   defaulted from an unrelated toggle, or synthesized. Two deliberate exceptions: (a) the
+   current-plan premium (§5.1) is what the user says they pay, entered directly and used
+   as-is for the savings comparison, not verified against the dataset — see §5.1 for why;
+   (b) the environmental-levy adjustment (§6.4) subtracts a flat, officially published
+   federal levy credit from displayed absolute premiums so they reconcile with what
+   insurers themselves show — an exact, auditable transformation of the BAG figure, not
+   an estimate.
 4. **Minimal friction.** One page, no wizard, no required navigation between input and
-   results, no explicit "submit" step once inputs are valid (§5.1).
+   results, no explicit "submit" step once inputs are valid (§5.1). The newcomer help
+   layer (§5.5) is consistent with this: it is ambient (a persistent one-liner per
+   input) or opt-in (an ⓘ explainer, a "how it works" guide, a dismissible first-run
+   card) — it never adds a required step and never blocks the input→results flow.
 
 ## 5. User Flow
 
@@ -150,6 +162,55 @@ birth year, and current insurer/premium, this is a deliberate, accepted trade-of
 favor of shareability (per product owner decision), not an oversight — no further consent
 step is required beyond the "current plan" fields being opt-in themselves.
 
+### 5.4 Language
+
+The comparator UI is served in German (default), French, Italian, and English. Each
+locale is a URL prefix — `/de/`, `/fr/`, `/it/`, `/en/` — so every locale has one
+canonical URL shape. A bare `/` redirects to the best `Accept-Language` match, falling
+back to German.
+
+A language switcher sits next to the input heading; switching languages replaces the
+locale segment and preserves every query parameter, so a shared comparison link (§5.3)
+keeps working and simply renders in the new language.
+
+Only UI copy is translated. Insurer names and BAG figures are shown as published. The
+admin dashboard (§7, REQ-22) is an internal tool and stays German-only. FR/IT/EN copy is
+machine-authored using correct insurance terminology; a native-speaker review is a
+recommended follow-up before those locales are treated as production-final (§12).
+
+### 5.5 Newcomer help
+
+An ambient, optional help layer for users new to the Swiss basic-insurance system.
+It does not change the fast path (§4, Principle #4).
+
+**Content.** Plain-language copy in three areas, authored in German and translated to
+the other locales (§5.4): (a) term explainers — one per input/badge concept
+(Franchise, Prämienregion, Altersklasse, Unfalldeckung, Tarifart/models, the
+member-count and discount badges), each a one-liner plus a 2–3 sentence short form;
+(b) how the system works — mandatory cover, the three-month sign-up window after
+moving, guaranteed acceptance, once-a-year switching (notice by 30 November), and that
+basic coverage is identical by law at every insurer; (c) what an alternative model
+trades away — lower premium for less freedom over the first point of contact. The copy
+explains the system and the terms only; it gives no insurer-specific advice and makes
+no recommendation (§4, Principle #2).
+
+**Inline layer.** Three parts on each relevant control: a persistent one-line hint
+below the input (the birth-year field already does this); an ⓘ trigger by the label
+that opens the short-form explainer (an anchored popover on wide viewports, an inline
+disclosure that expands in place on narrow ones); and a link from that explainer into
+the guide. All keyboard-operable and screen-reader-labelled (REQ-17).
+
+**Guide.** A banner at the top of the input card ("New to Swiss basic insurance? — How
+the system works") opens an on-page drawer with the essentials, the comparator staying
+mounted underneath. The drawer links to a standalone guide page at
+`/[locale]/how-it-works` (§10) with the full content and a "back to comparison" link
+that preserves the user's in-progress inputs.
+
+**First run.** On a first visit (tracked in `localStorage`), a dismissible slim card
+above the inputs points to the guide. It never auto-opens the drawer or the page;
+after dismissal only the always-present banner remains. If `localStorage` is
+unavailable the card simply always shows.
+
 ## 6. Data Requirements
 
 ### 6.1 Source
@@ -176,6 +237,26 @@ municipality is always visible on screen (§5.1).
   offers current year only, and the headline (§5.2) is computed against the current year.
 - No other historical years are in scope for v1.
 
+### 6.4 Environmental levy adjustment
+
+Every displayed *absolute* premium — the results list rows, the headline's cheapest
+figure (§5.2), and the current-insurer row — is shown net of the flat federal CO₂/VOC
+levy redistribution credit. This credit is a fixed per-person amount, identical for every
+insurer, published annually by BAFU (CHF 5.15/month for 2026); it is applied as a
+year-keyed constant, kept separate from the BAG premium file (different federal office,
+different publication cadence).
+
+Rationale: insurers subtract this same credit on their own websites, so matching it keeps
+this app's numbers reconcilable against an insurer's own quote, and keeps the savings
+comparison (§5.2) net-against-net rather than mixing a net self-reported premium against
+a gross dataset premium.
+
+Because the credit is flat and insurer-uniform, it never changes the ranking. It is
+**not** applied to relative figures — the alternative-model discount badge (REQ-23) and
+the year-over-year change — which stay computed on raw BAG tariffs. The adjustment and
+its amount are stated in the on-page data notice. If a shown year has no published levy
+figure, premiums are displayed unadjusted and the declaration is omitted for that year.
+
 ## 7. Functional Requirements
 
 | ID | Requirement |
@@ -197,13 +278,19 @@ municipality is always visible on screen (§5.1).
 | REQ-15 | If no plans match the current required inputs and active filters (e.g. an insurer doesn't operate in that region), a clear empty-state message is shown instead of a blank list. |
 | REQ-16 | Next-year lookups (list and headline) use the age band and deductible tier applicable to next year, not the current year, for users whose age band changes between the two (e.g. turning 19 or 26). |
 | REQ-17 | The page is usable at viewport widths from ~360px up (mobile) through desktop, and meets WCAG 2.1 AA. |
-| REQ-18 | Page `<title>` and meta description reflect the active comparison when loaded from a stateful URL, with a generic keyword-appropriate default otherwise. |
+| REQ-18 | Page `<title>` and meta description reflect the active comparison, in the page's locale, when loaded from a stateful URL, with a generic keyword-appropriate default otherwise. |
 | REQ-19 | Open Graph / Twitter Card metadata mirrors the title/description, so shared comparison links (REQ-11) preview correctly. |
-| REQ-20 | Parameterized comparison URLs are `noindex` with a canonical tag to the base URL; only the base URL is indexed, and is the sitemap's sole entry. |
+| REQ-20 | Parameterized comparison URLs are `noindex` with a canonical tag to their locale's base URL; only the locale base URLs are indexed, and they are the sitemap's only entries (one per locale, per REQ-26). |
 | REQ-21 | Every price inquiry (defined as: all required inputs valid and results rendered) is logged server-side for activity monitoring. Each log entry records timestamp, resolved Prämienregion, Altersklasse, Franchise, active year, and active filters (model set, accident coverage). It does **not** record IP address, the optional current-plan fields, or any other data not needed for aggregate usage analysis. Logged data is used solely for understanding usage patterns (popular regions, peak times, filter usage) and is never sold or shared. |
 | REQ-22 | A password-protected admin dashboard at `/admin` visualises aggregate inquiry activity. It is not publicly linked or indexed. Access is restricted by a secret token stored in an environment variable (no user account system required). The dashboard has a time-range selector (presets: Today, Last 7 days, Last 30 days, This month, Last 3 months, This year, and any custom from/to date; defaults to Last 30 days) that drives every panel on the page simultaneously. Panels: total inquiries in the selected range; a time-series trend chart (granularity auto-adapts: hourly for ≤2 days, daily for ≤90 days, monthly for >90 days); top 10 Prämienregionen by count; breakdown by Altersklasse; breakdown by Franchise tier; breakdown by active insurance model set; breakdown by accident-coverage toggle. The selected range is reflected in the page URL so it is bookmarkable. All figures are aggregate counts — no raw log rows are exposed through the UI. |
 | REQ-23 | Each alternative-model row in the results list (REQ-4) shows a discount badge next to its model badge, stating how much cheaper that row's premium is than the same insurer's own Standard premium at the same region/franchise/age band/accident-coverage — phrased "bis zu −X% ggü. Standard" (not a bare percentage), since a row shows that insurer's single cheapest matching product and the insurer may have other products in the same model that discount less. Standard rows show no badge. If that insurer has no Standard-tarifart premium for the same region/franchise/age band/accident-coverage to compare against, the badge is omitted for that row (not observed in current BAG data — every insurer offers Standard — but handled defensively, not as a crash/blank state). |
 | REQ-24 | Each row in the results list shows a badge stating that insurer's total OKP membership count (BAG Versichertenbestand data), abbreviated (e.g. "1.5 Mio.", "813 Tsd."), sourced from real BAG open data — not an estimate or placeholder. If that insurer has no matching Versichertenbestand row, the badge is omitted for that row (not a placeholder), the same defensive-omission pattern as the discount badge (REQ-23). |
+| REQ-25 | The comparator UI is available in German, French, Italian, and English on locale-prefixed URLs (`/de/`, `/fr/`, `/it/`, `/en/`); a bare `/` redirects to the best `Accept-Language` match, falling back to German. A language switcher preserves all comparison state (§5.4) across a language change. Only UI copy is translated — insurer names and BAG figures are not. The admin dashboard (REQ-22) stays German-only. |
+| REQ-26 | Each locale emits its own translated `<title>`, meta description, and Open Graph / Twitter Card tags, plus `hreflang` alternates for all locales including `x-default` (pointing at the German version). The sitemap lists one URL per locale. |
+| REQ-27 | Every displayed absolute premium (results list, headline, current-insurer row) is shown net of the year's flat federal CO₂/VOC levy credit (§6.4). Relative figures — the REQ-23 discount badge and the year-over-year change — are not adjusted. The adjustment, its amount, and the fact that it does not affect ranking are stated on-page. A year with no published levy figure shows unadjusted premiums and omits the declaration. |
+| REQ-28 | Each of the three required inputs, and each result row's model badge, carries a persistent one-line plain-language hint and an ⓘ trigger that opens a short-form explainer (§5.5) — an anchored popover on wide viewports, an inline disclosure on narrow ones. Triggers are keyboard-operable with managed focus and are screen-reader-labelled (REQ-17). The explainer links into the guide (REQ-29). |
+| REQ-29 | A persistent banner at the top of the input card opens an on-page drawer summarising how the Swiss basic-insurance system works (§5.5), with the comparator still mounted underneath; the drawer links to a standalone guide at `/[locale]/how-it-works` carrying the full content and a "back to comparison" link that preserves the current query state. On a first visit (tracked in `localStorage`), a dismissible slim card above the inputs also points to the guide; it never auto-opens the drawer or page, and degrades to always-shown if `localStorage` is unavailable. |
+| REQ-30 | The newcomer help content explains the system and the domain terms only. It contains no insurer-specific advice and no recommendation to choose a particular plan or insurer (§4, Principle #2). |
 
 ## 8. Edge Cases & Error Handling
 
@@ -235,6 +322,10 @@ municipality is always visible on screen (§5.1).
 - Monetary values are displayed in Swiss convention (e.g. "CHF 1'234.50", apostrophe
   thousands separator). The self-reported monthly-premium input (REQ-7) accepts the same
   convention on entry (decimal input for Rappen; a "CHF" affix, not a typed-in prefix).
+  This convention is independent of the UI language (§5.4) — it renders identically in
+  all four locales.
+- Displayed premiums are shown net of the federal CO₂/VOC levy credit (§6.4); the on-page
+  data notice states the amount and that it does not affect ranking.
 - Results render without a noticeable stall; a lightweight loading indicator covers any
   lookup that isn't effectively instant, consistent with the "minimal friction" principle
   (§4) — this is a UX expectation, not a technical performance target, which stays out of
@@ -250,22 +341,28 @@ Because comparison state lives entirely in URL query parameters (§5.3, REQ-11),
 of possible URLs is effectively unbounded (every combination of location × birth year ×
 deductible × optional current-plan fields is its own URL). That's good for shareability
 but would be harmful for SEO if left unmanaged — search engines would see it as
-near-infinite thin/duplicate content. v1 handles this by keeping exactly one URL
-indexable (the base app URL, with no query parameters) while still allowing every
+near-infinite thin/duplicate content. v1 handles this by keeping only the locale base
+URLs indexable (one per locale, with no query parameters) while still allowing every
 parameterized URL to be crawled, shared, and correctly previewed.
 
-- The page's `<title>` and meta description reflect the active comparison when the page
-  is loaded from a URL with state in it (e.g. *"Krankenkassenvergleich Zürich – ab CHF
-  245/Monat"*), and fall back to a generic, keyword-appropriate default (mentioning
-  Grundversicherung/Krankenkassenvergleich) when no comparison has been entered yet.
+- The page's `<title>` and meta description reflect the active comparison, in the page's
+  language, when the page is loaded from a URL with state in it (e.g. *"Krankenkassenvergleich
+  Zürich – ab CHF 245/Monat"*), and fall back to a generic, keyword-appropriate default
+  (mentioning Grundversicherung/Krankenkassenvergleich) when no comparison has been entered yet.
 - Open Graph and Twitter Card metadata mirror that title/description, so a shared
   comparison link (REQ-11) renders a correct, specific preview on social/messaging
   platforms rather than a generic one.
-- Every parameterized comparison URL carries a canonical tag pointing to the base app URL
-  and is marked `noindex`; only the base URL is intended to be indexed by search engines.
-  This does not affect crawling for link-preview purposes (Open Graph scraping is
-  independent of search-index `noindex` directives).
-- The sitemap contains only the base URL; robots.txt allows it.
+- Each locale page emits `hreflang` alternates for all four locales plus `x-default`
+  (the German version), so search engines serve the right language version (REQ-26).
+- Every parameterized comparison URL carries a canonical tag pointing to its locale's
+  base URL and is marked `noindex`; only the locale base URLs are intended to be indexed
+  by search engines. This does not affect crawling for link-preview purposes (Open Graph
+  scraping is independent of search-index `noindex` directives).
+- The sitemap contains the locale base URLs and the `/[locale]/how-it-works` guide
+  pages (§5.5) — one of each per locale — each carrying its `hreflang` language
+  alternates; robots.txt allows them. The `how-it-works` guide is a single evergreen
+  page per locale, indexable like the base URL; it is not the per-canton content
+  strategy still deferred in §12.
 - Semantic HTML (proper heading hierarchy, landmark regions) is used throughout — this
   serves SEO and is also required for the accessibility bar already in place (REQ-17).
 
@@ -290,7 +387,8 @@ parameterized URL to be crawled, shared, and correctly previewed.
 ## 12. Future Considerations (explicitly not v1)
 
 - Household/multi-person comparison view.
-- French/Italian language support.
+- Native-speaker French/Italian review of the machine-authored UI copy before those
+  locales are treated as production-final (§5.4).
 - Peer percentile badge ("you're paying more than X% of similar profiles").
 - Year-over-year "mover" flag for insurers with fast-rising rank/price — deferred because
   two data points (current + next year) is a thin trend signal.

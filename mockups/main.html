@@ -709,6 +709,93 @@
       padding-bottom: 40px;
     }
     .data-notice a { color: var(--md-sys-color-primary); text-decoration: none; }
+
+    /* ── Newcomer help layer (Design: docs/superpowers/specs/2026-08-27-newcomer-help-layer-design.md) ── */
+    /* Banner (always present) + first-run slim card (localStorage-gated) at the top of the input card */
+    .newcomer-firstrun {
+      display: flex; align-items: flex-start; gap: 10px;
+      background: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+      border-radius: var(--radius); padding: 12px 14px; font-size: 13px; margin-bottom: 12px;
+    }
+    .newcomer-firstrun .fr-text { flex: 1; }
+    .newcomer-firstrun .fr-text a,
+    .newcomer-banner a { color: var(--md-sys-color-primary); font-weight: 600; text-decoration: none; }
+    .newcomer-firstrun .fr-dismiss {
+      background: none; border: none; cursor: pointer; font-size: 14px; line-height: 1;
+      color: var(--md-sys-color-on-surface-variant); padding: 2px;
+    }
+    .newcomer-banner {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      background: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+      border-radius: 6px; padding: 8px 12px; font-size: 13px; margin-bottom: 16px;
+    }
+    .newcomer-banner a { white-space: nowrap; }
+
+    /* Layer 1 is the existing .hint line. Layer 2 — the ⓘ trigger next to a label / model badge. */
+    .help-i {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 15px; height: 15px; margin-left: 4px; padding: 0; vertical-align: middle;
+      border: 1px solid var(--md-sys-color-outline); border-radius: 50%;
+      background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface-variant);
+      font: italic 700 10px/1 Georgia, "Times New Roman", serif; cursor: pointer;
+    }
+    .help-i[aria-expanded="true"] {
+      background: var(--md-sys-color-primary); border-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+    }
+    .model-badge .help-i { width: 14px; height: 14px; margin-left: 0; }
+
+    /* Layer 2 — anchored popover (wide viewport). .field is the positioning context. */
+    .field { position: relative; }
+    .help-pop {
+      position: absolute; z-index: 20; top: 64px; left: 0; width: 290px;
+      background: var(--md-sys-color-surface);
+      border: 1px solid var(--md-sys-color-outline-variant); border-radius: var(--radius);
+      padding: 12px 14px; box-shadow: var(--shadow);
+    }
+    .help-pop::before {
+      content: ""; position: absolute; top: -6px; left: 24px; width: 10px; height: 10px;
+      background: var(--md-sys-color-surface);
+      border-left: 1px solid var(--md-sys-color-outline-variant);
+      border-top: 1px solid var(--md-sys-color-outline-variant); transform: rotate(45deg);
+    }
+    /* Layer 2 — inline disclosure (narrow viewport rendering of the same content) */
+    .help-disclosure {
+      margin-top: 8px; background: var(--md-sys-color-surface-variant);
+      border: 1px solid var(--md-sys-color-outline-variant); border-radius: 6px; padding: 9px 11px;
+    }
+    .help-pop p, .help-disclosure p { font-size: 12px; line-height: 1.45; margin: 0 0 8px; }
+    .help-pop p strong, .help-disclosure p strong { font-size: 12.5px; }
+    .help-more { font-size: 11.5px; color: var(--md-sys-color-primary); font-weight: 600; text-decoration: none; }
+
+    /* Layer 3 target — the how-it-works drawer (opened by banner / first-run card / popover link) */
+    .guide-scrim { inset: 0; background: rgba(0,0,0,.32); z-index: 40; }
+    .guide-drawer {
+      top: 0; right: 0; bottom: 0; width: min(420px, 92vw); z-index: 41;
+      background: var(--md-sys-color-surface);
+      border-left: 1px solid var(--md-sys-color-outline-variant);
+      box-shadow: -8px 0 28px rgba(0,0,0,.16); padding: 20px; overflow-y: auto;
+    }
+    .guide-drawer h2 { font-size: 16px; font-weight: 700; padding-right: 24px; }
+    .guide-drawer .guide-close {
+      position: absolute; top: 16px; right: 16px; background: none; border: none;
+      font-size: 16px; cursor: pointer; color: var(--md-sys-color-on-surface-variant);
+    }
+    .guide-sec { border-top: 1px solid var(--md-sys-color-outline-variant); padding: 12px 0; }
+    .guide-sec h3 { font-size: 13px; margin-bottom: 4px; }
+    .guide-sec ul { margin: 4px 0 0 18px; }
+    .guide-sec li, .guide-sec p { font-size: 12.5px; line-height: 1.5; color: var(--md-sys-color-on-surface-variant); }
+    .guide-terms { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+    .guide-terms span {
+      font-size: 10.5px; background: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container); border-radius: 4px; padding: 2px 6px; font-weight: 600;
+    }
+    .guide-fulllink {
+      display: inline-block; margin-top: 14px; font-size: 12.5px; font-weight: 600;
+      color: var(--md-sys-color-primary); text-decoration: none;
+    }
   </style>
 </head>
 <body>
@@ -722,6 +809,19 @@
 
   <!-- ── Input card ── -->
   <div class="card input-section">
+
+    <!-- ══ Newcomer help — first-run slim card (localStorage-gated) + always-present banner
+         (Design: 2026-08-27-newcomer-help-layer; src/components/help/NewcomerBanner.tsx) ══ -->
+    <div class="newcomer-firstrun">
+      <div class="fr-text">Neu im Schweizer System? <a href="#" data-opens="guide-drawer">Hier die 30-Sekunden-Version →</a></div>
+      <button class="fr-dismiss" aria-label="Ausblenden">✕</button>
+    </div>
+    <!-- After the card is dismissed, only this banner remains: -->
+    <div class="newcomer-banner">
+      <span>🇨🇭 Neu in der Schweizer Grundversicherung?</span>
+      <a href="#" data-opens="guide-drawer">So funktioniert das System →</a>
+    </div>
+
     <div class="header-row">
       <h1>Prämienvergleich</h1>
       <!-- src/components/LanguageSwitcher.tsx — native <select>, preserves query params on change -->
@@ -736,17 +836,22 @@
 
     <div class="fields-row">
       <div class="field">
-        <label for="plz">Postleitzahl (PLZ)</label>
+        <label for="plz">Postleitzahl (PLZ)
+          <button type="button" class="help-i" aria-expanded="false" aria-label="Was bedeutet Postleitzahl / Prämienregion?">i</button></label>
         <input id="plz" type="text" value="8044" maxlength="4" placeholder="z.B. 3001">
+        <!-- Layer 1 — persistent one-liner -->
+        <div class="hint">Bestimmt deine Prämienregion — Prämien unterscheiden sich nach Gemeinde, nicht nur Kanton.</div>
         <div class="resolved">&#10003; Zürich &amp; Dübendorf — bitte Gemeinde wählen</div>
       </div>
       <div class="field">
-        <label for="by">Jahrgang</label>
+        <label for="by">Jahrgang
+          <button type="button" class="help-i" aria-expanded="false" aria-label="Was bedeutet Jahrgang / Altersklasse?">i</button></label>
         <input id="by" type="number" value="1988" min="1900" max="2026" placeholder="z.B. 1985">
         <div class="hint">→ Erwachsen (26+), Franchise CHF 300–2500</div>
       </div>
       <div class="field">
-        <label for="fran">Franchise</label>
+        <label for="fran">Franchise
+          <button type="button" class="help-i" aria-expanded="true" aria-label="Was bedeutet Franchise?">i</button></label>
         <select id="fran">
           <option>CHF 300</option>
           <option selected>CHF 500</option>
@@ -755,6 +860,15 @@
           <option>CHF 2000</option>
           <option>CHF 2500</option>
         </select>
+        <div class="hint">Eine höhere Franchise senkt deine monatliche Prämie.</div>
+        <!-- Layer 2 — anchored popover (wide viewport, shown open here). The narrow-viewport
+             rendering is .help-disclosure, shown as its own mockup state further down. -->
+        <div class="help-pop" role="dialog" aria-label="Franchise erklärt">
+          <p><strong>Franchise (Selbstbehalt)</strong></p>
+          <p>Der Betrag deiner Gesundheitskosten, den du jedes Jahr selbst zahlst, bevor die Kasse übernimmt. Du wählst ihn: CHF 300 bis CHF 2500 (Erwachsene).</p>
+          <p>Hohe Franchise = tiefere Prämie, mehr Eigenrisiko. Die Leistungen sind per Gesetz in jedem Fall identisch.</p>
+          <a href="#" class="help-more" data-opens="guide-drawer">Ganzer Leitfaden: So funktioniert das System →</a>
+        </div>
       </div>
     </div>
 
@@ -888,7 +1002,9 @@
       <div class="plan-rank first">1</div>
       <div class="plan-insurer">
         <div class="name-row"><div class="name">Assura</div><span class="name-member"><span class="member-badge" title="682'061 Versicherte · Stand 2024" aria-label="682'061 Versicherte · Stand 2024"><span aria-hidden="true">👥</span> 682 Tsd.</span></span></div>
-        <div class="model-badge"><span class="model-tag">Standard</span> · Freie Arztwahl</div>
+        <!-- Model badge carries the same three-layer help: existing one-line restriction note (Layer 1)
+             + ⓘ opening the "insurance models" short form (Layer 2). -->
+        <div class="model-badge"><span class="model-tag">Standard</span> <button type="button" class="help-i" aria-expanded="false" aria-label="Was bedeuten die Versicherungsmodelle?">i</button> · Freie Arztwahl</div>
       </div>
       <div class="plan-yoy up">+4.2%</div>
       <div class="plan-price cheapest">
@@ -1256,6 +1372,57 @@
   <div class="empty-state">
     <p class="empty-title">Keine Angebote gefunden</p>
     <p class="empty-sub">Für PLZ 9999, Jahrgang 1988, CHF 500 Franchise mit den aktuellen Filtern sind keine Prämien in den BAG-Daten vorhanden. Bitte überprüfe deine Eingaben oder passe die Filter an.</p>
+  </div>
+
+  <!-- ══ Newcomer help — Layer 2 on a narrow viewport: inline disclosure instead of the popover ══ -->
+  <p class="mockup-label">Newcomer-Hilfe — ⓘ auf schmalem Viewport (Inline-Disclosure statt Popover)</p>
+  <div class="card input-section" style="max-width:360px">
+    <div class="field">
+      <label>Franchise
+        <button type="button" class="help-i" aria-expanded="true" aria-label="Was bedeutet Franchise?">i</button></label>
+      <select><option selected>CHF 500</option></select>
+      <div class="hint">Eine höhere Franchise senkt deine monatliche Prämie.</div>
+      <div class="help-disclosure">
+        <p><strong>Franchise (Selbstbehalt)</strong></p>
+        <p>Der Betrag, den du jedes Jahr selbst zahlst, bevor die Kasse übernimmt. CHF 300–2500 (Erwachsene).</p>
+        <p>Hohe Franchise = tiefere Prämie, mehr Eigenrisiko. Leistungen sind per Gesetz identisch.</p>
+        <a href="#" class="help-more" data-opens="guide-drawer">Ganzer Leitfaden →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ Newcomer help — the how-it-works drawer (opened by the banner, first-run card, or a Layer-2 link).
+       Comparator stays mounted underneath; footer link goes to the standalone /[locale]/how-it-works page. ══ -->
+  <p class="mockup-label">Newcomer-Hilfe — Leitfaden-Drawer (Vergleich bleibt darunter erhalten)</p>
+  <div style="position:relative;height:540px;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--radius);overflow:hidden;background:var(--md-sys-color-surface-variant)">
+    <div class="guide-scrim" style="position:absolute"></div>
+    <div class="guide-drawer" style="position:absolute">
+      <button class="guide-close" aria-label="Schliessen">✕</button>
+      <h2>So funktioniert die Schweizer Grundversicherung</h2>
+      <p style="font-size:12.5px;color:var(--md-sys-color-on-surface-variant);margin:8px 0 4px">
+        Obligatorisch und per Gesetz bei jeder Kasse identisch. Du vergleichst nur Preis, Modell und Service.</p>
+      <div class="guide-sec">
+        <h3>Die Regeln für alle</h3>
+        <ul>
+          <li>Anmeldung innert <strong>3 Monaten</strong> nach dem Zuzug (rückwirkend gedeckt).</li>
+          <li>Jede Kasse <strong>muss dich aufnehmen</strong> — keine Gesundheitsfragen.</li>
+          <li>Kassenwechsel <strong>einmal pro Jahr</strong> — Kündigung bis <strong>30. November</strong>.</li>
+          <li>Die Leistungen sind gesetzlich festgelegt und <strong>überall gleich</strong> — eine günstigere Kasse ist nicht «weniger» Versicherung.</li>
+        </ul>
+      </div>
+      <div class="guide-sec">
+        <h3>Die Begriffe im Formular</h3>
+        <div class="guide-terms">
+          <span>Franchise</span><span>Prämienregion</span><span>Altersklasse</span>
+          <span>Unfalldeckung</span><span>Tarifart / Modell</span>
+        </div>
+      </div>
+      <div class="guide-sec">
+        <h3>Standard vs. alternative Modelle</h3>
+        <p>Telmed / Hausarzt / HMO = «wen du zuerst kontaktierst». Tiefere Prämie gegen weniger freie Wahl der ersten Anlaufstelle.</p>
+      </div>
+      <a href="#" class="guide-fulllink">Ganzen Leitfaden öffnen — /de/how-it-works →</a>
+    </div>
   </div>
 
   <p class="data-notice">
