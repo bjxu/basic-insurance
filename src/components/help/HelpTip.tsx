@@ -1,0 +1,59 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
+import { HELP_ANCHORS, type TermKey } from "@/lib/help";
+
+// Layer 2 of the newcomer help (spec §"Inline help"). One <details> element:
+// - the <summary> is the ⓘ button (keyboard-operable, toggles [open], which the
+//   [details[open]_&] variants below key off for the active style + panel show);
+// - the panel is an anchored popover from the `sm` breakpoint up, and an inline
+//   disclosure (normal block flow, pushes content down) on narrow viewports.
+// Esc and outside-click close it on all sizes.
+export function HelpTip({ term }: { term: TermKey }) {
+  const t = useTranslations("help");
+  const ref = useRef<HTMLDetailsElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    function close(e: Event) {
+      if (e instanceof KeyboardEvent && e.key !== "Escape") return;
+      if (e.type === "pointerdown" && el && el.contains(e.target as Node)) return;
+      if (el) el.open = false;
+    }
+
+    document.addEventListener("keydown", close);
+    document.addEventListener("pointerdown", close);
+    return () => {
+      document.removeEventListener("keydown", close);
+      document.removeEventListener("pointerdown", close);
+    };
+  }, []);
+
+  return (
+    <details ref={ref} className="group relative inline-block align-middle">
+      <summary
+        aria-label={t("tip.openLabel")}
+        className="inline-flex h-[15px] w-[15px] cursor-pointer select-none items-center justify-center rounded-full border border-outline bg-surface text-[10px] font-bold italic text-on-surface-variant list-none [&::-webkit-details-marker]:hidden [details[open]_&]:border-primary [details[open]_&]:bg-primary [details[open]_&]:text-on-primary"
+      >
+        i
+      </summary>
+      <div
+        role="group"
+        className="mt-2 w-[min(18rem,calc(100vw-2rem))] rounded-lg border border-outline-variant bg-surface p-3 text-left shadow-[0_4px_12px_rgba(0,0,0,0.08)] sm:absolute sm:left-0 sm:z-20"
+      >
+        <p className="text-[12.5px] font-bold text-on-surface">{t(`terms.${term}.title`)}</p>
+        <p className="mt-1 text-xs leading-relaxed text-on-surface-variant">{t(`terms.${term}.short`)}</p>
+        <Link
+          href={`/how-it-works#${HELP_ANCHORS[term]}`}
+          className="mt-2 inline-block text-[11.5px] font-semibold text-primary"
+        >
+          {t("tip.fullLink")}
+        </Link>
+      </div>
+    </details>
+  );
+}
