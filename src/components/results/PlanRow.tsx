@@ -48,22 +48,11 @@ export function PlanRow({
     isCurrentPlan ? "border-error bg-error-container" : "border-outline-variant bg-surface"
   }`;
 
-  // The member-count badge renders twice: a right-aligned column on wide screens,
-  // and inline in the model line below `sm` where the column has no room. Exactly
-  // one is visible at any width — see the `sm:` toggles at each call site.
+  // The member-count badge sits beside the insurer name; on narrow screens the
+  // `w-full` wrapper drops it onto its own line directly under the name, while the
+  // inner pill always shrinks to its content.
   const memberCountLabel =
     memberCount != null ? formatMemberCountDetail(memberCount, memberCountAsOf, locale) : undefined;
-
-  const renderMemberBadge = (className: string) =>
-    memberCount != null ? (
-      <span
-        className={`${className} text-[11px] font-semibold px-1.5 py-px rounded bg-surface-variant text-on-surface-variant whitespace-nowrap`}
-        title={memberCountLabel}
-        aria-label={memberCountLabel}
-      >
-        <span aria-hidden="true">👥</span> {formatMemberCount(memberCount, locale)}
-      </span>
-    ) : null;
 
   const rowContent = (
     <>
@@ -71,11 +60,18 @@ export function PlanRow({
         {rank}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 min-w-0">
+        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 min-w-0">
           <div className="font-semibold text-[15px] truncate min-w-0">{plan.insurerName}</div>
           {isCurrentPlan && (
             <span className="text-[11px] font-semibold px-1.5 py-px rounded bg-error-container text-error flex-shrink-0">
               {t("results.yourInsurerBadge")}
+            </span>
+          )}
+          {memberCount != null && (
+            <span className="w-full sm:w-auto" title={memberCountLabel} aria-label={memberCountLabel}>
+              <span className="inline-block text-[11px] font-semibold px-1.5 py-px rounded bg-surface-variant text-on-surface-variant whitespace-nowrap">
+                <span aria-hidden="true">👥</span> {formatMemberCount(memberCount, locale)}
+              </span>
             </span>
           )}
         </div>
@@ -92,11 +88,9 @@ export function PlanRow({
               {t("results.discountBadge", { pct: discountPct.toFixed(1) })}
             </span>
           )}
-          {renderMemberBadge("sm:hidden")}
           <span>· {t(`copy.tarifart.${plan.tarifart}.description`)}</span>
         </div>
       </div>
-      {renderMemberBadge("hidden sm:inline-block flex-shrink-0")}
       {yoy != null && (
         <div
           className={`text-xs font-semibold px-1.5 py-px rounded ${
