@@ -3,14 +3,16 @@
 import { useTranslations } from "next-intl";
 import { validateBirthYear } from "@/lib/validate";
 import { getAltersklasse, getFranchiseTiers } from "@/lib/ageband";
+import { HelpTip } from "@/components/help/HelpTip";
 
 type Props = {
   value: string;
   onChange: (value: string) => void;
   calendarYear: number;
+  onOpenGuide: (section?: string) => void;
 };
 
-export function BirthYearInput({ value, onChange, calendarYear }: Props) {
+export function BirthYearInput({ value, onChange, calendarYear, onOpenGuide }: Props) {
   const t = useTranslations();
   const parsed = value ? Number(value) : null;
   const result = parsed != null ? validateBirthYear(parsed) : { valid: true as const };
@@ -18,10 +20,13 @@ export function BirthYearInput({ value, onChange, calendarYear }: Props) {
   const tiers = altersklasse ? getFranchiseTiers(altersklasse) : null;
 
   return (
-    <div>
-      <label htmlFor="by" className="block text-label-large text-on-surface-variant mb-1.5">
-        {t("inputs.birthYearLabel")}
-      </label>
+    <div className="relative">
+      <div className="flex items-start gap-1 mb-1.5">
+        <label htmlFor="by" className="text-label-large text-on-surface-variant">
+          {t("inputs.birthYearLabel")}
+        </label>
+        <HelpTip term="birthYear" onOpenGuide={onOpenGuide} />
+      </div>
       <input
         id="by"
         type="number"

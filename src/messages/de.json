@@ -5,7 +5,9 @@
     "ogTitle": "Krankenkassenvergleich – Grundversicherung Schweiz",
     "ogDescription": "Vergleiche Krankenkassenprämien für die Grundversicherung – alle Kassen, alle Modelle, offizielle BAG-Daten.",
     "twitterTitle": "Krankenkassenvergleich – Grundversicherung Schweiz",
-    "twitterDescription": "Vergleiche Krankenkassenprämien für die Grundversicherung – offizielle BAG-Daten."
+    "twitterDescription": "Vergleiche Krankenkassenprämien für die Grundversicherung – offizielle BAG-Daten.",
+    "howItWorksTitle": "So funktioniert die Schweizer Grundversicherung – Krankenkassenvergleich",
+    "howItWorksDescription": "Neu in der Schweiz? Wie die obligatorische Grundversicherung funktioniert: Anmeldefristen, Kassenwechsel, Franchise und Versicherungsmodelle — einfach erklärt."
   },
   "inputs": {
     "title": "Prämienvergleich",
@@ -75,6 +77,64 @@
   "footer": {
     "dataNotice": "Daten: BAG Opendata · Publikation {date} · Nur Pflichtleistungen (OKP) · Kein Sponsoring, keine Vermittlungslinks",
     "levyNotice": "Preise enthalten die Rückerstattung der CO₂-/VOC-Lenkungsabgabe (CHF {amount}/Monat, {year}) — für alle Kassen gleich hoch, ohne Einfluss auf die Rangfolge"
+  },
+  "help": {
+    "tip": {
+      "openLabel": "Erklärung anzeigen",
+      "fullLink": "Ganzer Leitfaden →"
+    },
+    "terms": {
+      "plz": {
+        "title": "Postleitzahl & Prämienregion",
+        "oneLiner": "Bestimmt deine Prämienregion — Prämien unterscheiden sich nach Gemeinde, nicht nur nach Kanton.",
+        "short": "Deine Prämie hängt davon ab, wo du wohnst. Viele Kantone sind in zwei oder drei Prämienregionen unterteilt, und die massgebende Region wird durch die Gemeinde bestimmt, nicht allein durch die Postleitzahl. Umfasst eine Postleitzahl mehrere Gemeinden, wählst du deine Gemeinde aus."
+      },
+      "birthYear": {
+        "title": "Jahrgang & Altersklasse",
+        "short": "Die Prämien unterscheiden sich in drei Altersklassen: Kinder (0–18), junge Erwachsene (19–25) und Erwachsene (ab 26). Dein Jahrgang bestimmt deine Altersklasse und damit auch, welche Franchise-Stufen dir zur Verfügung stehen."
+      },
+      "franchise": {
+        "title": "Franchise (Selbstbehalt)",
+        "oneLiner": "Eine höhere Franchise senkt deine monatliche Prämie.",
+        "short": "Die Franchise ist der Betrag deiner Gesundheitskosten, den du jedes Jahr zuerst selbst zahlst, bevor die Kasse übernimmt. Erwachsene wählen zwischen CHF 300 und CHF 2500. Eine hohe Franchise bedeutet eine tiefere Prämie, aber ein höheres Eigenrisiko, wenn du zum Arzt musst. Die Leistungen sind in jedem Fall dieselben."
+      },
+      "unfalldeckung": {
+        "title": "Unfalldeckung",
+        "short": "Die Grundversicherung deckt normalerweise auch Unfälle. Wenn du bei einem Arbeitgeber mindestens 8 Stunden pro Woche angestellt bist, bist du über ihn unfallversichert und kannst die Unfalldeckung in der Krankenkasse ausschliessen — das senkt die Prämie leicht. Im Zweifel eingeschlossen lassen."
+      },
+      "models": {
+        "title": "Versicherungsmodelle",
+        "short": "Du wählst zwischen dem Standardmodell (freie Arztwahl) und einem günstigeren Alternativmodell mit fester erster Anlaufstelle. Die Leistungen sind überall gleich.",
+        "altGroup": "Alternativmodelle"
+      }
+    },
+    "banner": {
+      "text": "🇨🇭 Neu in der Schweizer Grundversicherung?",
+      "cta": "So funktioniert das System →"
+    },
+    "drawer": {
+      "title": "So funktioniert die Schweizer Grundversicherung",
+      "close": "Schliessen",
+      "readFull": "Ganzen Leitfaden öffnen →"
+    },
+    "guide": {
+      "lead": "Die Grundversicherung (OKP) ist obligatorisch und per Gesetz bei jeder Krankenkasse identisch. Du vergleichst also nur Preis, Modell und Service — nicht den Leistungsumfang.",
+      "back": "← Zurück zum Vergleich",
+      "rules": {
+        "heading": "Die Regeln, die für alle gelten",
+        "item1": "Die Grundversicherung ist obligatorisch. Nach dem Zuzug in die Schweiz hast du drei Monate Zeit, dich zu versichern — der Schutz gilt rückwirkend ab deiner Ankunft.",
+        "item2": "Jede Krankenkasse muss dich in die Grundversicherung aufnehmen. Es gibt keine Gesundheitsfragen und keine Ablehnung.",
+        "item3": "Du kannst die Krankenkasse einmal pro Jahr wechseln. Die Kündigung muss bis zum 30. November bei der bisherigen Kasse eintreffen, der Wechsel gilt ab dem 1. Januar.",
+        "item4": "Der Leistungsumfang ist gesetzlich festgelegt und überall gleich. Eine günstigere Kasse bietet nicht weniger Versicherung."
+      },
+      "terms": {
+        "heading": "Die Begriffe im Formular",
+        "intro": "Kurz erklärt — dieselben Erläuterungen findest du auch neben jedem Eingabefeld."
+      },
+      "models": {
+        "heading": "Standard oder alternatives Modell"
+      }
+    }
   },
   "copy": {
     "tarifart": {

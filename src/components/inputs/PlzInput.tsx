@@ -2,29 +2,34 @@
 
 import { useTranslations } from "next-intl";
 import { validatePlz } from "@/lib/validate";
+import { HelpTip } from "@/components/help/HelpTip";
 
 type Props = {
   value: string;
   onChange: (value: string) => void;
   /** True when the PLZ has valid format but doesn't resolve to any known Gemeinde (REQ-13). */
   notFound?: boolean;
+  onOpenGuide: (section?: string) => void;
 };
 
-export function PlzInput({ value, onChange, notFound }: Props) {
+export function PlzInput({ value, onChange, notFound, onOpenGuide }: Props) {
   const t = useTranslations();
   const formatResult = value ? validatePlz(value) : { valid: true as const };
   const invalid = !formatResult.valid || Boolean(notFound);
-  const message = !formatResult.valid
+  const errorMessage = !formatResult.valid
     ? t(`validation.${formatResult.code}`)
     : notFound
       ? t("inputs.plzNotFound")
       : null;
 
   return (
-    <div>
-      <label htmlFor="plz" className="block text-label-large text-on-surface-variant mb-1.5">
-        {t("inputs.plzLabel")}
-      </label>
+    <div className="relative">
+      <div className="flex items-start gap-1 mb-1.5">
+        <label htmlFor="plz" className="text-label-large text-on-surface-variant">
+          {t("inputs.plzLabel")}
+        </label>
+        <HelpTip term="plz" onOpenGuide={onOpenGuide} />
+      </div>
       <input
         id="plz"
         type="text"
@@ -33,15 +38,18 @@ export function PlzInput({ value, onChange, notFound }: Props) {
         placeholder={t("inputs.plzPlaceholder")}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        aria-describedby="plz-hint"
+        aria-describedby={errorMessage ? "plz-hint plz-error" : "plz-hint"}
         aria-invalid={invalid}
         className={`w-full h-10 px-3 rounded-md border text-[15px] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-primary-container ${
           invalid ? "border-error focus:border-error" : "border-outline-variant focus:border-primary"
         }`}
       />
-      {message && (
-        <p id="plz-hint" className="text-body-small text-error mt-1">
-          {message}
+      <p id="plz-hint" className="text-body-small text-outline mt-1">
+        {t("help.terms.plz.oneLiner")}
+      </p>
+      {errorMessage && (
+        <p id="plz-error" className="text-body-small text-error mt-1">
+          {errorMessage}
         </p>
       )}
     </div>

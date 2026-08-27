@@ -5,7 +5,9 @@
     "ogTitle": "Health Insurance Comparison – Basic Insurance Switzerland",
     "ogDescription": "Compare Swiss basic health insurance premiums – every insurer, every model, official FOPH data.",
     "twitterTitle": "Health Insurance Comparison – Basic Insurance Switzerland",
-    "twitterDescription": "Compare Swiss basic health insurance premiums – official FOPH data."
+    "twitterDescription": "Compare Swiss basic health insurance premiums – official FOPH data.",
+    "howItWorksTitle": "How Swiss basic health insurance works – Premium comparison",
+    "howItWorksDescription": "New to Switzerland? How mandatory basic insurance works: sign-up deadlines, switching insurers, the deductible, and insurance models — explained simply."
   },
   "inputs": {
     "title": "Premium Comparison",
@@ -75,6 +77,64 @@
   "footer": {
     "dataNotice": "Data: FOPH open data · Published {date} · Mandatory benefits only · No sponsoring, no referral links",
     "levyNotice": "Prices include the CO₂/VOC levy redistribution (CHF {amount}/month, {year}) — the same for every insurer, with no effect on ranking"
+  },
+  "help": {
+    "tip": {
+      "openLabel": "Show explanation",
+      "fullLink": "Full guide →"
+    },
+    "terms": {
+      "plz": {
+        "title": "Postcode & premium region",
+        "oneLiner": "Sets your premium region — premiums differ by municipality, not just by canton.",
+        "short": "Your premium depends on where you live. Many cantons are split into two or three premium regions, and the region that applies is determined by the municipality, not the postcode alone. If a postcode covers several municipalities, you pick yours."
+      },
+      "birthYear": {
+        "title": "Birth year & age group",
+        "short": "Premiums differ across three age groups: children (0–18), young adults (19–25), and adults (26+). Your birth year sets your age group, and with it the deductible tiers available to you."
+      },
+      "franchise": {
+        "title": "Deductible (Franchise)",
+        "oneLiner": "A higher deductible lowers your monthly premium.",
+        "short": "The deductible is the share of your medical costs you pay yourself each year before the insurer starts paying. Adults choose between CHF 300 and CHF 2500. A high deductible means a lower premium but more out-of-pocket risk if you need care. The coverage is identical either way."
+      },
+      "unfalldeckung": {
+        "title": "Accident coverage",
+        "short": "Basic insurance normally also covers accidents. If you're employed at least 8 hours a week by an employer, you're covered for accidents through them and can exclude accident coverage from your health insurer — which lowers the premium slightly. If unsure, leave it included."
+      },
+      "models": {
+        "title": "Insurance models",
+        "short": "You choose between the standard model (free choice of doctor) and a cheaper alternative model with a set first point of contact. The coverage is the same everywhere.",
+        "altGroup": "Alternative models"
+      }
+    },
+    "banner": {
+      "text": "🇨🇭 New to Swiss basic insurance?",
+      "cta": "How the system works →"
+    },
+    "drawer": {
+      "title": "How Swiss basic insurance works",
+      "close": "Close",
+      "readFull": "Open the full guide →"
+    },
+    "guide": {
+      "lead": "Basic insurance (OKP) is mandatory and, by law, identical at every insurer. So you're only comparing price, model, and service — not the scope of coverage.",
+      "back": "← Back to comparison",
+      "rules": {
+        "heading": "The rules everyone follows",
+        "item1": "Basic insurance is mandatory. After you move to Switzerland you have three months to take out cover — it applies retroactively to your arrival date.",
+        "item2": "Every insurer must accept you for basic insurance. There are no health questions and no rejections.",
+        "item3": "You can switch insurer once a year. Your cancellation must reach your current insurer by 30 November; the switch takes effect on 1 January.",
+        "item4": "The scope of coverage is set by law and is the same everywhere. A cheaper insurer is not less insurance."
+      },
+      "terms": {
+        "heading": "The words on the form",
+        "intro": "In brief — you'll find the same explanations next to each input field."
+      },
+      "models": {
+        "heading": "Standard or alternative model"
+      }
+    }
   },
   "copy": {
     "tarifart": {

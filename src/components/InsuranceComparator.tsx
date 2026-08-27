@@ -12,6 +12,8 @@ import { FilterBar } from "./results/FilterBar";
 import { PlanList } from "./results/PlanList";
 import { EmptyState } from "./results/EmptyState";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { NewcomerBanner } from "./help/NewcomerBanner";
+import { HowItWorksDrawer } from "./help/HowItWorksDrawer";
 import { getAltersklasse, getFranchiseTiers } from "@/lib/ageband";
 import { resolveGemeinden, needsDisambiguation } from "@/lib/location";
 import {
@@ -66,6 +68,14 @@ export function InsuranceComparator() {
   const [premiumsByYear, setPremiumsByYear] = useState<Record<number, PremiumRow[]>>({});
   const [premiumsLoading, setPremiumsLoading] = useState(false);
   const [premiumsError, setPremiumsError] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
+  const [guideSection, setGuideSection] = useState<string | undefined>(undefined);
+
+  const openGuide = useCallback((section?: string) => {
+    setGuideSection(section);
+    setGuideOpen(true);
+  }, []);
+  const closeGuide = useCallback(() => setGuideOpen(false), []);
 
   const gemeinden = plz.length === 4 ? resolveGemeinden(plz) : [];
   const ambiguous = needsDisambiguation(gemeinden);
@@ -256,6 +266,7 @@ export function InsuranceComparator() {
   return (
     <main className="max-w-[860px] mx-auto my-8 px-4">
       <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-6">
+        <NewcomerBanner onOpenGuide={openGuide} />
         <div className="flex items-start justify-between gap-3 mb-1">
           <h1 className="text-title-large text-on-surface">{t("inputs.title")}</h1>
           <LanguageSwitcher />
@@ -263,9 +274,9 @@ export function InsuranceComparator() {
         <p className="text-body-medium text-on-surface-variant mb-5">{t("inputs.tagline")}</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <PlzInput value={plz} onChange={handlePlzChange} notFound={plzNotFound} />
-          <BirthYearInput value={birthYear} onChange={setBirthYear} calendarYear={year} />
-          <DeductibleSelect altersklasse={altersklasse} value={franchise} onChange={setFranchise} />
+          <PlzInput value={plz} onChange={handlePlzChange} notFound={plzNotFound} onOpenGuide={openGuide} />
+          <BirthYearInput value={birthYear} onChange={setBirthYear} calendarYear={year} onOpenGuide={openGuide} />
+          <DeductibleSelect altersklasse={altersklasse} value={franchise} onChange={setFranchise} onOpenGuide={openGuide} />
         </div>
 
         {ambiguous && (
@@ -334,6 +345,7 @@ export function InsuranceComparator() {
             onToggleAltModels={() => setAltModelsActive((v) => !v)}
             unfalldeckung={unfalldeckung}
             onToggleUnfalldeckung={() => setUnfalldeckung((v) => !v)}
+            onOpenGuide={openGuide}
           />
 
           <p className="text-sm text-on-surface-variant mt-4 mb-2">
@@ -375,6 +387,8 @@ export function InsuranceComparator() {
           </>
         )}
       </p>
+
+      <HowItWorksDrawer open={guideOpen} section={guideSection} onClose={closeGuide} />
     </main>
   );
 }

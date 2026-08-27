@@ -5,7 +5,9 @@
     "ogTitle": "Comparateur d'assurance maladie – Assurance de base Suisse",
     "ogDescription": "Comparez les primes de l'assurance de base suisse – toutes les caisses, tous les modèles, données officielles de l'OFSP.",
     "twitterTitle": "Comparateur d'assurance maladie – Assurance de base Suisse",
-    "twitterDescription": "Comparez les primes de l'assurance de base suisse – données officielles de l'OFSP."
+    "twitterDescription": "Comparez les primes de l'assurance de base suisse – données officielles de l'OFSP.",
+    "howItWorksTitle": "Comment fonctionne l'assurance de base suisse – Comparaison des primes",
+    "howItWorksDescription": "Nouveau en Suisse ? Comment fonctionne l'assurance de base obligatoire : délais d'affiliation, changement de caisse, franchise et modèles d'assurance — expliqué simplement."
   },
   "inputs": {
     "title": "Comparaison des primes",
@@ -75,6 +77,64 @@
   "footer": {
     "dataNotice": "Données : Open Data OFSP · Publication {date} · Prestations obligatoires uniquement (AOS) · Aucun sponsoring, aucun lien d'intermédiation",
     "levyNotice": "Les prix incluent la restitution de la taxe d'incitation CO₂/COV (CHF {amount}/mois, {year}) — identique pour toutes les caisses, sans effet sur le classement"
+  },
+  "help": {
+    "tip": {
+      "openLabel": "Afficher l'explication",
+      "fullLink": "Guide complet →"
+    },
+    "terms": {
+      "plz": {
+        "title": "Code postal et région de primes",
+        "oneLiner": "Détermine votre région de primes — les primes varient selon la commune, pas seulement selon le canton.",
+        "short": "Votre prime dépend de votre lieu de domicile. De nombreux cantons sont divisés en deux ou trois régions de primes, et la région déterminante dépend de la commune, pas seulement du code postal. Si un code postal couvre plusieurs communes, vous choisissez la vôtre."
+      },
+      "birthYear": {
+        "title": "Année de naissance et classe d'âge",
+        "short": "Les primes diffèrent selon trois classes d'âge : enfants (0–18), jeunes adultes (19–25) et adultes (dès 26). Votre année de naissance détermine votre classe d'âge et donc aussi les franchises disponibles."
+      },
+      "franchise": {
+        "title": "Franchise (participation)",
+        "oneLiner": "Une franchise plus élevée réduit votre prime mensuelle.",
+        "short": "La franchise est la part de vos frais de santé que vous payez vous-même chaque année avant que la caisse n'intervienne. Les adultes choisissent entre CHF 300 et CHF 2500. Une franchise élevée signifie une prime plus basse, mais un risque personnel plus grand en cas de recours au médecin. Les prestations restent identiques dans tous les cas."
+      },
+      "unfalldeckung": {
+        "title": "Couverture accidents",
+        "short": "L'assurance de base couvre normalement aussi les accidents. Si vous êtes employé au moins 8 heures par semaine chez un employeur, vous êtes assuré contre les accidents par son intermédiaire et pouvez exclure la couverture accidents de la caisse-maladie — ce qui réduit légèrement la prime. En cas de doute, laissez-la incluse."
+      },
+      "models": {
+        "title": "Modèles d'assurance",
+        "short": "Vous choisissez entre le modèle standard (libre choix du médecin) et un modèle alternatif meilleur marché avec un premier point de contact défini. Les prestations sont partout identiques.",
+        "altGroup": "Modèles alternatifs"
+      }
+    },
+    "banner": {
+      "text": "🇨🇭 Nouveau dans l'assurance de base suisse ?",
+      "cta": "Comment fonctionne le système →"
+    },
+    "drawer": {
+      "title": "Comment fonctionne l'assurance de base suisse",
+      "close": "Fermer",
+      "readFull": "Ouvrir le guide complet →"
+    },
+    "guide": {
+      "lead": "L'assurance de base (AOS) est obligatoire et identique par la loi auprès de chaque caisse-maladie. Vous ne comparez donc que le prix, le modèle et le service — pas l'étendue des prestations.",
+      "back": "← Retour à la comparaison",
+      "rules": {
+        "heading": "Les règles qui s'appliquent à tous",
+        "item1": "L'assurance de base est obligatoire. Après votre arrivée en Suisse, vous avez trois mois pour vous assurer — la couverture s'applique rétroactivement à la date de votre arrivée.",
+        "item2": "Chaque caisse-maladie doit vous accepter dans l'assurance de base. Il n'y a aucune question de santé ni aucun refus.",
+        "item3": "Vous pouvez changer de caisse-maladie une fois par an. La résiliation doit parvenir à votre caisse actuelle au plus tard le 30 novembre ; le changement prend effet au 1er janvier.",
+        "item4": "L'étendue des prestations est fixée par la loi et identique partout. Une caisse meilleur marché n'offre pas moins d'assurance."
+      },
+      "terms": {
+        "heading": "Les termes du formulaire",
+        "intro": "En bref — vous trouvez les mêmes explications à côté de chaque champ de saisie."
+      },
+      "models": {
+        "heading": "Modèle standard ou alternatif"
+      }
+    }
   },
   "copy": {
     "tarifart": {

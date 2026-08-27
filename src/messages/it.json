@@ -5,7 +5,9 @@
     "ogTitle": "Confronto assicurazione malattia – Assicurazione di base Svizzera",
     "ogDescription": "Confronta i premi dell'assicurazione di base svizzera – tutte le casse, tutti i modelli, dati ufficiali dell'UFSP.",
     "twitterTitle": "Confronto assicurazione malattia – Assicurazione di base Svizzera",
-    "twitterDescription": "Confronta i premi dell'assicurazione di base svizzera – dati ufficiali dell'UFSP."
+    "twitterDescription": "Confronta i premi dell'assicurazione di base svizzera – dati ufficiali dell'UFSP.",
+    "howItWorksTitle": "Come funziona l'assicurazione di base svizzera – Confronto dei premi",
+    "howItWorksDescription": "Nuovo in Svizzera? Come funziona l'assicurazione di base obbligatoria: termini di affiliazione, cambio di cassa, franchigia e modelli assicurativi — spiegato in modo semplice."
   },
   "inputs": {
     "title": "Confronto dei premi",
@@ -75,6 +77,64 @@
   "footer": {
     "dataNotice": "Dati: Open Data UFSP · Pubblicazione {date} · Solo prestazioni obbligatorie (AOMS) · Nessuno sponsor, nessun link di intermediazione",
     "levyNotice": "I prezzi includono la restituzione della tassa d'incentivazione CO₂/COV (CHF {amount}/mese, {year}) — uguale per tutte le casse, senza effetto sulla classifica"
+  },
+  "help": {
+    "tip": {
+      "openLabel": "Mostra la spiegazione",
+      "fullLink": "Guida completa →"
+    },
+    "terms": {
+      "plz": {
+        "title": "Numero postale e regione di premio",
+        "oneLiner": "Determina la tua regione di premio — i premi variano in base al Comune, non solo al Cantone.",
+        "short": "Il tuo premio dipende da dove abiti. Molti Cantoni sono suddivisi in due o tre regioni di premio e la regione determinante dipende dal Comune, non solo dal numero postale. Se un numero postale copre più Comuni, scegli il tuo."
+      },
+      "birthYear": {
+        "title": "Anno di nascita e fascia d'età",
+        "short": "I premi variano in tre fasce d'età: bambini (0–18), giovani adulti (19–25) e adulti (dai 26). Il tuo anno di nascita determina la fascia d'età e quindi anche le franchigie disponibili."
+      },
+      "franchise": {
+        "title": "Franchigia (partecipazione)",
+        "oneLiner": "Una franchigia più alta riduce il tuo premio mensile.",
+        "short": "La franchigia è la parte delle tue spese sanitarie che paghi tu stesso ogni anno prima che intervenga la cassa. Gli adulti scelgono tra CHF 300 e CHF 2500. Una franchigia alta significa un premio più basso, ma un rischio personale maggiore se devi andare dal medico. Le prestazioni sono comunque le stesse."
+      },
+      "unfalldeckung": {
+        "title": "Copertura infortuni",
+        "short": "L'assicurazione di base copre di norma anche gli infortuni. Se sei impiegato almeno 8 ore alla settimana presso un datore di lavoro, sei assicurato contro gli infortuni tramite lui e puoi escludere la copertura infortuni dalla cassa malati — questo riduce leggermente il premio. Nel dubbio, lasciala inclusa."
+      },
+      "models": {
+        "title": "Modelli assicurativi",
+        "short": "Scegli tra il modello standard (libera scelta del medico) e un modello alternativo più conveniente con un primo punto di contatto definito. Le prestazioni sono ovunque le stesse.",
+        "altGroup": "Modelli alternativi"
+      }
+    },
+    "banner": {
+      "text": "🇨🇭 Nuovo nell'assicurazione di base svizzera?",
+      "cta": "Come funziona il sistema →"
+    },
+    "drawer": {
+      "title": "Come funziona l'assicurazione di base svizzera",
+      "close": "Chiudi",
+      "readFull": "Apri la guida completa →"
+    },
+    "guide": {
+      "lead": "L'assicurazione di base (AOMS) è obbligatoria e per legge identica presso ogni cassa malati. Confronti quindi solo il prezzo, il modello e il servizio — non l'entità delle prestazioni.",
+      "back": "← Torna al confronto",
+      "rules": {
+        "heading": "Le regole valide per tutti",
+        "item1": "L'assicurazione di base è obbligatoria. Dopo il trasferimento in Svizzera hai tre mesi di tempo per assicurarti — la copertura vale retroattivamente dalla data del tuo arrivo.",
+        "item2": "Ogni cassa malati deve accettarti nell'assicurazione di base. Non ci sono domande sulla salute né rifiuti.",
+        "item3": "Puoi cambiare cassa malati una volta all'anno. La disdetta deve pervenire alla cassa attuale entro il 30 novembre; il cambio ha effetto dal 1° gennaio.",
+        "item4": "L'entità delle prestazioni è stabilita per legge ed è uguale ovunque. Una cassa più conveniente non offre meno assicurazione."
+      },
+      "terms": {
+        "heading": "I termini del modulo",
+        "intro": "In breve — le stesse spiegazioni le trovi anche accanto a ogni campo."
+      },
+      "models": {
+        "heading": "Modello standard o alternativo"
+      }
+    }
   },
   "copy": {
     "tarifart": {

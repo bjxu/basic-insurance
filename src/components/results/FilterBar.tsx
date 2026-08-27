@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { HelpTip } from "@/components/help/HelpTip";
 
 type Props = {
   year: number;
@@ -10,6 +11,7 @@ type Props = {
   onToggleAltModels: () => void;
   unfalldeckung: boolean;
   onToggleUnfalldeckung: () => void;
+  onOpenGuide: (section?: string) => void;
 };
 
 export function FilterBar({
@@ -20,6 +22,7 @@ export function FilterBar({
   onToggleAltModels,
   unfalldeckung,
   onToggleUnfalldeckung,
+  onOpenGuide,
 }: Props) {
   const t = useTranslations("filterBar");
   return (
@@ -41,30 +44,36 @@ export function FilterBar({
         ))}
       </div>
       <div className="w-px h-6 bg-outline-variant mx-1" />
-      <button
-        type="button"
-        role="button"
-        aria-pressed={altModelsActive}
-        onClick={onToggleAltModels}
-        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm ${
-          altModelsActive ? "bg-primary-container border-primary-container text-primary font-semibold" : "border-outline-variant text-on-surface-variant"
-        }`}
-      >
-        <span className={`w-2 h-2 rounded-full ${altModelsActive ? "bg-primary" : "bg-outline"}`} />
-        {t("altModelsLabel", { state: altModelsActive ? t("stateOn") : t("stateOff") })}
-      </button>
-      <button
-        type="button"
-        role="button"
-        aria-pressed={unfalldeckung}
-        onClick={onToggleUnfalldeckung}
-        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm ${
-          unfalldeckung ? "bg-primary-container border-primary-container text-primary font-semibold" : "border-outline-variant text-on-surface-variant"
-        }`}
-      >
-        <span className={`w-2 h-2 rounded-full ${unfalldeckung ? "bg-primary" : "bg-outline"}`} />
-        {t("accidentLabel", { state: unfalldeckung ? t("included") : t("excluded") })}
-      </button>
+      <span className="relative inline-flex items-center gap-1">
+        <button
+          type="button"
+          role="button"
+          aria-pressed={altModelsActive}
+          onClick={onToggleAltModels}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm ${
+            altModelsActive ? "bg-primary-container border-primary-container text-primary font-semibold" : "border-outline-variant text-on-surface-variant"
+          }`}
+        >
+          <span className={`w-2 h-2 rounded-full ${altModelsActive ? "bg-primary" : "bg-outline"}`} />
+          {t("altModelsLabel", { state: altModelsActive ? t("stateOn") : t("stateOff") })}
+        </button>
+        <HelpTip term="models" onOpenGuide={onOpenGuide} />
+      </span>
+      <span className="relative inline-flex items-center gap-1">
+        <button
+          type="button"
+          role="button"
+          aria-pressed={unfalldeckung}
+          onClick={onToggleUnfalldeckung}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm ${
+            unfalldeckung ? "bg-primary-container border-primary-container text-primary font-semibold" : "border-outline-variant text-on-surface-variant"
+          }`}
+        >
+          <span className={`w-2 h-2 rounded-full ${unfalldeckung ? "bg-primary" : "bg-outline"}`} />
+          {t("accidentLabel", { state: unfalldeckung ? t("included") : t("excluded") })}
+        </button>
+        <HelpTip term="unfalldeckung" onOpenGuide={onOpenGuide} />
+      </span>
     </div>
   );
 }
