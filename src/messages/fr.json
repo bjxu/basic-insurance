@@ -98,6 +98,10 @@
         "oneLiner": "Une franchise plus élevée réduit votre prime mensuelle.",
         "short": "La franchise est la part de vos frais de santé que vous payez vous-même chaque année avant que la caisse n'intervienne. Les adultes choisissent entre CHF 300 et CHF 2500. Une franchise élevée signifie une prime plus basse, mais un risque personnel plus grand en cas de recours au médecin. Les prestations restent identiques dans tous les cas."
       },
+      "unfalldeckung": {
+        "title": "Couverture accidents",
+        "short": "L'assurance de base couvre normalement aussi les accidents. Si vous êtes employé au moins 8 heures par semaine chez un employeur, vous êtes assuré contre les accidents par son intermédiaire et pouvez exclure la couverture accidents de la caisse-maladie — ce qui réduit légèrement la prime. En cas de doute, laissez-la incluse."
+      },
       "models": {
         "title": "Modèles d'assurance",
         "short": "Dans le modèle standard, vous consultez le médecin de votre choix. Les modèles alternatifs (médecin de famille, HMO, Telmed) exigent qu'en cas de problème de santé vous contactiez d'abord un point de contact défini — votre médecin de famille, un centre de santé ou un conseil téléphonique. En échange, la prime est plus basse. L'étendue des prestations reste la même."

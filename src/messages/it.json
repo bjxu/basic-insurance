@@ -98,6 +98,10 @@
         "oneLiner": "Una franchigia più alta riduce il tuo premio mensile.",
         "short": "La franchigia è la parte delle tue spese sanitarie che paghi tu stesso ogni anno prima che intervenga la cassa. Gli adulti scelgono tra CHF 300 e CHF 2500. Una franchigia alta significa un premio più basso, ma un rischio personale maggiore se devi andare dal medico. Le prestazioni sono comunque le stesse."
       },
+      "unfalldeckung": {
+        "title": "Copertura infortuni",
+        "short": "L'assicurazione di base copre di norma anche gli infortuni. Se sei impiegato almeno 8 ore alla settimana presso un datore di lavoro, sei assicurato contro gli infortuni tramite lui e puoi escludere la copertura infortuni dalla cassa malati — questo riduce leggermente il premio. Nel dubbio, lasciala inclusa."
+      },
       "models": {
         "title": "Modelli assicurativi",
         "short": "Nel modello standard vai da qualsiasi medico a tua scelta. I modelli alternativi (medico di famiglia, HMO, Telmed) richiedono che, in caso di problemi di salute, tu contatti prima un punto di riferimento definito — il tuo medico di famiglia, un centro sanitario o una consulenza telefonica. In cambio il premio è più basso. L'entità delle prestazioni resta invariata."

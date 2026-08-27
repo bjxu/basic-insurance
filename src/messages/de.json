@@ -98,6 +98,10 @@
         "oneLiner": "Eine höhere Franchise senkt deine monatliche Prämie.",
         "short": "Die Franchise ist der Betrag deiner Gesundheitskosten, den du jedes Jahr zuerst selbst zahlst, bevor die Kasse übernimmt. Erwachsene wählen zwischen CHF 300 und CHF 2500. Eine hohe Franchise bedeutet eine tiefere Prämie, aber ein höheres Eigenrisiko, wenn du zum Arzt musst. Die Leistungen sind in jedem Fall dieselben."
       },
+      "unfalldeckung": {
+        "title": "Unfalldeckung",
+        "short": "Die Grundversicherung deckt normalerweise auch Unfälle. Wenn du bei einem Arbeitgeber mindestens 8 Stunden pro Woche angestellt bist, bist du über ihn unfallversichert und kannst die Unfalldeckung in der Krankenkasse ausschliessen — das senkt die Prämie leicht. Im Zweifel eingeschlossen lassen."
+      },
       "models": {
         "title": "Versicherungsmodelle",
         "short": "Im Standardmodell gehst du zu jedem Arzt deiner Wahl. Alternative Modelle (Hausarzt, HMO, Telmed) verlangen, dass du bei gesundheitlichen Fragen zuerst eine bestimmte Stelle kontaktierst — deinen Hausarzt, ein Gesundheitszentrum oder eine telefonische Beratung. Dafür ist die Prämie tiefer. Der Leistungsumfang bleibt gleich."

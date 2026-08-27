@@ -98,6 +98,10 @@
         "oneLiner": "A higher deductible lowers your monthly premium.",
         "short": "The deductible is the share of your medical costs you pay yourself each year before the insurer starts paying. Adults choose between CHF 300 and CHF 2500. A high deductible means a lower premium but more out-of-pocket risk if you need care. The coverage is identical either way."
       },
+      "unfalldeckung": {
+        "title": "Accident coverage",
+        "short": "Basic insurance normally also covers accidents. If you're employed at least 8 hours a week by an employer, you're covered for accidents through them and can exclude accident coverage from your health insurer — which lowers the premium slightly. If unsure, leave it included."
+      },
       "models": {
         "title": "Insurance models",
         "short": "In the standard model you see any doctor you choose. Alternative models (family doctor, HMO, Telmed) require you to contact a set first point of care for health questions — your family doctor, a health centre, or a phone advice line. In exchange the premium is lower. The scope of coverage stays the same."

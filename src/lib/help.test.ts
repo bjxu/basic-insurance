@@ -1,11 +1,13 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import {
   TERM_KEYS,
+  GUIDE_TERM_KEYS,
   HELP_ANCHORS,
   HELP_SEEN_KEY,
   readHelpSeen,
   markHelpSeen,
 } from "@/lib/help";
+import de from "@/messages/de.json";
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -26,6 +28,30 @@ describe("HELP_ANCHORS", () => {
     for (const key of TERM_KEYS) {
       expect(typeof HELP_ANCHORS[key]).toBe("string");
       expect(HELP_ANCHORS[key].length).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe("term catalog", () => {
+  const terms = de.help.terms as Record<string, { title?: string; short?: string }>;
+
+  it("every inline-tip term key resolves in the default (de) catalog", () => {
+    for (const key of TERM_KEYS) {
+      expect(terms[key]?.title, key).toBeTruthy();
+      expect(terms[key]?.short, key).toBeTruthy();
+    }
+  });
+
+  it("every guide term key resolves in the default (de) catalog", () => {
+    for (const key of GUIDE_TERM_KEYS) {
+      expect(terms[key]?.title, key).toBeTruthy();
+      expect(terms[key]?.short, key).toBeTruthy();
+    }
+  });
+
+  it("GUIDE_TERM_KEYS is a superset of TERM_KEYS", () => {
+    for (const key of TERM_KEYS) {
+      expect(GUIDE_TERM_KEYS).toContain(key);
     }
   });
 });
@@ -66,5 +92,10 @@ describe("readHelpSeen / markHelpSeen", () => {
   it("readHelpSeen is false when window is undefined (SSR)", () => {
     vi.stubGlobal("window", undefined);
     expect(readHelpSeen()).toBe(false);
+  });
+
+  it("markHelpSeen is a no-op (no throw) when window is undefined (SSR)", () => {
+    vi.stubGlobal("window", undefined);
+    expect(() => markHelpSeen()).not.toThrow();
   });
 });
