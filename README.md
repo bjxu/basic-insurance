@@ -41,13 +41,11 @@ site against the official BAG calculator, priminfo.ch, for correctness. It:
 npm run test:blackbox
 ```
 
-**Note:** priminfo.admin.ch is a low-traffic government site and appears to
-rate-limit/soft-block automated traffic after a burst of requests (observed while
-building this script — prixio.ch was unaffected, only priminfo failed). The script
-already retries each case with backoff, but if every case fails with a priminfo-side
-timeout or "0 matching rows" error, that's the site throttling you, not a script bug —
-wait a while (minutes, possibly longer) and try again, ideally without hammering it
-with repeated back-to-back runs.
+**Note:** priminfo.admin.ch's autocomplete widget occasionally fails to initialize on a
+fresh page load (observed a handful of times while building this script — prixio.ch was
+unaffected). The script retries each case with backoff to absorb that. If you instead
+see every case fail with the *same* error, that's more likely a real bug (e.g. priminfo
+changed its markup) than transient flakiness — worth a closer look before re-running.
 
 ## Stack
 
