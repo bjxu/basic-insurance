@@ -195,9 +195,9 @@ explains the system and the terms only; it gives no insurer-specific advice and 
 no recommendation (§4, Principle #2).
 
 **Inline layer.** A persistent one-line hint below each of the three inputs (the
-birth-year field already does this), and an ⓘ trigger — by each input's label, and once
-next to the "alternative models" filter toggle (not repeated on every result row) —
-that opens the short-form explainer (an anchored popover on wide viewports, an inline
+birth-year field already does this), and an ⓘ trigger — by each input's label, and next
+to each of the two result-filter toggles (alternative models, accident coverage); the
+model ⓘ is not repeated on every result row — that opens the short-form explainer (an anchored popover on wide viewports, an inline
 disclosure that expands in place on narrow ones). The models explainer additionally
 lists each BAG Tarifart with its one-line restriction — Standard on top, then Hausarzt /
 Telmed / HMO grouped under an "alternative models" label — reusing the same
@@ -290,7 +290,7 @@ figure, premiums are displayed unadjusted and the declaration is omitted for tha
 | REQ-25 | The comparator UI is available in German, French, Italian, and English on locale-prefixed URLs (`/de/`, `/fr/`, `/it/`, `/en/`); a bare `/` redirects to the best `Accept-Language` match, falling back to German. A language switcher preserves all comparison state (§5.4) across a language change. Only UI copy is translated — insurer names and BAG figures are not. The admin dashboard (REQ-22) stays German-only. |
 | REQ-26 | Each locale emits its own translated `<title>`, meta description, and Open Graph / Twitter Card tags, plus `hreflang` alternates for all locales including `x-default` (pointing at the German version). The sitemap lists one URL per locale. |
 | REQ-27 | Every displayed absolute premium (results list, headline, current-insurer row) is shown net of the year's flat federal CO₂/VOC levy credit (§6.4). Relative figures — the REQ-23 discount badge and the year-over-year change — are not adjusted. The adjustment, its amount, and the fact that it does not affect ranking are stated on-page. A year with no published levy figure shows unadjusted premiums and omits the declaration. |
-| REQ-28 | Each of the three required inputs carries a persistent one-line plain-language hint and an ⓘ trigger that opens a short-form explainer (§5.5); a single ⓘ for the insurance-model concept sits next to the "alternative models" filter toggle (not repeated per result row). The explainer is an anchored popover on wide viewports, an inline disclosure on narrow ones; triggers are keyboard-operable and screen-reader-labelled per concept (REQ-17). Each explainer ends with a link that opens the guide drawer at the matching section (REQ-29). |
+| REQ-28 | Each of the three required inputs carries a persistent one-line plain-language hint and an ⓘ trigger that opens a short-form explainer (§5.5); each of the two result-filter toggles (alternative models, accident coverage) carries an ⓘ for its concept — the model ⓘ is not repeated per result row. The explainer is an anchored popover on wide viewports, an inline disclosure on narrow ones; triggers are keyboard-operable and screen-reader-labelled per concept (REQ-17). Each explainer ends with a link that opens the guide drawer at the matching section (REQ-29). |
 | REQ-29 | A quiet, always-present banner at the top of the input card opens an on-page drawer summarising how the Swiss basic-insurance system works (§5.5), with the comparator still mounted underneath; the drawer links to a standalone guide at `/[locale]/how-it-works` carrying the full content and a "back to comparison" link that preserves the current query state. Nothing auto-opens — the guide is reached only by user action (the banner, a drawer link, or an ⓘ's "full explainer" link). |
 | REQ-30 | The newcomer help content explains the system and the domain terms only. It contains no insurer-specific advice and no recommendation to choose a particular plan or insurer (§4, Principle #2). |
 

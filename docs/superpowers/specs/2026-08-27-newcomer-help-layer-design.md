@@ -28,7 +28,9 @@ second, decision confidence third.
 >    always-present banner is now the sole newcomer entry point; the `localStorage`
 >    first-run tracking is gone.
 > 2. The insurance-model ⓘ moved from every result row to a single trigger next to the
->    "alternative models" filter toggle (it was redundant on ~30 rows).
+>    "alternative models" filter toggle (it was redundant on ~30 rows); an ⓘ for
+>    Unfalldeckung was added next to the "accident coverage" toggle, so both filter
+>    toggles now carry one. `unfalldeckung` joined `TERM_KEYS`.
 > 3. The Layer-3 "full explainer" link opens the guide drawer scrolled to the section
 >    (as this spec's Layer 3 always described) — an interim implementation had it
 >    navigate to the standalone page instead.
@@ -92,10 +94,11 @@ Franchise CHF 300–2500"); this generalises the pattern:
 
 ### Layer 2 — ⓘ trigger → short form
 
-A small ⓘ button next to each field label, plus one next to the "alternative models"
-filter toggle for the insurance-model concept (one ⓘ, not one per result row — the
-per-row model badge keeps only its Layer-1 restriction note). Activating it shows that
-concept's short-form explainer. Responsive rendering:
+A small ⓘ button next to each field label, plus one next to each of the two
+result-filter toggles — "alternative models" (the insurance-model concept, one ⓘ, not
+one per result row — the per-row model badge keeps only its Layer-1 restriction note)
+and "accident coverage" (the Unfalldeckung concept). Activating it shows that concept's
+short-form explainer. Responsive rendering:
 
 - **Wide viewport (≥ the existing `sm` breakpoint):** an anchored **popover** —
   dismiss on tap-away, Esc, or re-activating the trigger; does not shift layout.
@@ -165,7 +168,7 @@ standalone page.
 - `src/lib/help.ts` — content-key list / helpers if needed; the copy itself is in the
   message files.
 - `HelpTip` is consumed by `PlzInput`, `BirthYearInput`, `DeductibleSelect`, and
-  `FilterBar` (the alternative-models toggle); `NewcomerBanner` and `HowItWorksDrawer`
+  `FilterBar` (both filter toggles); `NewcomerBanner` and `HowItWorksDrawer`
   are mounted by `InsuranceComparator`, which owns the drawer open/section state and
   passes an `onOpenGuide(section?)` callback down to every `HelpTip`.
 

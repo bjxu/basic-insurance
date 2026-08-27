@@ -994,9 +994,12 @@
       <button type="button" class="help-i" aria-expanded="false" aria-label="Erklärung anzeigen: Versicherungsmodelle">i</button>
     </span>
     <!-- Chip label reflects CURRENT VALUE, not the action, to avoid ambiguity (REQ-5) -->
-    <div class="chip-toggle active" role="button" tabindex="0" aria-pressed="true">
-      <span class="dot"></span> Unfall: eingeschlossen
-    </div>
+    <span style="position:relative;display:inline-flex;align-items:center;gap:4px">
+      <div class="chip-toggle active" role="button" tabindex="0" aria-pressed="true">
+        <span class="dot"></span> Unfall: eingeschlossen
+      </div>
+      <button type="button" class="help-i" aria-expanded="false" aria-label="Erklärung anzeigen: Unfalldeckung">i</button>
+    </span>
     <!-- Inactive state: <div class="chip-toggle"><span class="dot"></span> Unfall: ausgeschlossen</div> -->
   </div>
 

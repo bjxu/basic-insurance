@@ -59,18 +59,21 @@ export function FilterBar({
         </button>
         <HelpTip term="models" onOpenGuide={onOpenGuide} />
       </span>
-      <button
-        type="button"
-        role="button"
-        aria-pressed={unfalldeckung}
-        onClick={onToggleUnfalldeckung}
-        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm ${
-          unfalldeckung ? "bg-primary-container border-primary-container text-primary font-semibold" : "border-outline-variant text-on-surface-variant"
-        }`}
-      >
-        <span className={`w-2 h-2 rounded-full ${unfalldeckung ? "bg-primary" : "bg-outline"}`} />
-        {t("accidentLabel", { state: unfalldeckung ? t("included") : t("excluded") })}
-      </button>
+      <span className="relative inline-flex items-center gap-1">
+        <button
+          type="button"
+          role="button"
+          aria-pressed={unfalldeckung}
+          onClick={onToggleUnfalldeckung}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm ${
+            unfalldeckung ? "bg-primary-container border-primary-container text-primary font-semibold" : "border-outline-variant text-on-surface-variant"
+          }`}
+        >
+          <span className={`w-2 h-2 rounded-full ${unfalldeckung ? "bg-primary" : "bg-outline"}`} />
+          {t("accidentLabel", { state: unfalldeckung ? t("included") : t("excluded") })}
+        </button>
+        <HelpTip term="unfalldeckung" onOpenGuide={onOpenGuide} />
+      </span>
     </div>
   );
 }
