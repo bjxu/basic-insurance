@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { HELP_ANCHORS, type TermKey } from "@/lib/help";
@@ -14,8 +14,13 @@ import { HELP_ANCHORS, type TermKey } from "@/lib/help";
 export function HelpTip({ term }: { term: TermKey }) {
   const t = useTranslations("help");
   const ref = useRef<HTMLDetailsElement>(null);
+  const [open, setOpen] = useState(false);
 
+  // Register the global close listeners only while the panel is open — with up to
+  // ~37 HelpTips on the results page, always-live listeners would fire on every
+  // keystroke for no reason.
   useEffect(() => {
+    if (!open) return;
     const el = ref.current;
     if (!el) return;
 
@@ -31,19 +36,22 @@ export function HelpTip({ term }: { term: TermKey }) {
       document.removeEventListener("keydown", close);
       document.removeEventListener("pointerdown", close);
     };
-  }, []);
+  }, [open]);
 
   return (
-    <details ref={ref} className="group relative inline-block align-middle">
+    <details
+      ref={ref}
+      onToggle={(e) => setOpen(e.currentTarget.open)}
+      className="group inline-block align-middle"
+    >
       <summary
-        aria-label={t("tip.openLabel")}
+        aria-label={`${t("tip.openLabel")}: ${t(`terms.${term}.title`)}`}
         className="inline-flex h-[15px] w-[15px] cursor-pointer select-none items-center justify-center rounded-full border border-outline bg-surface text-[10px] font-bold italic text-on-surface-variant list-none [&::-webkit-details-marker]:hidden [details[open]_&]:border-primary [details[open]_&]:bg-primary [details[open]_&]:text-on-primary"
       >
         i
       </summary>
       <div
-        role="group"
-        className="mt-2 w-[min(18rem,calc(100vw-2rem))] rounded-lg border border-outline-variant bg-surface p-3 text-left shadow-[0_4px_12px_rgba(0,0,0,0.08)] sm:absolute sm:left-0 sm:z-20"
+        className="mt-2 w-full rounded-lg border border-outline-variant bg-surface p-3 text-left shadow-[0_4px_12px_rgba(0,0,0,0.08)] z-20 sm:absolute sm:left-0 sm:top-full sm:mt-1 sm:w-[min(20rem,calc(100vw-2rem))] sm:max-w-[calc(100vw-2rem)]"
       >
         <p className="text-[12.5px] font-bold text-on-surface">{t(`terms.${term}.title`)}</p>
         <p className="mt-1 text-xs leading-relaxed text-on-surface-variant">{t(`terms.${term}.short`)}</p>

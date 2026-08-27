@@ -19,8 +19,8 @@ export function BirthYearInput({ value, onChange, calendarYear }: Props) {
   const tiers = altersklasse ? getFranchiseTiers(altersklasse) : null;
 
   return (
-    <div>
-      <div className="flex items-center gap-1 mb-1.5">
+    <div className="relative">
+      <div className="flex items-start gap-1 mb-1.5">
         <label htmlFor="by" className="text-label-large text-on-surface-variant">
           {t("inputs.birthYearLabel")}
         </label>

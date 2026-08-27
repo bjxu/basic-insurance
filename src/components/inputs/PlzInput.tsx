@@ -22,8 +22,8 @@ export function PlzInput({ value, onChange, notFound }: Props) {
       : null;
 
   return (
-    <div>
-      <div className="flex items-center gap-1 mb-1.5">
+    <div className="relative">
+      <div className="flex items-start gap-1 mb-1.5">
         <label htmlFor="plz" className="text-label-large text-on-surface-variant">
           {t("inputs.plzLabel")}
         </label>
