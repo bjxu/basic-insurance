@@ -13,7 +13,7 @@ export function NewcomerBanner({ onOpenGuide }: { onOpenGuide: () => void }) {
       <span>{t("banner.text")}</span>
       <button
         type="button"
-        onClick={onOpenGuide}
+        onClick={() => onOpenGuide()}
         className="whitespace-nowrap font-semibold text-primary"
       >
         {t("banner.cta")}
