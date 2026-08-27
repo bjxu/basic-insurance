@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { validateBirthYear } from "@/lib/validate";
 import { getAltersklasse, getFranchiseTiers } from "@/lib/ageband";
+import { HelpTip } from "@/components/help/HelpTip";
 
 type Props = {
   value: string;
@@ -19,9 +20,12 @@ export function BirthYearInput({ value, onChange, calendarYear }: Props) {
 
   return (
     <div>
-      <label htmlFor="by" className="block text-label-large text-on-surface-variant mb-1.5">
-        {t("inputs.birthYearLabel")}
-      </label>
+      <div className="flex items-center gap-1 mb-1.5">
+        <label htmlFor="by" className="text-label-large text-on-surface-variant">
+          {t("inputs.birthYearLabel")}
+        </label>
+        <HelpTip term="birthYear" />
+      </div>
       <input
         id="by"
         type="number"

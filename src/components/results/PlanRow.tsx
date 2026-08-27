@@ -9,6 +9,7 @@ import metadata from "@/data/metadata.json";
 import { MODEL_TAG_CLASSES, DEFAULT_MODEL_TAG_CLASSES } from "@/lib/tarifart-style";
 import { ProductList } from "./ProductList";
 import { PRODUCT_DETAIL_DROPDOWN_ENABLED } from "@/lib/featureFlags";
+import { HelpTip } from "@/components/help/HelpTip";
 
 const ENVIRONMENTAL_LEVY_PER_MONTH: Record<string, number> = metadata.environmentalLevyPerMonth;
 
@@ -83,6 +84,7 @@ export function PlanRow({
           >
             {t(`copy.tarifart.${plan.tarifart}.label`)}
           </span>
+          <HelpTip term="models" />
           {discountPct != null && discountPct > 0 && (
             <span className="inline-block px-1.5 py-px rounded text-[11px] font-bold bg-primary-container text-on-primary-container whitespace-nowrap">
               {t("results.discountBadge", { pct: discountPct.toFixed(1) })}

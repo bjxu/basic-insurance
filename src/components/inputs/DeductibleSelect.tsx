@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import type { Altersklasse } from "@/lib/types";
 import { getFranchiseTiers } from "@/lib/ageband";
+import { HelpTip } from "@/components/help/HelpTip";
 
 type Props = {
   altersklasse: Altersklasse | null;
@@ -12,18 +13,23 @@ type Props = {
 
 export function DeductibleSelect({ altersklasse, value, onChange }: Props) {
   const t = useTranslations("inputs");
+  const th = useTranslations("help");
   const tiers = altersklasse ? getFranchiseTiers(altersklasse) : [];
 
   return (
     <div>
-      <label htmlFor="fran" className="block text-label-large text-on-surface-variant mb-1.5">
-        {t("deductibleLabel")}
-      </label>
+      <div className="flex items-center gap-1 mb-1.5">
+        <label htmlFor="fran" className="text-label-large text-on-surface-variant">
+          {t("deductibleLabel")}
+        </label>
+        <HelpTip term="franchise" />
+      </div>
       <select
         id="fran"
         value={value ?? ""}
         disabled={!altersklasse}
         onChange={(e) => onChange(Number(e.target.value))}
+        aria-describedby="fran-hint"
         className="w-full h-10 px-3 rounded-md border border-outline-variant text-[15px] bg-surface outline-none focus:border-primary focus-visible:ring-2 focus-visible:ring-primary-container disabled:bg-surface-variant disabled:text-outline"
       >
         <option value="" disabled>
@@ -35,6 +41,9 @@ export function DeductibleSelect({ altersklasse, value, onChange }: Props) {
           </option>
         ))}
       </select>
+      <p id="fran-hint" className="text-body-small text-outline mt-1">
+        {th("terms.franchise.oneLiner")}
+      </p>
     </div>
   );
 }
