@@ -49,3 +49,6 @@ next-env.d.ts
 
 # Superpowers brainstorming companion
 .superpowers/
+
+# Claude Code local worktrees & tooling
+.claude/
