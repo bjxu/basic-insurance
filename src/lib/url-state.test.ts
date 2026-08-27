@@ -13,6 +13,18 @@ const BASE_STATE: ComparisonState = {
   currentMonthlyPremium: 350.5,
 };
 
+describe("decodeState — models default", () => {
+  it("defaults to all tarifarten (alternative models on) when no models param is present", () => {
+    const models = decodeState(new URLSearchParams("")).models;
+    expect(models.length).toBeGreaterThan(1);
+    expect(models).toContain("standard");
+  });
+
+  it("respects an explicit models=standard from a shared link", () => {
+    expect(decodeState(new URLSearchParams("models=standard")).models).toEqual(["standard"]);
+  });
+});
+
 describe("encodeState / decodeState — currentMonthlyPremium round-trip", () => {
   it("encodes currentMonthlyPremium as the cp param", () => {
     const params = encodeState(BASE_STATE);
