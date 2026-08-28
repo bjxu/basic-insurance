@@ -8,6 +8,7 @@ import { buildInquiryLogPayload } from "./inquiryLog";
 const BASE_INPUT = {
   praemienregionId: "ZH-1",
   altersklasse: "erwachsen",
+  ageGroup: "26-35",
   franchise: 300,
   year: 2026,
   altModelsActive: false,
@@ -22,6 +23,7 @@ describe("buildInquiryLogPayload", () => {
     expect(buildInquiryLogPayload(BASE_INPUT)).toEqual({
       regionId: "ZH-1",
       altersklasse: "erwachsen",
+      ageGroup: "26-35",
       franchise: 300,
       year: 2026,
       models: ["standard"],
@@ -82,5 +84,13 @@ describe("buildInquiryLogPayload", () => {
         currentMonthlyPremium: 400,
       }),
     ).toBeNull();
+  });
+
+  it("carries the age group through unchanged", () => {
+    expect(buildInquiryLogPayload({ ...BASE_INPUT, ageGroup: "66+" })?.ageGroup).toBe("66+");
+  });
+
+  it("returns null when the age group is not resolved yet", () => {
+    expect(buildInquiryLogPayload({ ...BASE_INPUT, ageGroup: null })).toBeNull();
   });
 });
