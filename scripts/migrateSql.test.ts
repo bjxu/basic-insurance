@@ -9,7 +9,7 @@ describe("CREATE_TABLE_SQL", () => {
   it("declares every column the stats and log-inquiry queries expect", () => {
     for (const column of [
       "id", "ts", "region_id", "altersklasse", "franchise", "year", "models", "accident",
-      "locale", "current_insurer", "current_premium_band",
+      "locale", "current_insurer", "current_premium_band", "age_band",
     ]) {
       expect(CREATE_TABLE_SQL).toContain(column);
     }
@@ -31,7 +31,7 @@ describe("CREATE_INDEX_SQL", () => {
 describe("ALTER_TABLE_SQL", () => {
   it("adds each new column idempotently", () => {
     const joined = ALTER_TABLE_SQL.join("\n");
-    for (const column of ["locale", "current_insurer", "current_premium_band"]) {
+    for (const column of ["locale", "current_insurer", "current_premium_band", "age_band"]) {
       expect(joined).toContain(`ADD COLUMN IF NOT EXISTS ${column}`);
     }
   });
