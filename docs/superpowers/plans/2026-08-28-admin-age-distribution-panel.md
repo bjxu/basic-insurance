@@ -29,8 +29,8 @@
 
 | File | Responsibility | Task |
 |------|----------------|------|
-| `src/lib/ageBand.ts` (new) | Pure `ageBand(age)` + `AGE_BANDS` / `AgeBand` type | 1 |
-| `src/lib/ageBand.test.ts` (new) | Boundary tests | 1 |
+| `src/lib/ageband.ts` (new) | Pure `ageBand(age)` + `AGE_BANDS` / `AgeBand` type | 1 |
+| `src/lib/ageband.test.ts` (new) | Boundary tests | 1 |
 | `scripts/migrateSql.ts` | Add `age_band` to `CREATE_TABLE_SQL`; 4th `ALTER_TABLE_SQL` entry | 2 |
 | `scripts/migrateSql.test.ts` | Assert `age_band` present | 2 |
 | `src/lib/inquiryLog.ts` | `birthYear` input → `ageBand?` output | 3 |
@@ -49,8 +49,8 @@
 ## Task 1: `ageBand` helper
 
 **Files:**
-- Create: `src/lib/ageBand.ts`
-- Test: `src/lib/ageBand.test.ts`
+- Create: `src/lib/ageband.ts`
+- Test: `src/lib/ageband.test.ts`
 
 **Interfaces:**
 - Consumes: nothing.
@@ -61,11 +61,11 @@
 
 - [ ] **Step 1: Write the failing test**
 
-Create `src/lib/ageBand.test.ts`:
+Create `src/lib/ageband.test.ts`:
 
 ```ts
 import { describe, it, expect } from "vitest";
-import { ageBand, AGE_BANDS } from "./ageBand";
+import { ageBand, AGE_BANDS } from "./ageband";
 
 describe("ageBand", () => {
   it("buckets ages at every band boundary", () => {
@@ -103,12 +103,12 @@ describe("ageBand", () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `npx vitest run src/lib/ageBand.test.ts`
-Expected: FAIL — `Failed to resolve import "./ageBand"`.
+Run: `npx vitest run src/lib/ageband.test.ts`
+Expected: FAIL — `Failed to resolve import "./ageband"`.
 
 - [ ] **Step 3: Write minimal implementation**
 
-Create `src/lib/ageBand.ts`:
+Create `src/lib/ageband.ts`:
 
 ```ts
 // Coarse client-side bucketing of the user's age, derived from the birth year
@@ -139,13 +139,13 @@ export function ageBand(age: number): AgeBand | null {
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `npx vitest run src/lib/ageBand.test.ts`
+Run: `npx vitest run src/lib/ageband.test.ts`
 Expected: PASS (3 tests).
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/lib/ageBand.ts src/lib/ageBand.test.ts
+git add src/lib/ageband.ts src/lib/ageband.test.ts
 git commit -m "feat: add ageBand client-side bucketing helper"
 ```
 
@@ -242,7 +242,7 @@ git commit -m "feat: migration adds age_band column to inquiry_log"
 - Test: `src/lib/inquiryLog.test.ts`
 
 **Interfaces:**
-- Consumes: `ageBand`, `AgeBand` from `src/lib/ageBand.ts` (Task 1).
+- Consumes: `ageBand`, `AgeBand` from `src/lib/ageband.ts` (Task 1).
 - Produces: updated
   ```ts
   type InquiryLogPayload = { /* ...existing... */ ageBand?: AgeBand };
@@ -303,7 +303,7 @@ In `src/lib/inquiryLog.ts`:
 Add the import:
 
 ```ts
-import { ageBand, type AgeBand } from "./ageBand";
+import { ageBand, type AgeBand } from "./ageband";
 ```
 
 Add to `InquiryLogPayload` (after `currentPremiumBand?`):
@@ -348,7 +348,7 @@ git commit -m "feat: buildInquiryLogPayload derives ageBand from birth year"
 - Test: `src/app/api/log-inquiry/route.test.ts`
 
 **Interfaces:**
-- Consumes: `AGE_BANDS` from `src/lib/ageBand.ts`.
+- Consumes: `AGE_BANDS` from `src/lib/ageband.ts`.
 - Produces: `POST` accepts `{ ...existing, ageBand? }`; INSERT writes `age_band` as the 10th value.
 
 - [ ] **Step 1: Write the failing tests**
@@ -410,7 +410,7 @@ In `src/app/api/log-inquiry/route.ts`:
 Add the import and constant:
 
 ```ts
-import { AGE_BANDS } from "@/lib/ageBand";
+import { AGE_BANDS } from "@/lib/ageband";
 ```
 ```ts
 const AGE_BAND_VALUES: readonly string[] = AGE_BANDS;
@@ -634,7 +634,7 @@ git commit -m "feat: admin stats returns age-band breakdown"
 - Modify: `src/components/admin/Dashboard.tsx`
 
 **Interfaces:**
-- Consumes: `stats.ageBands` (Task 6); `AGE_BANDS` from `src/lib/ageBand.ts`; existing `BreakdownBar`.
+- Consumes: `stats.ageBands` (Task 6); `AGE_BANDS` from `src/lib/ageband.ts`; existing `BreakdownBar`.
 
 - [ ] **Step 1: Extend the `Stats` type**
 
@@ -649,7 +649,7 @@ Add to `type Stats = { ... }`:
 Add near the other `@/lib` imports:
 
 ```ts
-import { AGE_BANDS } from "@/lib/ageBand";
+import { AGE_BANDS } from "@/lib/ageband";
 ```
 
 Add module-level, beside `PREMIUM_BAND_LABEL` / `orderedBandRows`:

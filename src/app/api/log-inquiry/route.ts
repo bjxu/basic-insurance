@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSql } from "@/lib/db";
 import { routing } from "@/i18n/routing";
 import { PREMIUM_BANDS } from "@/lib/premiumBand";
-import { AGE_BANDS } from "@/lib/ageBand";
+import { AGE_BANDS } from "@/lib/ageband";
 import insurersData from "@/data/insurers.json";
 
 const TARIFARTEN = ["standard", "hmo", "hausarzt", "telmed", "andere"];

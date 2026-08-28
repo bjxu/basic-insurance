@@ -5,7 +5,7 @@
 
 import { ALL_TARIFARTS } from "./lookup";
 import { premiumBand, type PremiumBand } from "./premiumBand";
-import { ageBand, type AgeBand } from "./ageBand";
+import { ageBand, type AgeBand } from "./ageband";
 import type { Tarifart } from "./types";
 
 export type InquiryLogPayload = {
