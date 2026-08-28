@@ -16,6 +16,7 @@ import { formatCount } from "@/lib/format";
 import type { Granularity } from "@/lib/adminStats";
 import insurersData from "@/data/insurers.json";
 import { PREMIUM_BANDS } from "@/lib/premiumBand";
+import { AGE_GROUPS } from "@/lib/ageGroup";
 
 type Stats = {
   total: number;
@@ -29,6 +30,7 @@ type Stats = {
   languages: { locale: string; n: number }[];
   currentInsurers: { insurerCode: string; n: number }[];
   premiumBands: { band: string; n: number }[];
+  ageGroups: { ageGroup: string; n: number }[];
 };
 
 const fetcher = async (url: string) => {
@@ -78,6 +80,28 @@ function orderedBandRows(rows: { band: string; n: number }[]): { label: string; 
   return PREMIUM_BANDS.filter((b) => byBand.has(b)).map((b) => ({
     label: PREMIUM_BAND_LABEL[b] ?? b,
     value: byBand.get(b) ?? 0,
+  }));
+}
+
+const AGE_GROUP_LABEL: Record<string, string> = {
+  "0": "Neugeboren (0)",
+  "1-5": "1–5 Jahre",
+  "6-12": "6–12 Jahre",
+  "13-18": "13–18 Jahre",
+  "19-25": "19–25 Jahre",
+  "26-35": "26–35 Jahre",
+  "36-50": "36–50 Jahre",
+  "51-65": "51–65 Jahre",
+  "66+": "66+ Jahre",
+};
+
+function orderedAgeGroupRows(
+  rows: { ageGroup: string; n: number }[],
+): { label: string; value: number }[] {
+  const byGroup = new Map(rows.map((r) => [r.ageGroup, r.n]));
+  return AGE_GROUPS.filter((g) => byGroup.has(g)).map((g) => ({
+    label: AGE_GROUP_LABEL[g] ?? g,
+    value: byGroup.get(g) ?? 0,
   }));
 }
 
@@ -156,6 +180,13 @@ export function Dashboard({
                 }))}
               />
             </div>
+          </div>
+
+          <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-5 mb-4">
+            <h2 className="text-title-medium text-on-surface-variant uppercase tracking-wide mb-4">
+              Altersgruppe
+            </h2>
+            <BreakdownBar rows={orderedAgeGroupRows(stats?.ageGroups ?? [])} />
           </div>
 
           <div className="grid grid-cols-2 gap-4">

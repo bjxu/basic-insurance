@@ -38,6 +38,7 @@ describe("GET /api/admin/stats", () => {
       languages: [],
       currentInsurers: [],
       premiumBands: [],
+      ageGroups: [],
     });
   });
 
@@ -55,6 +56,10 @@ describe("GET /api/admin/stats", () => {
       if (text.includes("COALESCE(locale")) return Promise.resolve([{ locale: "de", n: 12 }]);
       if (text.includes("current_insurer")) return Promise.resolve([{ insurerCode: "1542", n: 7 }]);
       if (text.includes("current_premium_band")) return Promise.resolve([{ band: "250-349", n: 4 }]);
+      if (text.includes("age_group")) {
+        expect(text).toContain("age_group IS NOT NULL");
+        return Promise.resolve([{ ageGroup: "26-35", n: 18 }]);
+      }
       return Promise.resolve([]);
     });
     vi.mocked(db.getSql).mockReturnValue(fakeSql as unknown as ReturnType<typeof db.getSql>);
@@ -83,6 +88,7 @@ describe("GET /api/admin/stats", () => {
       languages: [{ locale: "de", n: 12 }],
       currentInsurers: [{ insurerCode: "1542", n: 7 }],
       premiumBands: [{ band: "250-349", n: 4 }],
+      ageGroups: [{ ageGroup: "26-35", n: 18 }],
     });
   });
 

@@ -73,6 +73,10 @@ Runs via `npm run ingest`. Steps:
 ```ts
 type AgeKlasse = 'kind' | 'jung' | 'erwachsen'; // 0–18, 19–25, 26+
 
+type AgeGroup =
+  | '0' | '1-5' | '6-12' | '13-18'
+  | '19-25' | '26-35' | '36-50' | '51-65' | '66+'; // life-stage bands for analytics only; NOT a premium input
+
 type Tarifart =
   | 'standard'
   | 'hmo'
@@ -225,6 +229,12 @@ function getAltersklasse(birthYear: number, calendarYear: number): AgeKlasse
 function getFranchiseTiers(altersklasse: AgeKlasse): number[]
 ```
 
+Analytics age-group bucketing lives in `ageGroup.ts`:
+
+```ts
+function getAgeGroup(birthYear: number, visitYear: number): AgeGroup   // analytics bucketing; visitYear = real current year
+```
+
 ---
 
 ## 7. SEO & Metadata (REQ-18, 19, 20)
@@ -279,8 +289,13 @@ Month labels, deductible labels, and model description strings are defined in
 
 The browser fires a `POST /api/log-inquiry` request exactly once per resolved
 comparison — i.e. when all three required inputs become valid and results are first
-rendered, and again whenever a filter that changes the result set is toggled. Debounced
-to 1 s to avoid flooding on rapid input changes.
+rendered, and again whenever a filter that changes the result set is toggled — or
+whenever a birth-year edit moves the visitor into a different resolved age group.
+Debounced to 1 s to avoid flooding on rapid input changes.
+
+The payload also carries `ageGroup`, computed from the visitor's age in the *current*
+calendar year (not the selected premium year) — so it does not shift when the year
+toggle changes, unlike `altersklasse`.
 
 ### 10.2 API route (`src/app/api/log-inquiry/route.ts`)
 
@@ -293,6 +308,7 @@ A Next.js Route Handler (runs on Vercel serverless). It:
    `currentInsurer` (a BAG insurer code, validated against the bundled insurer
    list) and `currentPremiumBand` (one of the five fixed bands) are optional; if
    present they must be valid (400 otherwise).
+   `ageGroup` (one of the nine fixed life-stage bands) is optional; if present it must be valid (400 otherwise), if absent it is stored as NULL.
 2. Writes one row to the `inquiry_log` table. Still no IP address, no exact
    premium, no free-text, and no join key back to a user or session — the
    incumbent insurer code and the coarse premium band are the only current-plan
@@ -314,15 +330,22 @@ CREATE TABLE inquiry_log (
   accident    BOOLEAN     NOT NULL,
   locale      TEXT,                  -- 'de' | 'fr' | 'it' | 'en' | 'pt' | 'es' | NULL (unknown / pre-feature rows)
   current_insurer      TEXT,         -- BAG insurer code; NULL when no current plan provided
-  current_premium_band TEXT          -- see below; NULL when no current plan provided
+  current_premium_band TEXT,         -- see below; NULL when no current plan provided
+  age_group            TEXT          -- life-stage band (see below); NULL for pre-feature rows
 );
 ```
 
 `current_premium_band` is one of `<250 | 250-349 | 350-449 | 450-549 | 550+`, bucketed
-client-side — the exact premium is never transmitted. All three new columns are nullable:
+client-side — the exact premium is never transmitted. These columns are all nullable:
 `locale` is NULL for rows logged before the feature shipped, and `current_insurer` /
 `current_premium_band` are NULL for any inquiry where the optional current plan was not
 provided.
+
+`age_group` is one of `0 | 1-5 | 6-12 | 13-18 | 19-25 | 26-35 | 36-50 | 51-65 | 66+`,
+bucketed client-side from the visitor's age in the current calendar year — the birth
+year is never transmitted. It is NULL for rows logged before this feature shipped.
+Unlike `altersklasse` (age in the selected premium year), `age_group` always reflects
+the visitor's age at the time of the visit.
 
 No personal data is stored. No join key back to a user or session exists by design.
 
@@ -420,6 +443,14 @@ FROM inquiry_log
 WHERE ts >= $1 AND ts < $2
 GROUP BY 1 ORDER BY 2 DESC;
 
+-- 4b. Age group breakdown (finer; NULL age_group = pre-feature rows, excluded)
+-- No ORDER BY: bands come back arbitrary and are sorted client-side into the
+-- fixed AGE_GROUPS sequence.
+SELECT age_group AS "ageGroup", COUNT(*) AS n
+FROM inquiry_log
+WHERE ts >= $1 AND ts < $2 AND age_group IS NOT NULL
+GROUP BY 1;
+
 -- 5. Franchise breakdown
 SELECT franchise, COUNT(*) AS n
 FROM inquiry_log
@@ -513,6 +544,15 @@ bookmarkable.
 │  │  …                           │  │  (horizontal bar chart)  ││
 │  └──────────────────────────────┘  └──────────────────────────┘│
 │                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐ │
+│  │  Altersgruppe   (age at the time of the visit)            │ │
+│  │  0            ▌   3%      26–35  ████████ 24%             │ │
+│  │  1–5          █   6%      36–50  ██████   19%             │ │
+│  │  6–12         ██  9%      51–65  ████     12%             │ │
+│  │  13–18        ██  8%      66+    ██        6%             │ │
+│  │  19–25        ███ 13%     (rows youngest→oldest, up to 9) │ │
+│  └───────────────────────────────────────────────────────────┘ │
+│                                                                 │
 │  ┌──────────────────────────────┐  ┌──────────────────────────┐│
 │  │  Franchise Distribution      │  │  Insurance Model         ││
 │  │  CHF 300  ████████████ 38%   │  │  Standard   ████████ 82%  ││
@@ -555,6 +595,13 @@ bookmarkable.
   (HH:mm for hourly, DD MMM for daily, MMM YYYY for monthly), tooltip on hover.
 - **All breakdown charts:** Recharts `<BarChart layout="vertical">` with count + %
   label at the end of each bar. Bars all share the `blue-600` accent.
+- **Altersgruppe panel:** full-width card directly below the Altersklasse panel (the KVG
+  `altersklasse` panel is left untouched). `BreakdownBar` with rows ordered
+  youngest→oldest via the fixed `AGE_GROUPS` sequence (`orderedAgeGroupRows`), not by
+  count. It passes no explicit total, so each bar's % is its share of the sum of the
+  age-group rows shown — pre-feature rows with a NULL `age_group` are excluded by the
+  query (§13.2 query 4b). This is the finer life-stage view (age at the time of the
+  visit) alongside the coarser KVG `altersklasse` (age in the selected premium year).
 - **Language panel:** one bar per UI locale — Deutsch / Français / Italiano / English /
   Português / Español, plus **Unbekannt** for rows with no `locale` (query 8). Full-width
   card below Accident Coverage.
@@ -571,7 +618,8 @@ bookmarkable.
   stale data remains visible underneath to avoid layout shift.
 - Page is desktop-only (no mobile requirement for the admin tool).
 - No pagination — all result sets are small (≤ 10 rows for regions and current
-  insurers; ≤ 7 rows for language; ≤ 6 rows for all other breakdowns).
+  insurers; ≤ 9 rows for the Altersgruppe panel; ≤ 7 rows for language; ≤ 6 rows for
+  all other breakdowns).
 
 ### 13.5 SEO / Discoverability
 
@@ -608,15 +656,17 @@ always safe to re-run.
 - This feature adds three columns (`locale`, `current_insurer`,
   `current_premium_band`); it must not be deployed until `npm run db:migrate`
   has completed against production.
+- A later change adds a fourth column (`age_group`), same constraint: run
+  `npm run db:migrate` before deploying the code that writes it.
 
 ---
 
 ## 15. Key Constraints & Decisions
 
 - **No database for premium data.** BAG data is bundled. Annual re-ingestion is a `git commit`, not a migration. This is viable because the dataset is small (~10 MB) and changes are infrequent and wholesale.
-- **Postgres only for inquiry logs.** The log table is append-only. Alongside the original REQ-21 fields it now also holds the incumbent insurer's BAG code and a coarse (~100-CHF) band of the self-reported current premium. A simple serverless Postgres instance (Vercel Postgres) is sufficient; no ORM is needed. There is no migration framework — schema changes are plain SQL in `scripts/migrateSql.ts`: the initial `CREATE TABLE IF NOT EXISTS` plus idempotent `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` statements for columns added after first ship, run via `npm run db:migrate` (see §14.1).
+- **Postgres only for inquiry logs.** The log table is append-only. Alongside the original REQ-21 fields it now also holds the incumbent insurer's BAG code, a coarse (~100-CHF) band of the self-reported current premium, and a coarse nine-band age group (age at the time of the visit; birth year never transmitted). A simple serverless Postgres instance (Vercel Postgres) is sufficient; no ORM is needed. There is no migration framework — schema changes are plain SQL in `scripts/migrateSql.ts`: the initial `CREATE TABLE IF NOT EXISTS` plus idempotent `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` statements for columns added after first ship, run via `npm run db:migrate` (see §14.1).
 - **No user accounts, no server-side sessions.** All state is in the URL per §4 / REQ-11.
-- **No referral links, no analytics SDKs** that would require a cookie banner. Inquiry logging (REQ-21) still does not require consent under Swiss DSG / GDPR as implemented, and this is a deliberate re-affirmation after adding the insurer code and premium band: there is no IP address, no join key back to a user or session, the premium is a coarse bucket (five ~100-CHF bands), and the region is one of ~40 premium regions. No single row, and no combination of the stored fields, identifies a natural person.
+- **No referral links, no analytics SDKs** that would require a cookie banner. Inquiry logging (REQ-21) still does not require consent under Swiss DSG / GDPR as implemented, and this is a deliberate re-affirmation after adding the insurer code, premium band, and age group: there is no IP address, no join key back to a user or session, the premium is a coarse bucket (five ~100-CHF bands), the age group is one of nine life-stage bands (the birth year itself is never stored, only the derived band), and the region is one of ~40 premium regions. No single row, and no combination of the stored fields, identifies a natural person.
 - **Single language (German).** Multi-language support is explicitly out of scope for
   v1 (§12 of requirements). String literals are centralised in `copy.ts` to make
   future i18n straightforward without over-engineering it now.

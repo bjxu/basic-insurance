@@ -15,6 +15,7 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 import { NewcomerBanner } from "./help/NewcomerBanner";
 import { HowItWorksDrawer } from "./help/HowItWorksDrawer";
 import { getAltersklasse, getFranchiseTiers } from "@/lib/ageband";
+import { getAgeGroup } from "@/lib/ageGroup";
 import { resolveGemeinden, needsDisambiguation } from "@/lib/location";
 import {
   filterPlans,
@@ -86,6 +87,9 @@ export function InsuranceComparator() {
 
   const parsedBirthYear = birthYear ? Number(birthYear) : null;
   const altersklasse = parsedBirthYear ? getAltersklasse(parsedBirthYear, year) : null;
+  // Age group uses the visitor's age NOW — deliberately NOT `year` (which can be
+  // toggled to next year and drives `altersklasse`). See src/lib/ageGroup.ts.
+  const ageGroup = parsedBirthYear ? getAgeGroup(parsedBirthYear, new Date().getFullYear()) : null;
 
   // A PLZ edit invalidates any previously-picked Gemeinde from a different PLZ (bug fix:
   // without this, bfsNr could point at a Gemeinde not in the new PLZ's list, silently
@@ -166,6 +170,7 @@ export function InsuranceComparator() {
     const payload = buildInquiryLogPayload({
       praemienregionId,
       altersklasse,
+      ageGroup,
       franchise,
       year,
       altModelsActive,
@@ -186,7 +191,7 @@ export function InsuranceComparator() {
 
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [praemienregionId, altersklasse, franchise, year, altModelsActive, unfalldeckung, ALL_PREMIUMS.length]);
+  }, [praemienregionId, altersklasse, ageGroup, franchise, year, altModelsActive, unfalldeckung, ALL_PREMIUMS.length]);
 
   const inputsValid = Boolean(praemienregionId && altersklasse && franchise);
 

@@ -10,6 +10,7 @@ import type { Tarifart } from "./types";
 export type InquiryLogPayload = {
   regionId: string;
   altersklasse: string;
+  ageGroup: string;
   franchise: number;
   year: number;
   models: Tarifart[];
@@ -22,6 +23,7 @@ export type InquiryLogPayload = {
 export function buildInquiryLogPayload(input: {
   praemienregionId: string | null;
   altersklasse: string | null;
+  ageGroup: string | null;
   franchise: number | null;
   year: number;
   altModelsActive: boolean;
@@ -30,11 +32,12 @@ export function buildInquiryLogPayload(input: {
   currentInsurerCode: string | null;
   currentMonthlyPremium: number | null;
 }): InquiryLogPayload | null {
-  if (!input.praemienregionId || !input.altersklasse || !input.franchise) return null;
+  if (!input.praemienregionId || !input.altersklasse || !input.ageGroup || !input.franchise) return null;
 
   const payload: InquiryLogPayload = {
     regionId: input.praemienregionId,
     altersklasse: input.altersklasse,
+    ageGroup: input.ageGroup,
     franchise: input.franchise,
     year: input.year,
     models: input.altModelsActive ? ALL_TARIFARTS : ["standard"],

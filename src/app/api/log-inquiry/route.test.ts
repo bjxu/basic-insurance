@@ -21,6 +21,7 @@ const validPayload = {
   models: ["standard"],
   accident: true,
   locale: "de",
+  ageGroup: "26-35",
 };
 
 describe("POST /api/log-inquiry", () => {
@@ -53,7 +54,7 @@ describe("POST /api/log-inquiry", () => {
     expect(fakeSql).toHaveBeenCalledTimes(1);
     const [strings, ...values] = fakeSql.mock.calls[0];
     expect(strings.join("?")).toContain("INSERT INTO inquiry_log");
-    expect(values).toEqual(["ZH-1", "erwachsen", 300, 2026, ["standard"], true, "de", null, null]);
+    expect(values).toEqual(["ZH-1", "erwachsen", 300, 2026, ["standard"], true, "de", null, null, "26-35"]);
   });
 
   it("inserts NULL locale when locale is omitted", async () => {
@@ -67,7 +68,7 @@ describe("POST /api/log-inquiry", () => {
 
     expect(res.status).toBe(204);
     const [, ...values] = fakeSql.mock.calls[0];
-    expect(values).toEqual(["ZH-1", "erwachsen", 300, 2026, ["standard"], true, null, null, null]);
+    expect(values).toEqual(["ZH-1", "erwachsen", 300, 2026, ["standard"], true, null, null, null, "26-35"]);
   });
 
   it("returns 400 on an unknown locale", async () => {
@@ -97,7 +98,7 @@ describe("POST /api/log-inquiry", () => {
     expect(res.status).toBe(204);
     const [, ...values] = fakeSql.mock.calls[0];
     expect(values).toEqual([
-      "ZH-1", "erwachsen", 300, 2026, ["standard"], true, "de", "1542", "350-449",
+      "ZH-1", "erwachsen", 300, 2026, ["standard"], true, "de", "1542", "350-449", "26-35",
     ]);
   });
 
@@ -110,5 +111,24 @@ describe("POST /api/log-inquiry", () => {
     const res = await POST(makeRequest(validPayload));
     expect(res.status).toBe(204);
     expect(errSpy).toHaveBeenCalledWith("log-inquiry insert failed", expect.any(Error));
+  });
+
+  it("returns 400 on an unknown age group", async () => {
+    const res = await POST(makeRequest({ ...validPayload, ageGroup: "999" }));
+    expect(res.status).toBe(400);
+  });
+
+  it("inserts NULL age_group when ageGroup is omitted", async () => {
+    process.env.POSTGRES_URL = "postgres://test";
+    const fakeSql = vi.fn().mockResolvedValue([]);
+    vi.mocked(db.getSql).mockReturnValue(fakeSql as unknown as ReturnType<typeof db.getSql>);
+
+    const { ageGroup, ...noAgeGroup } = validPayload;
+    void ageGroup;
+    const res = await POST(makeRequest(noAgeGroup));
+
+    expect(res.status).toBe(204);
+    const [, ...values] = fakeSql.mock.calls[0];
+    expect(values).toEqual(["ZH-1", "erwachsen", 300, 2026, ["standard"], true, "de", null, null, null]);
   });
 });
