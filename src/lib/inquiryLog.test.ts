@@ -94,13 +94,35 @@ describe("buildInquiryLogPayload", () => {
   });
 
   it("derives ageBand against the active year, not the current date", () => {
-    // year 2026 − birthYear 2009 = age 17 → "0-18"
-    expect(buildInquiryLogPayload({ ...BASE_INPUT, birthYear: 2009 })?.ageBand).toBe("0-18");
+    // active year 2030 − birthYear 2009 = age 21 → "19-25"
+    // (against today's date this would be age 17 → "0-18", so this distinguishes them)
+    expect(
+      buildInquiryLogPayload({ ...BASE_INPUT, year: 2030, birthYear: 2009 })?.ageBand,
+    ).toBe("19-25");
+  });
+
+  it("still derives the band for a plausible elderly birth year", () => {
+    // year 2026 − birthYear 1946 = age 80 → "76+"
+    expect(buildInquiryLogPayload({ ...BASE_INPUT, birthYear: 1946 })?.ageBand).toBe("76+");
   });
 
   it("omits ageBand when the birth year implies a negative age", () => {
     expect(
       buildInquiryLogPayload({ ...BASE_INPUT, birthYear: 2030 }),
+    ).not.toHaveProperty("ageBand");
+  });
+
+  it("omits ageBand for an implausible mid-typing birth year (1-digit prefix)", () => {
+    // year 2026 − birthYear 1 = age 2025 → implausible, must not be logged as "76+"
+    expect(
+      buildInquiryLogPayload({ ...BASE_INPUT, birthYear: 1 }),
+    ).not.toHaveProperty("ageBand");
+  });
+
+  it("omits ageBand for an implausible mid-typing birth year (3-digit prefix)", () => {
+    // year 2026 − birthYear 198 = age 1828 → implausible, must not be logged as "76+"
+    expect(
+      buildInquiryLogPayload({ ...BASE_INPUT, birthYear: 198 }),
     ).not.toHaveProperty("ageBand");
   });
 });

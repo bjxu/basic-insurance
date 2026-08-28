@@ -94,7 +94,9 @@ const AGE_BAND_LABEL: Record<string, string> = {
   "76+": "76+",
 };
 
-function orderedAgeBandRows(rows: { band: string; n: number }[]): { label: string; value: number }[] {
+export function orderedAgeBandRows(
+  rows: { band: string; n: number }[],
+): { label: string; value: number }[] {
   const byBand = new Map(rows.map((r) => [r.band, r.n]));
   return AGE_BANDS.filter((b) => byBand.has(b)).map((b) => ({
     label: AGE_BAND_LABEL[b] ?? b,
@@ -201,9 +203,12 @@ export function Dashboard({
           </div>
 
           <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-5 mt-4">
-            <h2 className="text-title-medium text-on-surface-variant uppercase tracking-wide mb-4">
+            <h2 className="text-title-medium text-on-surface-variant uppercase tracking-wide mb-1">
               Altersverteilung
             </h2>
+            <p className="text-body-small text-outline mb-4">
+              nur Anfragen seit der Altersband-Migration
+            </p>
             <BreakdownBar labelWidth="short" rows={orderedAgeBandRows(stats?.ageBands ?? [])} />
           </div>
 

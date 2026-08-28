@@ -541,15 +541,15 @@ bookmarkable.
 │  └──────────────────────────────┘                              │
 │                                                                 │
 │  ┌───────────────────────────────────────────────────────────┐ │
-│  │  Language                                                  │ │
-│  │  Deutsch    ████████████ 70%   Français  ███  17%         │ │
-│  │  Italiano   █  8%              English   ▌  4%   …        │ │
-│  └───────────────────────────────────────────────────────────┘ │
-│                                                                 │
-│  ┌───────────────────────────────────────────────────────────┐ │
 │  │  Age distribution (complements not replaces Altersklasse) │ │
 │  │  0–18 ██ 6%   19–25 ███ 8%   26–35 ████████████ 22%       │ │
 │  │  36–45 ██████████ 18%   …   66–75 ██████ 11%   76+ ██ 7%  │ │
+│  └───────────────────────────────────────────────────────────┘ │
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐ │
+│  │  Language                                                  │ │
+│  │  Deutsch    ████████████ 70%   Français  ███  17%         │ │
+│  │  Italiano   █  8%              English   ▌  4%   …        │ │
 │  └───────────────────────────────────────────────────────────┘ │
 │                                                                 │
 │  ┌──────────────────────────────┐  ┌──────────────────────────┐│
@@ -588,8 +588,9 @@ bookmarkable.
   client-side (§10.3). **Only counts inquiries where the current plan was provided**, same
   subtitle + subset-% treatment as the current-insurer panel.
 - **Altersverteilung panel:** the eight fixed age bands `0–18 / 19–25 / 26–35 / 36–45 /
-  46–55 / 56–65 / 66–75 / 76+` in ascending order (query 11); a **full-width card** below
-  the Language panel. Bands are bucketed client-side from the birth year (§10.3); the
+  46–55 / 56–65 / 66–75 / 76+` in ascending order (query 11); a **full-width card**
+  immediately before the Anfragen-pro-Sprache (Language) card. Bands are bucketed
+  client-side from the birth year (§10.3); the
   panel orders the rows client-side by the canonical `AGE_BANDS` sequence (query 11 has no
   `ORDER BY`). This panel **complements — it does not replace — the Altersklasse panel**,
   which keeps the BAG three-band `kind / jung / erwachsen` split (query 4); Altersverteilung
@@ -636,18 +637,18 @@ inquiry row until the migration is applied. The migration is idempotent
 (`ALTER TABLE ... ADD COLUMN IF NOT EXISTS`, `scripts/migrateSql.ts`), so it is
 always safe to re-run.
 
-- This feature adds three columns (`locale`, `current_insurer`,
-  `current_premium_band`); it must not be deployed until `npm run db:migrate`
-  has completed against production.
+- This feature adds four columns (`locale`, `current_insurer`,
+  `current_premium_band`, `age_band`); it must not be deployed until
+  `npm run db:migrate` has completed against production.
 
 ---
 
 ## 15. Key Constraints & Decisions
 
 - **No database for premium data.** BAG data is bundled. Annual re-ingestion is a `git commit`, not a migration. This is viable because the dataset is small (~10 MB) and changes are infrequent and wholesale.
-- **Postgres only for inquiry logs.** The log table is append-only. Alongside the original REQ-21 fields it now also holds the incumbent insurer's BAG code and a coarse (~100-CHF) band of the self-reported current premium. A simple serverless Postgres instance (Vercel Postgres) is sufficient; no ORM is needed. There is no migration framework — schema changes are plain SQL in `scripts/migrateSql.ts`: the initial `CREATE TABLE IF NOT EXISTS` plus idempotent `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` statements for columns added after first ship, run via `npm run db:migrate` (see §14.1).
+- **Postgres only for inquiry logs.** The log table is append-only. Alongside the original REQ-21 fields it now also holds the incumbent insurer's BAG code, a coarse (~100-CHF) band of the self-reported current premium, and a coarse age band (one of eight buckets) derived client-side from the entered birth year. A simple serverless Postgres instance (Vercel Postgres) is sufficient; no ORM is needed. There is no migration framework — schema changes are plain SQL in `scripts/migrateSql.ts`: the initial `CREATE TABLE IF NOT EXISTS` plus idempotent `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` statements for columns added after first ship, run via `npm run db:migrate` (see §14.1).
 - **No user accounts, no server-side sessions.** All state is in the URL per §4 / REQ-11.
-- **No referral links, no analytics SDKs** that would require a cookie banner. Inquiry logging (REQ-21) still does not require consent under Swiss DSG / GDPR as implemented, and this is a deliberate re-affirmation after adding the insurer code and premium band: there is no IP address, no join key back to a user or session, the premium is a coarse bucket (five ~100-CHF bands), and the region is one of ~40 premium regions. No single row, and no combination of the stored fields, identifies a natural person.
+- **No referral links, no analytics SDKs** that would require a cookie banner. Inquiry logging (REQ-21) still does not require consent under Swiss DSG / GDPR as implemented, and this is a deliberate re-affirmation after adding the insurer code and premium band: there is no IP address, no join key back to a user or session, the premium is a coarse bucket (five ~100-CHF bands), and the region is one of ~40 premium regions. No single row, and no combination of the stored fields, identifies a natural person. Adding the `age_band` column does not change this conclusion: it is one of only eight bands spread across ~40 regions, carries no birth year or exact age and no join key, and so remains non-identifying alone or in combination with the other fields.
 - **Single language (German).** Multi-language support is explicitly out of scope for
   v1 (§12 of requirements). String literals are centralised in `copy.ts` to make
   future i18n straightforward without over-engineering it now.

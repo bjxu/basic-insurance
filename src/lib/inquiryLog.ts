@@ -55,7 +55,12 @@ export function buildInquiryLogPayload(input: {
     payload.currentPremiumBand = band;
   }
 
-  const age = input.birthYear != null ? ageBand(input.year - input.birthYear) : null;
+  // `validateBirthYear` does NOT gate this path — InsuranceComparator derives the
+  // band straight from `Number(birthYear)`, so a mid-typing 1–3-digit prefix on a
+  // pre-filled shared URL yields an implausible age. Gate on the same 120-year
+  // plausibility bound `src/lib/validate.ts` uses (MAX_PLAUSIBLE_AGE = 120).
+  const rawAge = input.birthYear != null ? input.year - input.birthYear : null;
+  const age = rawAge != null && rawAge >= 0 && rawAge <= 120 ? ageBand(rawAge) : null;
   if (age) {
     payload.ageBand = age;
   }
