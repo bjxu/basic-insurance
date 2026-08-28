@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect, useCallback } from "react";
+import { useMemo, useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { PlzInput } from "./inputs/PlzInput";
@@ -156,43 +156,6 @@ export function InsuranceComparator() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [plz, bfsNr, birthYear, franchise, year, unfalldeckung, altModelsActive, currentPlan]);
 
-  // Log the resolved query once premium data has loaded and results can render
-  // (REQ-21, architecture.md §10.1) — fires on first valid+rendered results, and
-  // again whenever a filter that changes the result set (models/accident/year)
-  // is toggled. Debounced 1s so rapid toggling coalesces into one request.
-  // currentPlan is deliberately excluded from the deps — it doesn't affect the
-  // result set, only the headline comparison, so editing it shouldn't re-log.
-  // locale and the current-plan fields are captured opportunistically at fire
-  // time: they're read off current state when the effect runs, but don't trigger
-  // it, so a plan entered after the last trigger fire lands on the next fire
-  // (whenever a result-set filter next changes), not immediately.
-  useEffect(() => {
-    const payload = buildInquiryLogPayload({
-      praemienregionId,
-      altersklasse,
-      ageGroup,
-      franchise,
-      year,
-      altModelsActive,
-      unfalldeckung,
-      locale,
-      currentInsurerCode: currentPlan.insurerCode ?? null,
-      currentMonthlyPremium: currentPlan.monthlyPremium ?? null,
-    });
-    if (!payload || ALL_PREMIUMS.length === 0) return;
-
-    const timer = setTimeout(() => {
-      fetch("/api/log-inquiry", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(payload),
-      }).catch(() => {}); // logging must never surface to the user (architecture.md §10.2)
-    }, 1000);
-
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [praemienregionId, altersklasse, ageGroup, franchise, year, altModelsActive, unfalldeckung, ALL_PREMIUMS.length]);
-
   const inputsValid = Boolean(praemienregionId && altersklasse && franchise);
 
   // A current plan is "provided" once both fields are filled with a usable value — no
@@ -202,6 +165,54 @@ export function InsuranceComparator() {
       currentPlan.monthlyPremium != null &&
       validateCurrentPremium(currentPlan.monthlyPremium).valid,
   );
+
+  // The current-plan section renders below the results, so it is usually filled in
+  // *after* the first log has already been scheduled. Keep the latest values in a
+  // ref so the debounced send reads them at fire time rather than from a stale
+  // render closure.
+  const currentPlanRef = useRef(currentPlan);
+  useEffect(() => {
+    currentPlanRef.current = currentPlan;
+  }, [currentPlan]);
+
+  // Log the resolved query once premium data has loaded and results can render
+  // (REQ-21, architecture.md §10.1). Debounced 1s so rapid changes coalesce into
+  // one request. Triggers: first valid+rendered results; a result-set filter
+  // (models/accident/year) toggled; a birth-year edit that changes the age group;
+  // and `currentPlanProvided` flipping (so a current plan entered after results
+  // first rendered is captured without waiting for an unrelated filter toggle).
+  // The current-plan values themselves are not deps — they are read from the ref
+  // at fire time, so partial edits don't spam requests.
+  useEffect(() => {
+    if (!praemienregionId || !altersklasse || !ageGroup || !franchise || ALL_PREMIUMS.length === 0) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      const plan = currentPlanRef.current;
+      const payload = buildInquiryLogPayload({
+        praemienregionId,
+        altersklasse,
+        ageGroup,
+        franchise,
+        year,
+        altModelsActive,
+        unfalldeckung,
+        locale,
+        currentInsurerCode: plan.insurerCode ?? null,
+        currentMonthlyPremium: plan.monthlyPremium ?? null,
+      });
+      if (!payload) return;
+      fetch("/api/log-inquiry", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload),
+      }).catch(() => {}); // logging must never surface to the user (architecture.md §10.2)
+    }, 1000);
+
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [praemienregionId, altersklasse, ageGroup, franchise, year, altModelsActive, unfalldeckung, ALL_PREMIUMS.length, currentPlanProvided]);
 
   const results = useMemo(() => {
     if (!inputsValid || !praemienregionId || !altersklasse || !franchise || ALL_PREMIUMS.length === 0) return null;

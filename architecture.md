@@ -287,11 +287,19 @@ Month labels, deductible labels, and model description strings are defined in
 
 ### 10.1 Trigger
 
-The browser fires a `POST /api/log-inquiry` request exactly once per resolved
-comparison — i.e. when all three required inputs become valid and results are first
-rendered, and again whenever a filter that changes the result set is toggled — or
-whenever a birth-year edit moves the visitor into a different resolved age group.
-Debounced to 1 s to avoid flooding on rapid input changes.
+The browser fires a `POST /api/log-inquiry` request when all three required inputs
+become valid and results are first rendered, and again whenever: a filter that
+changes the result set is toggled; a birth-year edit moves the visitor into a
+different resolved age group; or the optional current plan first becomes complete
+(both insurer and a valid premium filled in). Debounced to 1 s to avoid flooding on
+rapid input changes.
+
+The current-plan values are not themselves request triggers — they are read from a
+ref when the debounced request fires, so partial edits don't spam requests. Because
+the current-plan section renders below the results, a completed current plan
+typically produces a second row (the first written before it was filled in); there
+is no join key to reconcile the two (REQ-21), so the `current_insurer` /
+`current_premium_band` panels count inquiries, not unique users.
 
 The payload also carries `ageGroup`, computed from the visitor's age in the *current*
 calendar year (not the selected premium year) — so it does not shift when the year
@@ -609,7 +617,9 @@ bookmarkable.
   verbatim (not translated). **Only counts inquiries where a current insurer was named**
   (`current_insurer IS NOT NULL`, independent of whether a premium was given) — the panel
   subtitle states this. The query is `LIMIT 10` and the panel passes no explicit total,
-  so each bar's % is its share of the top 10 shown (not of all inquiries).
+  so each bar's % is its share of the top 10 shown (not of all inquiries). Expect this
+  count to be well below the total-inquiry count: the current plan is optional and, per
+  §10.1, is only logged once the user completes it (or later toggles a filter).
 - **Current premium panel:** the five fixed bands `CHF <250 / CHF 250–349 / CHF 350–449 /
   CHF 450–549 / CHF 550+` in ascending order (query 10), band boundaries computed
   client-side (§10.3). **Only counts inquiries where the current plan was provided**, same
