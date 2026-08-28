@@ -100,8 +100,9 @@ counts are unaffected.
 
 Extend `isValidPayload` / the schema:
 
-- `locale` — **required**, must be one of
-  `["de","fr","it","en","pt","es"]` (import `routing.locales`). Missing/invalid → 400.
+- `locale` — optional; if present must be one of `routing.locales`
+  (`["de","fr","it","en","pt","es"]`) — 400 otherwise; if absent, stored as NULL
+  and shown as "Unbekannt".
 - `currentInsurer` — optional; if present, must be a `string` matching an
   `insurerCode` in `src/data/insurers.json`. Invalid → 400.
 - `currentPremiumBand` — optional; if present, must be one of `PREMIUM_BANDS`.
@@ -204,7 +205,7 @@ description / ASCII diagram.
 |------|----------|
 | `src/lib/premiumBand.test.ts` (new) | Every band boundary (249.99, 250, 349.99, 350, …, 550), `0`, negative, `NaN`, `Infinity`. |
 | `src/lib/inquiryLog.test.ts` | `locale` always in payload; `currentInsurer` present only with a code; `currentPremiumBand` present only with a valid premium; absent keys omitted (not `undefined` set). |
-| `src/app/api/log-inquiry/route.test.ts` | Missing `locale` → 400; bad `locale` → 400; unknown `currentInsurer` code → 400; bad band → 400; valid full payload → 204; valid payload with neither optional field → 204. |
+| `src/app/api/log-inquiry/route.test.ts` | Omitted `locale` → 204 with NULL in the locale position; bad `locale` → 400; unknown `currentInsurer` code → 400; bad band → 400; valid full payload → 204; valid payload with neither optional field → 204. |
 | `src/lib/adminStats.test.ts` | Unchanged helpers still pass (no logic change there — verify only). |
 | `src/app/api/admin/stats/route.test.ts` | Response contains `languages`, `currentInsurers`, `premiumBands`; no-`POSTGRES_URL` payload has them as `[]`. |
 | `scripts/migrateSql.test.ts` | `CREATE_TABLE_SQL` declares the three new columns; `ALTER_TABLE_SQL` contains an idempotent `ADD COLUMN IF NOT EXISTS` for each of `locale`, `current_insurer`, `current_premium_band`. |

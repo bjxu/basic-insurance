@@ -198,7 +198,7 @@ export function Dashboard({
                 Aktuelle Krankenkasse
               </h2>
               <p className="text-body-small text-outline mb-4">
-                nur Anfragen mit angegebenem aktuellem Plan
+                nur Anfragen mit angegebener aktueller Krankenkasse
               </p>
               <BreakdownBar
                 rows={(stats?.currentInsurers ?? []).map((r) => ({

@@ -20,7 +20,7 @@ type InquiryPayload = {
   year: number;
   models: string[];
   accident: boolean;
-  locale: string;
+  locale?: string;
   currentInsurer?: string;
   currentPremiumBand?: string;
 };
@@ -38,11 +38,14 @@ function isValidPayload(body: unknown): body is InquiryPayload {
     typeof b.year === "number" &&
     Array.isArray(b.models) &&
     b.models.every((m) => typeof m === "string" && TARIFARTEN.includes(m)) &&
-    typeof b.accident === "boolean" &&
-    typeof b.locale === "string" &&
-    LOCALES.includes(b.locale);
+    typeof b.accident === "boolean";
 
   if (!baseOk) return false;
+
+  // locale: absent is allowed (stored as NULL); present must be a known locale.
+  if (b.locale !== undefined) {
+    if (typeof b.locale !== "string" || !LOCALES.includes(b.locale)) return false;
+  }
 
   if (b.currentInsurer !== undefined) {
     if (typeof b.currentInsurer !== "string" || !INSURER_CODES.has(b.currentInsurer)) return false;
@@ -75,11 +78,13 @@ export async function POST(request: NextRequest) {
     await sql`INSERT INTO inquiry_log
               (region_id, altersklasse, franchise, year, models, accident, locale, current_insurer, current_premium_band)
               VALUES (${body.regionId}, ${body.altersklasse}, ${body.franchise}, ${body.year},
-                      ${body.models}, ${body.accident}, ${body.locale},
+                      ${body.models}, ${body.accident}, ${body.locale ?? null},
                       ${body.currentInsurer ?? null}, ${body.currentPremiumBand ?? null})`;
     return new NextResponse(null, { status: 204 });
-  } catch {
-    // Logging failures must never surface to the user.
+  } catch (err) {
+    // Logging failures must never surface to the user — but they must be visible
+    // in server logs so schema drift / DB errors don't fail silently.
+    console.error("log-inquiry insert failed", err);
     return new NextResponse(null, { status: 204 });
   }
 }

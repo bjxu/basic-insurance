@@ -286,10 +286,17 @@ to 1 s to avoid flooding on rapid input changes.
 
 A Next.js Route Handler (runs on Vercel serverless). It:
 
-1. Validates the request body against a strict schema (all fields required, enumerated
-   values only).
-2. Writes one row to the `inquiry_log` table. No IP address, no current-plan fields,
-   no free-text — only the fields specified in REQ-21.
+1. Validates the request body against a schema. Required: `regionId`,
+   `altersklasse`, `franchise`, `year`, `models`, `accident` — enumerated values
+   only where applicable. `locale` is optional; if present it must be one of
+   `routing.locales` (400 otherwise), if absent it is stored as NULL.
+   `currentInsurer` (a BAG insurer code, validated against the bundled insurer
+   list) and `currentPremiumBand` (one of the five fixed bands) are optional; if
+   present they must be valid (400 otherwise).
+2. Writes one row to the `inquiry_log` table. Still no IP address, no exact
+   premium, no free-text, and no join key back to a user or session — the
+   incumbent insurer code and the coarse premium band are the only current-plan
+   fields, both optional.
 3. Returns `204 No Content`. Failures are silent to the user (logging must never block
    or degrade the comparison UI).
 
@@ -444,10 +451,13 @@ WHERE ts >= $1 AND ts < $2 AND current_insurer IS NOT NULL
 GROUP BY 1 ORDER BY 2 DESC LIMIT 10;
 
 -- 10. Current premium band (only inquiries where the current plan was provided)
+-- No ORDER BY: bands come back in arbitrary order and are sorted client-side
+-- into the fixed PREMIUM_BANDS sequence. `ORDER BY 1` would sort lexically and
+-- push `<250` to the end.
 SELECT current_premium_band AS band, COUNT(*) AS n
 FROM inquiry_log
 WHERE ts >= $1 AND ts < $2 AND current_premium_band IS NOT NULL
-GROUP BY 1 ORDER BY 1;
+GROUP BY 1;
 ```
 
 ### 13.3 Page Layout
@@ -525,10 +535,11 @@ bookmarkable.
 │  ┌──────────────────────────────┐  ┌──────────────────────────┐│
 │  │  Current insurer             │  │  Current premium         ││
 │  │  (current plan provided only)│  │  (current plan prov. only)││
-│  │  Assura   ████████████ 28%   │  │  CHF 250–349 ████████ 36%││
-│  │  CSS      ████████     20%   │  │  CHF 350–449 ██████████45%││
-│  │  Helsana  ██████       15%   │  │  CHF <250    ███      12%││
-│  │  …                           │  │  …                       ││
+│  │  Assura   ████████████ 28%   │  │  CHF <250    ███       7% ││
+│  │  CSS      ████████     20%   │  │  CHF 250–349 ████████ 36%││
+│  │  Helsana  ██████       15%   │  │  CHF 350–449 ██████████45%││
+│  │  …                           │  │  CHF 450–549 ██        9% ││
+│  │                              │  │  CHF 550+    ▌         3% ││
 │  └──────────────────────────────┘  └──────────────────────────┘│
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -548,8 +559,10 @@ bookmarkable.
   Português / Español, plus **Unbekannt** for rows with no `locale` (query 8). Full-width
   card below Accident Coverage.
 - **Current insurer panel:** top 10 BAG insurers by count (query 9); insurer names shown
-  verbatim (not translated). **Only counts inquiries where the current plan was provided**
-  — the panel subtitle states this, and the % is of that subset, not of all inquiries.
+  verbatim (not translated). **Only counts inquiries where a current insurer was named**
+  (`current_insurer IS NOT NULL`, independent of whether a premium was given) — the panel
+  subtitle states this. The query is `LIMIT 10` and the panel passes no explicit total,
+  so each bar's % is its share of the top 10 shown (not of all inquiries).
 - **Current premium panel:** the five fixed bands `CHF <250 / CHF 250–349 / CHF 350–449 /
   CHF 450–549 / CHF 550+` in ascending order (query 10), band boundaries computed
   client-side (§10.3). **Only counts inquiries where the current plan was provided**, same
@@ -582,14 +595,28 @@ Required environment variables in production:
 | `POSTGRES_URL` | Vercel Postgres connection string for inquiry logging |
 | `ADMIN_SECRET` | Password protecting `/admin`; compared constant-time in the login action |
 
+### 14.1 Release checklist — database migrations
+
+**Standing rule:** whenever a change adds or alters a column on `inquiry_log`,
+`npm run db:migrate` MUST be run against the production `POSTGRES_URL` *before*
+that change is deployed. The route handler swallows INSERT failures (§10.2), so a
+schema that lags the code does not raise an error — it silently drops every
+inquiry row until the migration is applied. The migration is idempotent
+(`ALTER TABLE ... ADD COLUMN IF NOT EXISTS`, `scripts/migrateSql.ts`), so it is
+always safe to re-run.
+
+- This feature adds three columns (`locale`, `current_insurer`,
+  `current_premium_band`); it must not be deployed until `npm run db:migrate`
+  has completed against production.
+
 ---
 
 ## 15. Key Constraints & Decisions
 
 - **No database for premium data.** BAG data is bundled. Annual re-ingestion is a `git commit`, not a migration. This is viable because the dataset is small (~10 MB) and changes are infrequent and wholesale.
-- **Postgres only for inquiry logs.** The log table is append-only and stores no personal data. A simple serverless Postgres instance (Vercel Postgres) is sufficient; no ORM or migration framework is needed beyond a single `CREATE TABLE`.
+- **Postgres only for inquiry logs.** The log table is append-only. Alongside the original REQ-21 fields it now also holds the incumbent insurer's BAG code and a coarse (~100-CHF) band of the self-reported current premium. A simple serverless Postgres instance (Vercel Postgres) is sufficient; no ORM is needed. There is no migration framework — schema changes are plain SQL in `scripts/migrateSql.ts`: the initial `CREATE TABLE IF NOT EXISTS` plus idempotent `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` statements for columns added after first ship, run via `npm run db:migrate` (see §14.1).
 - **No user accounts, no server-side sessions.** All state is in the URL per §4 / REQ-11.
-- **No referral links, no analytics SDKs** that would require a cookie banner. Inquiry logging (REQ-21) stores no personal data and does not require consent under Swiss DSG / GDPR as implemented.
+- **No referral links, no analytics SDKs** that would require a cookie banner. Inquiry logging (REQ-21) still does not require consent under Swiss DSG / GDPR as implemented, and this is a deliberate re-affirmation after adding the insurer code and premium band: there is no IP address, no join key back to a user or session, the premium is a coarse bucket (five ~100-CHF bands), and the region is one of ~40 premium regions. No single row, and no combination of the stored fields, identifies a natural person.
 - **Single language (German).** Multi-language support is explicitly out of scope for
   v1 (§12 of requirements). String literals are centralised in `copy.ts` to make
   future i18n straightforward without over-engineering it now.

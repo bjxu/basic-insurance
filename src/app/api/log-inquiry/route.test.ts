@@ -56,11 +56,18 @@ describe("POST /api/log-inquiry", () => {
     expect(values).toEqual(["ZH-1", "erwachsen", 300, 2026, ["standard"], true, "de", null, null]);
   });
 
-  it("returns 400 when locale is missing", async () => {
+  it("inserts NULL locale when locale is omitted", async () => {
+    process.env.POSTGRES_URL = "postgres://test";
+    const fakeSql = vi.fn().mockResolvedValue([]);
+    vi.mocked(db.getSql).mockReturnValue(fakeSql as unknown as ReturnType<typeof db.getSql>);
+
     const { locale, ...noLocale } = validPayload;
     void locale;
     const res = await POST(makeRequest(noLocale));
-    expect(res.status).toBe(400);
+
+    expect(res.status).toBe(204);
+    const [, ...values] = fakeSql.mock.calls[0];
+    expect(values).toEqual(["ZH-1", "erwachsen", 300, 2026, ["standard"], true, null, null, null]);
   });
 
   it("returns 400 on an unknown locale", async () => {
@@ -98,8 +105,10 @@ describe("POST /api/log-inquiry", () => {
     process.env.POSTGRES_URL = "postgres://test";
     const fakeSql = vi.fn().mockRejectedValue(new Error("db down"));
     vi.mocked(db.getSql).mockReturnValue(fakeSql as unknown as ReturnType<typeof db.getSql>);
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
     const res = await POST(makeRequest(validPayload));
     expect(res.status).toBe(204);
+    expect(errSpy).toHaveBeenCalledWith("log-inquiry insert failed", expect.any(Error));
   });
 });

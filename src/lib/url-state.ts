@@ -3,6 +3,7 @@
 // degrades gracefully (§5.2).
 
 import type { Tarifart } from "./types";
+import insurersData from "@/data/insurers.json";
 
 export type ComparisonState = {
   plz: string | null;
@@ -17,6 +18,7 @@ export type ComparisonState = {
 };
 
 const VALID_TARIFARTEN: Tarifart[] = ["standard", "hmo", "hausarzt", "telmed", "andere"];
+const VALID_INSURER_CODES = new Set(insurersData.map((i) => i.insurerCode));
 
 export function encodeState(state: ComparisonState): URLSearchParams {
   const params = new URLSearchParams();
@@ -41,6 +43,7 @@ export function decodeState(params: URLSearchParams): ComparisonState {
   const franRaw = params.get("fran");
   const yearRaw = params.get("year");
   const modelsRaw = params.get("models");
+  const ciRaw = params.get("ci");
   const cpRaw = params.get("cp");
 
   return {
@@ -55,7 +58,10 @@ export function decodeState(params: URLSearchParams): ComparisonState {
     models: modelsRaw
       ? (modelsRaw.split(",").filter((m): m is Tarifart => VALID_TARIFARTEN.includes(m as Tarifart)))
       : [...VALID_TARIFARTEN],
-    currentInsurerCode: params.get("ci") || null,
+    // Validate against the known insurer list, mirroring how models is filtered
+    // against VALID_TARIFARTEN — a stale/mistyped shared link must not flow an
+    // unknown code into the log-inquiry payload (which would 400 the whole row).
+    currentInsurerCode: ciRaw && VALID_INSURER_CODES.has(ciRaw) ? ciRaw : null,
     currentMonthlyPremium: cpRaw && /^\d+(\.\d{1,2})?$/.test(cpRaw) && Number(cpRaw) > 0 ? Number(cpRaw) : null,
   };
 }
