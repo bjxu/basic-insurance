@@ -161,14 +161,13 @@ is unchanged.
     <h2 className="text-title-medium text-on-surface-variant uppercase tracking-wide mb-4">
       Altersverteilung
     </h2>
-    <BreakdownBar labelWidth="short" rows={orderedAgeBandRows(stats?.ageBands ?? [])} total={stats?.total} />
+    <BreakdownBar labelWidth="short" rows={orderedAgeBandRows(stats?.ageBands ?? [])} />
   </div>
   ```
-  `total={stats?.total}` — like the language panel, because `age_band` is present
-  on essentially every post-migration row, so percentages are meaningful against
-  the range total. (If a large backlog of pre-migration NULL rows is a concern
-  for the first weeks, the panel simply reads slightly low until they age out of
-  the default 30-day window — acceptable.)
+  **No `total` prop** — percentages are of the age-known subset (rows summed by
+  `BreakdownBar`), consistent with the other `IS NOT NULL` panels ("Aktuelle
+  Krankenkasse", "Aktuelle Prämie"). This also sidesteps the pre-migration NULL
+  backlog making the panel read low against the range total for the first weeks.
 
 The existing 3-way "Altersklasse" panel is **kept unchanged**.
 
