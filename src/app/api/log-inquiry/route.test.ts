@@ -53,7 +53,7 @@ describe("POST /api/log-inquiry", () => {
     expect(fakeSql).toHaveBeenCalledTimes(1);
     const [strings, ...values] = fakeSql.mock.calls[0];
     expect(strings.join("?")).toContain("INSERT INTO inquiry_log");
-    expect(values).toEqual(["ZH-1", "erwachsen", 300, 2026, ["standard"], true, "de", null, null]);
+    expect(values).toEqual(["ZH-1", "erwachsen", 300, 2026, ["standard"], true, "de", null, null, null]);
   });
 
   it("inserts NULL locale when locale is omitted", async () => {
@@ -67,7 +67,7 @@ describe("POST /api/log-inquiry", () => {
 
     expect(res.status).toBe(204);
     const [, ...values] = fakeSql.mock.calls[0];
-    expect(values).toEqual(["ZH-1", "erwachsen", 300, 2026, ["standard"], true, null, null, null]);
+    expect(values).toEqual(["ZH-1", "erwachsen", 300, 2026, ["standard"], true, null, null, null, null]);
   });
 
   it("returns 400 on an unknown locale", async () => {
@@ -97,7 +97,26 @@ describe("POST /api/log-inquiry", () => {
     expect(res.status).toBe(204);
     const [, ...values] = fakeSql.mock.calls[0];
     expect(values).toEqual([
-      "ZH-1", "erwachsen", 300, 2026, ["standard"], true, "de", "1542", "350-449",
+      "ZH-1", "erwachsen", 300, 2026, ["standard"], true, "de", "1542", "350-449", null,
+    ]);
+  });
+
+  it("returns 400 on an unknown age band", async () => {
+    const res = await POST(makeRequest({ ...validPayload, ageBand: "18-30" }));
+    expect(res.status).toBe(400);
+  });
+
+  it("stores age band when valid", async () => {
+    process.env.POSTGRES_URL = "postgres://test";
+    const fakeSql = vi.fn().mockResolvedValue([]);
+    vi.mocked(db.getSql).mockReturnValue(fakeSql as unknown as ReturnType<typeof db.getSql>);
+
+    const res = await POST(makeRequest({ ...validPayload, ageBand: "36-45" }));
+
+    expect(res.status).toBe(204);
+    const [, ...values] = fakeSql.mock.calls[0];
+    expect(values).toEqual([
+      "ZH-1", "erwachsen", 300, 2026, ["standard"], true, "de", null, null, "36-45",
     ]);
   });
 
