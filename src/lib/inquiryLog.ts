@@ -5,6 +5,7 @@
 
 import { ALL_TARIFARTS } from "./lookup";
 import { premiumBand, type PremiumBand } from "./premiumBand";
+import { ageBand, type AgeBand } from "./ageBand";
 import type { Tarifart } from "./types";
 
 export type InquiryLogPayload = {
@@ -17,6 +18,7 @@ export type InquiryLogPayload = {
   locale: string;
   currentInsurer?: string;
   currentPremiumBand?: PremiumBand;
+  ageBand?: AgeBand;
 };
 
 export function buildInquiryLogPayload(input: {
@@ -29,6 +31,7 @@ export function buildInquiryLogPayload(input: {
   locale: string;
   currentInsurerCode: string | null;
   currentMonthlyPremium: number | null;
+  birthYear: number | null;
 }): InquiryLogPayload | null {
   if (!input.praemienregionId || !input.altersklasse || !input.franchise) return null;
 
@@ -50,6 +53,11 @@ export function buildInquiryLogPayload(input: {
     input.currentMonthlyPremium != null ? premiumBand(input.currentMonthlyPremium) : null;
   if (band) {
     payload.currentPremiumBand = band;
+  }
+
+  const age = input.birthYear != null ? ageBand(input.year - input.birthYear) : null;
+  if (age) {
+    payload.ageBand = age;
   }
 
   return payload;

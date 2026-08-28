@@ -15,6 +15,7 @@ const BASE_INPUT = {
   locale: "de",
   currentInsurerCode: null,
   currentMonthlyPremium: null,
+  birthYear: null,
 };
 
 describe("buildInquiryLogPayload", () => {
@@ -82,5 +83,24 @@ describe("buildInquiryLogPayload", () => {
         currentMonthlyPremium: 400,
       }),
     ).toBeNull();
+  });
+
+  it("includes ageBand only when a birth year is given", () => {
+    expect(buildInquiryLogPayload(BASE_INPUT)).not.toHaveProperty("ageBand");
+    // year 2026 − birthYear 1985 = age 41 → "36-45"
+    expect(
+      buildInquiryLogPayload({ ...BASE_INPUT, birthYear: 1985 })?.ageBand,
+    ).toBe("36-45");
+  });
+
+  it("derives ageBand against the active year, not the current date", () => {
+    // year 2026 − birthYear 2009 = age 17 → "0-18"
+    expect(buildInquiryLogPayload({ ...BASE_INPUT, birthYear: 2009 })?.ageBand).toBe("0-18");
+  });
+
+  it("omits ageBand when the birth year implies a negative age", () => {
+    expect(
+      buildInquiryLogPayload({ ...BASE_INPUT, birthYear: 2030 }),
+    ).not.toHaveProperty("ageBand");
   });
 });
