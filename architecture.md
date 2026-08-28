@@ -291,8 +291,9 @@ A Next.js Route Handler (runs on Vercel serverless). It:
    only where applicable. `locale` is optional; if present it must be one of
    `routing.locales` (400 otherwise), if absent it is stored as NULL.
    `currentInsurer` (a BAG insurer code, validated against the bundled insurer
-   list) and `currentPremiumBand` (one of the five fixed bands) are optional; if
-   present they must be valid (400 otherwise).
+   list), `currentPremiumBand` (one of the five fixed bands), and `ageBand` (one
+   of the eight fixed age bands) are optional; if present they must be valid
+   (400 otherwise).
 2. Writes one row to the `inquiry_log` table. Still no IP address, no exact
    premium, no free-text, and no join key back to a user or session — the
    incumbent insurer code and the coarse premium band are the only current-plan
@@ -314,15 +315,20 @@ CREATE TABLE inquiry_log (
   accident    BOOLEAN     NOT NULL,
   locale      TEXT,                  -- 'de' | 'fr' | 'it' | 'en' | 'pt' | 'es' | NULL (unknown / pre-feature rows)
   current_insurer      TEXT,         -- BAG insurer code; NULL when no current plan provided
-  current_premium_band TEXT          -- see below; NULL when no current plan provided
+  current_premium_band TEXT,         -- see below; NULL when no current plan provided
+  age_band             TEXT          -- see below; NULL for pre-migration rows
 );
 ```
 
 `current_premium_band` is one of `<250 | 250-349 | 350-449 | 450-549 | 550+`, bucketed
-client-side — the exact premium is never transmitted. All three new columns are nullable:
-`locale` is NULL for rows logged before the feature shipped, and `current_insurer` /
-`current_premium_band` are NULL for any inquiry where the optional current plan was not
-provided.
+client-side — the exact premium is never transmitted. All three of `locale` /
+`current_insurer` / `current_premium_band` are nullable: `locale` is NULL for rows logged
+before the feature shipped, and `current_insurer` / `current_premium_band` are NULL for
+any inquiry where the optional current plan was not provided.
+
+`age_band` is one of `0-18 | 19-25 | 26-35 | 36-45 | 46-55 | 56-65 | 66-75 | 76+`,
+bucketed client-side from the entered birth year; the birth year itself is never
+transmitted. It is nullable — NULL for rows logged before this panel's migration.
 
 No personal data is stored. No join key back to a user or session exists by design.
 
@@ -458,6 +464,14 @@ SELECT current_premium_band AS band, COUNT(*) AS n
 FROM inquiry_log
 WHERE ts >= $1 AND ts < $2 AND current_premium_band IS NOT NULL
 GROUP BY 1;
+
+-- 11. Age-band distribution (Altersverteilung panel; only rows logged since the migration)
+-- No ORDER BY: bands come back in arbitrary order and are ordered client-side into the
+-- canonical AGE_BANDS sequence. `ORDER BY 1` would sort lexically and mis-place `76+`.
+SELECT age_band, COUNT(*) AS n
+FROM inquiry_log
+WHERE ts >= $1 AND ts < $2 AND age_band IS NOT NULL
+GROUP BY 1;
 ```
 
 ### 13.3 Page Layout
@@ -532,6 +546,12 @@ bookmarkable.
 │  │  Italiano   █  8%              English   ▌  4%   …        │ │
 │  └───────────────────────────────────────────────────────────┘ │
 │                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐ │
+│  │  Altersverteilung   (ergänzt Altersklasse, ersetzt sie nicht) │
+│  │  0–18 ██ 6%   19–25 ███ 8%   26–35 ████████████ 22%       │ │
+│  │  36–45 ██████████ 18%   …   66–75 ██████ 11%   76+ ██ 7%  │ │
+│  └───────────────────────────────────────────────────────────┘ │
+│                                                                 │
 │  ┌──────────────────────────────┐  ┌──────────────────────────┐│
 │  │  Current insurer             │  │  Current premium         ││
 │  │  (current plan provided only)│  │  (current plan prov. only)││
@@ -567,11 +587,22 @@ bookmarkable.
   CHF 450–549 / CHF 550+` in ascending order (query 10), band boundaries computed
   client-side (§10.3). **Only counts inquiries where the current plan was provided**, same
   subtitle + subset-% treatment as the current-insurer panel.
+- **Altersverteilung panel:** the eight fixed age bands `0–18 / 19–25 / 26–35 / 36–45 /
+  46–55 / 56–65 / 66–75 / 76+` in ascending order (query 11); a **full-width card** below
+  the Language panel. Bands are bucketed client-side from the birth year (§10.3); the
+  panel orders the rows client-side by the canonical `AGE_BANDS` sequence (query 11 has no
+  `ORDER BY`). This panel **complements — it does not replace — the Altersklasse panel**,
+  which keeps the BAG three-band `kind / jung / erwachsen` split (query 4); Altersverteilung
+  is the finer view. Its `age_band IS NOT NULL` filter excludes inquiries logged before the
+  age-band migration, so its total can be lower than the Altersklasse panel's; the panel
+  shows each bar's % as its share of the age-known subset (no explicit total passed), the
+  same treatment as the other `IS NOT NULL` panels.
 - Loading state: skeleton shimmer over each panel while the fetch is in flight;
   stale data remains visible underneath to avoid layout shift.
 - Page is desktop-only (no mobile requirement for the admin tool).
 - No pagination — all result sets are small (≤ 10 rows for regions and current
-  insurers; ≤ 7 rows for language; ≤ 6 rows for all other breakdowns).
+  insurers; ≤ 8 rows for the age distribution; ≤ 7 rows for language; ≤ 6 rows for
+  all other breakdowns).
 
 ### 13.5 SEO / Discoverability
 
