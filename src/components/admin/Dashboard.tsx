@@ -16,6 +16,7 @@ import { formatCount } from "@/lib/format";
 import type { Granularity } from "@/lib/adminStats";
 import insurersData from "@/data/insurers.json";
 import { PREMIUM_BANDS } from "@/lib/premiumBand";
+import { AGE_BANDS } from "@/lib/ageband";
 
 type Stats = {
   total: number;
@@ -29,6 +30,7 @@ type Stats = {
   languages: { locale: string; n: number }[];
   currentInsurers: { insurerCode: string; n: number }[];
   premiumBands: { band: string; n: number }[];
+  ageBands: { band: string; n: number }[];
 };
 
 const fetcher = async (url: string) => {
@@ -77,6 +79,27 @@ function orderedBandRows(rows: { band: string; n: number }[]): { label: string; 
   const byBand = new Map(rows.map((r) => [r.band, r.n]));
   return PREMIUM_BANDS.filter((b) => byBand.has(b)).map((b) => ({
     label: PREMIUM_BAND_LABEL[b] ?? b,
+    value: byBand.get(b) ?? 0,
+  }));
+}
+
+const AGE_BAND_LABEL: Record<string, string> = {
+  "0-18": "0–18",
+  "19-25": "19–25",
+  "26-35": "26–35",
+  "36-45": "36–45",
+  "46-55": "46–55",
+  "56-65": "56–65",
+  "66-75": "66–75",
+  "76+": "76+",
+};
+
+export function orderedAgeBandRows(
+  rows: { band: string; n: number }[],
+): { label: string; value: number }[] {
+  const byBand = new Map(rows.map((r) => [r.band, r.n]));
+  return AGE_BANDS.filter((b) => byBand.has(b)).map((b) => ({
+    label: AGE_BAND_LABEL[b] ?? b,
     value: byBand.get(b) ?? 0,
   }));
 }
@@ -177,6 +200,16 @@ export function Dashboard({
                 rows={(stats?.models ?? []).map((r) => ({ label: MODEL_LABEL[r.model] ?? r.model, value: r.n }))}
               />
             </div>
+          </div>
+
+          <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-5 mt-4">
+            <h2 className="text-title-medium text-on-surface-variant uppercase tracking-wide mb-1">
+              Altersverteilung
+            </h2>
+            <p className="text-body-small text-outline mb-4">
+              nur Anfragen seit der Altersband-Migration
+            </p>
+            <BreakdownBar labelWidth="short" rows={orderedAgeBandRows(stats?.ageBands ?? [])} />
           </div>
 
           <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-5 mt-4">

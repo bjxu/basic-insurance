@@ -158,10 +158,13 @@ export function InsuranceComparator() {
   // is toggled. Debounced 1s so rapid toggling coalesces into one request.
   // currentPlan is deliberately excluded from the deps — it doesn't affect the
   // result set, only the headline comparison, so editing it shouldn't re-log.
-  // locale and the current-plan fields are captured opportunistically at fire
-  // time: they're read off current state when the effect runs, but don't trigger
-  // it, so a plan entered after the last trigger fire lands on the next fire
-  // (whenever a result-set filter next changes), not immediately.
+  // locale, birthYear, and the current-plan fields are captured opportunistically
+  // at fire time: they're read off current state when the effect runs, but don't
+  // trigger it, so a plan entered after the last trigger fire lands on the next
+  // fire (whenever a result-set filter next changes), not immediately. Likewise a
+  // birth-year edit that doesn't cross an Altersklasse boundary isn't itself a
+  // trigger (altersklasse is), so the new age band lands on the next unrelated
+  // fire rather than immediately.
   useEffect(() => {
     const payload = buildInquiryLogPayload({
       praemienregionId,
@@ -173,6 +176,7 @@ export function InsuranceComparator() {
       locale,
       currentInsurerCode: currentPlan.insurerCode ?? null,
       currentMonthlyPremium: currentPlan.monthlyPremium ?? null,
+      birthYear: parsedBirthYear,
     });
     if (!payload || ALL_PREMIUMS.length === 0) return;
 

@@ -291,8 +291,9 @@ A Next.js Route Handler (runs on Vercel serverless). It:
    only where applicable. `locale` is optional; if present it must be one of
    `routing.locales` (400 otherwise), if absent it is stored as NULL.
    `currentInsurer` (a BAG insurer code, validated against the bundled insurer
-   list) and `currentPremiumBand` (one of the five fixed bands) are optional; if
-   present they must be valid (400 otherwise).
+   list), `currentPremiumBand` (one of the five fixed bands), and `ageBand` (one
+   of the eight fixed age bands) are optional; if present they must be valid
+   (400 otherwise).
 2. Writes one row to the `inquiry_log` table. Still no IP address, no exact
    premium, no free-text, and no join key back to a user or session — the
    incumbent insurer code and the coarse premium band are the only current-plan
@@ -314,15 +315,20 @@ CREATE TABLE inquiry_log (
   accident    BOOLEAN     NOT NULL,
   locale      TEXT,                  -- 'de' | 'fr' | 'it' | 'en' | 'pt' | 'es' | NULL (unknown / pre-feature rows)
   current_insurer      TEXT,         -- BAG insurer code; NULL when no current plan provided
-  current_premium_band TEXT          -- see below; NULL when no current plan provided
+  current_premium_band TEXT,         -- see below; NULL when no current plan provided
+  age_band             TEXT          -- see below; NULL for pre-migration rows
 );
 ```
 
 `current_premium_band` is one of `<250 | 250-349 | 350-449 | 450-549 | 550+`, bucketed
-client-side — the exact premium is never transmitted. All three new columns are nullable:
-`locale` is NULL for rows logged before the feature shipped, and `current_insurer` /
-`current_premium_band` are NULL for any inquiry where the optional current plan was not
-provided.
+client-side — the exact premium is never transmitted. All three of `locale` /
+`current_insurer` / `current_premium_band` are nullable: `locale` is NULL for rows logged
+before the feature shipped, and `current_insurer` / `current_premium_band` are NULL for
+any inquiry where the optional current plan was not provided.
+
+`age_band` is one of `0-18 | 19-25 | 26-35 | 36-45 | 46-55 | 56-65 | 66-75 | 76+`,
+bucketed client-side from the entered birth year; the birth year itself is never
+transmitted. It is nullable — NULL for rows logged before this panel's migration.
 
 No personal data is stored. No join key back to a user or session exists by design.
 
@@ -458,6 +464,14 @@ SELECT current_premium_band AS band, COUNT(*) AS n
 FROM inquiry_log
 WHERE ts >= $1 AND ts < $2 AND current_premium_band IS NOT NULL
 GROUP BY 1;
+
+-- 11. Age-band distribution (Altersverteilung panel; only rows logged since the migration)
+-- No ORDER BY: bands come back in arbitrary order and are ordered client-side into the
+-- canonical AGE_BANDS sequence. `ORDER BY 1` would sort lexically and mis-place `76+`.
+SELECT age_band AS band, COUNT(*) AS n
+FROM inquiry_log
+WHERE ts >= $1 AND ts < $2 AND age_band IS NOT NULL
+GROUP BY 1;
 ```
 
 ### 13.3 Page Layout
@@ -527,6 +541,12 @@ bookmarkable.
 │  └──────────────────────────────┘                              │
 │                                                                 │
 │  ┌───────────────────────────────────────────────────────────┐ │
+│  │  Age distribution (complements not replaces Altersklasse) │ │
+│  │  0–18 ██ 6%   19–25 ███ 8%   26–35 ████████████ 22%       │ │
+│  │  36–45 ██████████ 18%   …   66–75 ██████ 11%   76+ ██ 7%  │ │
+│  └───────────────────────────────────────────────────────────┘ │
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐ │
 │  │  Language                                                  │ │
 │  │  Deutsch    ████████████ 70%   Français  ███  17%         │ │
 │  │  Italiano   █  8%              English   ▌  4%   …        │ │
@@ -567,11 +587,23 @@ bookmarkable.
   CHF 450–549 / CHF 550+` in ascending order (query 10), band boundaries computed
   client-side (§10.3). **Only counts inquiries where the current plan was provided**, same
   subtitle + subset-% treatment as the current-insurer panel.
+- **Altersverteilung panel:** the eight fixed age bands `0–18 / 19–25 / 26–35 / 36–45 /
+  46–55 / 56–65 / 66–75 / 76+` in ascending order (query 11); a **full-width card**
+  immediately before the Anfragen-pro-Sprache (Language) card. Bands are bucketed
+  client-side from the birth year (§10.3); the
+  panel orders the rows client-side by the canonical `AGE_BANDS` sequence (query 11 has no
+  `ORDER BY`). This panel **complements — it does not replace — the Altersklasse panel**,
+  which keeps the BAG three-band `kind / jung / erwachsen` split (query 4); Altersverteilung
+  is the finer view. Its `age_band IS NOT NULL` filter excludes inquiries logged before the
+  age-band migration, so its total can be lower than the Altersklasse panel's; the panel
+  shows each bar's % as its share of the age-known subset (no explicit total passed), the
+  same treatment as the other `IS NOT NULL` panels.
 - Loading state: skeleton shimmer over each panel while the fetch is in flight;
   stale data remains visible underneath to avoid layout shift.
 - Page is desktop-only (no mobile requirement for the admin tool).
 - No pagination — all result sets are small (≤ 10 rows for regions and current
-  insurers; ≤ 7 rows for language; ≤ 6 rows for all other breakdowns).
+  insurers; ≤ 8 rows for the age distribution; ≤ 7 rows for language; ≤ 6 rows for
+  all other breakdowns).
 
 ### 13.5 SEO / Discoverability
 
@@ -605,18 +637,18 @@ inquiry row until the migration is applied. The migration is idempotent
 (`ALTER TABLE ... ADD COLUMN IF NOT EXISTS`, `scripts/migrateSql.ts`), so it is
 always safe to re-run.
 
-- This feature adds three columns (`locale`, `current_insurer`,
-  `current_premium_band`); it must not be deployed until `npm run db:migrate`
-  has completed against production.
+- This feature adds four columns (`locale`, `current_insurer`,
+  `current_premium_band`, `age_band`); it must not be deployed until
+  `npm run db:migrate` has completed against production.
 
 ---
 
 ## 15. Key Constraints & Decisions
 
 - **No database for premium data.** BAG data is bundled. Annual re-ingestion is a `git commit`, not a migration. This is viable because the dataset is small (~10 MB) and changes are infrequent and wholesale.
-- **Postgres only for inquiry logs.** The log table is append-only. Alongside the original REQ-21 fields it now also holds the incumbent insurer's BAG code and a coarse (~100-CHF) band of the self-reported current premium. A simple serverless Postgres instance (Vercel Postgres) is sufficient; no ORM is needed. There is no migration framework — schema changes are plain SQL in `scripts/migrateSql.ts`: the initial `CREATE TABLE IF NOT EXISTS` plus idempotent `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` statements for columns added after first ship, run via `npm run db:migrate` (see §14.1).
+- **Postgres only for inquiry logs.** The log table is append-only. Alongside the original REQ-21 fields it now also holds the incumbent insurer's BAG code, a coarse (~100-CHF) band of the self-reported current premium, and a coarse age band (one of eight buckets) derived client-side from the entered birth year. A simple serverless Postgres instance (Vercel Postgres) is sufficient; no ORM is needed. There is no migration framework — schema changes are plain SQL in `scripts/migrateSql.ts`: the initial `CREATE TABLE IF NOT EXISTS` plus idempotent `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` statements for columns added after first ship, run via `npm run db:migrate` (see §14.1).
 - **No user accounts, no server-side sessions.** All state is in the URL per §4 / REQ-11.
-- **No referral links, no analytics SDKs** that would require a cookie banner. Inquiry logging (REQ-21) still does not require consent under Swiss DSG / GDPR as implemented, and this is a deliberate re-affirmation after adding the insurer code and premium band: there is no IP address, no join key back to a user or session, the premium is a coarse bucket (five ~100-CHF bands), and the region is one of ~40 premium regions. No single row, and no combination of the stored fields, identifies a natural person.
+- **No referral links, no analytics SDKs** that would require a cookie banner. Inquiry logging (REQ-21) still does not require consent under Swiss DSG / GDPR as implemented, and this is a deliberate re-affirmation after adding the insurer code and premium band: there is no IP address, no join key back to a user or session, the premium is a coarse bucket (five ~100-CHF bands), and the region is one of ~40 premium regions. No single row, and no combination of the stored fields, identifies a natural person. Adding the `age_band` column does not change this conclusion: it is one of only eight bands spread across ~40 regions, carries no birth year or exact age and no join key, and so remains non-identifying alone or in combination with the other fields.
 - **Single language (German).** Multi-language support is explicitly out of scope for
   v1 (§12 of requirements). String literals are centralised in `copy.ts` to make
   future i18n straightforward without over-engineering it now.

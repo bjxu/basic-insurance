@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSql } from "@/lib/db";
 import { routing } from "@/i18n/routing";
 import { PREMIUM_BANDS } from "@/lib/premiumBand";
+import { AGE_BANDS } from "@/lib/ageband";
 import insurersData from "@/data/insurers.json";
 
 const TARIFARTEN = ["standard", "hmo", "hausarzt", "telmed", "andere"];
@@ -12,6 +13,7 @@ const ALTERSKLASSEN = ["kind", "jung", "erwachsen"];
 const LOCALES: readonly string[] = routing.locales;
 const INSURER_CODES = new Set(insurersData.map((i) => i.insurerCode));
 const BANDS: readonly string[] = PREMIUM_BANDS;
+const AGE_BAND_VALUES: readonly string[] = AGE_BANDS;
 
 type InquiryPayload = {
   regionId: string;
@@ -23,6 +25,7 @@ type InquiryPayload = {
   locale?: string;
   currentInsurer?: string;
   currentPremiumBand?: string;
+  ageBand?: string;
 };
 
 function isValidPayload(body: unknown): body is InquiryPayload {
@@ -53,6 +56,9 @@ function isValidPayload(body: unknown): body is InquiryPayload {
   if (b.currentPremiumBand !== undefined) {
     if (typeof b.currentPremiumBand !== "string" || !BANDS.includes(b.currentPremiumBand)) return false;
   }
+  if (b.ageBand !== undefined) {
+    if (typeof b.ageBand !== "string" || !AGE_BAND_VALUES.includes(b.ageBand)) return false;
+  }
   return true;
 }
 
@@ -76,10 +82,10 @@ export async function POST(request: NextRequest) {
   try {
     const sql = getSql();
     await sql`INSERT INTO inquiry_log
-              (region_id, altersklasse, franchise, year, models, accident, locale, current_insurer, current_premium_band)
+              (region_id, altersklasse, franchise, year, models, accident, locale, current_insurer, current_premium_band, age_band)
               VALUES (${body.regionId}, ${body.altersklasse}, ${body.franchise}, ${body.year},
                       ${body.models}, ${body.accident}, ${body.locale ?? null},
-                      ${body.currentInsurer ?? null}, ${body.currentPremiumBand ?? null})`;
+                      ${body.currentInsurer ?? null}, ${body.currentPremiumBand ?? null}, ${body.ageBand ?? null})`;
     return new NextResponse(null, { status: 204 });
   } catch (err) {
     // Logging failures must never surface to the user — but they must be visible

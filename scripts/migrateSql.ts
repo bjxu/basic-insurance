@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS inquiry_log (
   accident             BOOLEAN NOT NULL,
   locale               TEXT,
   current_insurer      TEXT,
-  current_premium_band TEXT
+  current_premium_band TEXT,
+  age_band             TEXT
 );
 `.trim();
 
@@ -30,4 +31,5 @@ export const ALTER_TABLE_SQL = [
   "ALTER TABLE inquiry_log ADD COLUMN IF NOT EXISTS locale TEXT;",
   "ALTER TABLE inquiry_log ADD COLUMN IF NOT EXISTS current_insurer TEXT;",
   "ALTER TABLE inquiry_log ADD COLUMN IF NOT EXISTS current_premium_band TEXT;",
+  "ALTER TABLE inquiry_log ADD COLUMN IF NOT EXISTS age_band TEXT;",
 ];
