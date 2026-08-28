@@ -90,6 +90,10 @@ describe("buildInquiryLogPayload", () => {
     expect(buildInquiryLogPayload({ ...BASE_INPUT, ageGroup: "66+" })?.ageGroup).toBe("66+");
   });
 
+  it("keeps the newborn band '0' (not treated as falsy)", () => {
+    expect(buildInquiryLogPayload({ ...BASE_INPUT, ageGroup: "0" })?.ageGroup).toBe("0");
+  });
+
   it("returns null when the age group is not resolved yet", () => {
     expect(buildInquiryLogPayload({ ...BASE_INPUT, ageGroup: null })).toBeNull();
   });

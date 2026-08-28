@@ -13,7 +13,7 @@ const ALTERSKLASSEN = ["kind", "jung", "erwachsen"];
 const LOCALES: readonly string[] = routing.locales;
 const INSURER_CODES = new Set(insurersData.map((i) => i.insurerCode));
 const BANDS: readonly string[] = PREMIUM_BANDS;
-const AGE_GROUP_SET: readonly string[] = AGE_GROUPS;
+const AGE_GROUP_VALUES: readonly string[] = AGE_GROUPS;
 
 type InquiryPayload = {
   regionId: string;
@@ -58,7 +58,7 @@ function isValidPayload(body: unknown): body is InquiryPayload {
   }
 
   if (b.ageGroup !== undefined) {
-    if (typeof b.ageGroup !== "string" || !AGE_GROUP_SET.includes(b.ageGroup)) return false;
+    if (typeof b.ageGroup !== "string" || !AGE_GROUP_VALUES.includes(b.ageGroup)) return false;
   }
 
   return true;

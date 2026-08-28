@@ -226,8 +226,13 @@ Age band is computed by `ageband.ts`:
 // Age band = age reached during the calendar year (year - birthYear).
 // Confirmed against BAG data documentation (open question §11.1).
 function getAltersklasse(birthYear: number, calendarYear: number): AgeKlasse
-function getAgeGroup(birthYear: number, visitYear: number): AgeGroup   // analytics bucketing; visitYear = real current year
 function getFranchiseTiers(altersklasse: AgeKlasse): number[]
+```
+
+Analytics age-group bucketing lives in `ageGroup.ts`:
+
+```ts
+function getAgeGroup(birthYear: number, visitYear: number): AgeGroup   // analytics bucketing; visitYear = real current year
 ```
 
 ---
@@ -284,8 +289,9 @@ Month labels, deductible labels, and model description strings are defined in
 
 The browser fires a `POST /api/log-inquiry` request exactly once per resolved
 comparison — i.e. when all three required inputs become valid and results are first
-rendered, and again whenever a filter that changes the result set is toggled. Debounced
-to 1 s to avoid flooding on rapid input changes.
+rendered, and again whenever a filter that changes the result set is toggled — or
+whenever a birth-year edit moves the visitor into a different resolved age group.
+Debounced to 1 s to avoid flooding on rapid input changes.
 
 The payload also carries `ageGroup`, computed from the visitor's age in the *current*
 calendar year (not the selected premium year) — so it does not shift when the year
@@ -330,7 +336,7 @@ CREATE TABLE inquiry_log (
 ```
 
 `current_premium_band` is one of `<250 | 250-349 | 350-449 | 450-549 | 550+`, bucketed
-client-side — the exact premium is never transmitted. All three new columns are nullable:
+client-side — the exact premium is never transmitted. These columns are all nullable:
 `locale` is NULL for rows logged before the feature shipped, and `current_insurer` /
 `current_premium_band` are NULL for any inquiry where the optional current plan was not
 provided.
@@ -539,12 +545,12 @@ bookmarkable.
 │  └──────────────────────────────┘  └──────────────────────────┘│
 │                                                                 │
 │  ┌───────────────────────────────────────────────────────────┐ │
-│  │  Altersgruppe   (age at the time of the visit)             │ │
-│  │  0            ▌   3%      26–35  ████████ 24%              │ │
-│  │  1–5          █   6%      36–50  ██████   19%              │ │
-│  │  6–12         ██  9%      51–65  ████     12%              │ │
-│  │  13–18        ██  8%      66+    ██        6%              │ │
-│  │  19–25        ███ 13%     (rows youngest→oldest, up to 9)  │ │
+│  │  Altersgruppe   (age at the time of the visit)            │ │
+│  │  0            ▌   3%      26–35  ████████ 24%             │ │
+│  │  1–5          █   6%      36–50  ██████   19%             │ │
+│  │  6–12         ██  9%      51–65  ████     12%             │ │
+│  │  13–18        ██  8%      66+    ██        6%             │ │
+│  │  19–25        ███ 13%     (rows youngest→oldest, up to 9) │ │
 │  └───────────────────────────────────────────────────────────┘ │
 │                                                                 │
 │  ┌──────────────────────────────┐  ┌──────────────────────────┐│
