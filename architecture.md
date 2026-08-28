@@ -468,7 +468,7 @@ GROUP BY 1;
 -- 11. Age-band distribution (Altersverteilung panel; only rows logged since the migration)
 -- No ORDER BY: bands come back in arbitrary order and are ordered client-side into the
 -- canonical AGE_BANDS sequence. `ORDER BY 1` would sort lexically and mis-place `76+`.
-SELECT age_band, COUNT(*) AS n
+SELECT age_band AS band, COUNT(*) AS n
 FROM inquiry_log
 WHERE ts >= $1 AND ts < $2 AND age_band IS NOT NULL
 GROUP BY 1;
@@ -547,7 +547,7 @@ bookmarkable.
 │  └───────────────────────────────────────────────────────────┘ │
 │                                                                 │
 │  ┌───────────────────────────────────────────────────────────┐ │
-│  │  Altersverteilung   (ergänzt Altersklasse, ersetzt sie nicht) │
+│  │  Age distribution (complements not replaces Altersklasse) │ │
 │  │  0–18 ██ 6%   19–25 ███ 8%   26–35 ████████████ 22%       │ │
 │  │  36–45 ██████████ 18%   …   66–75 ██████ 11%   76+ ██ 7%  │ │
 │  └───────────────────────────────────────────────────────────┘ │
