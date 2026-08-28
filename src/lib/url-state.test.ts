@@ -25,6 +25,16 @@ describe("decodeState — models default", () => {
   });
 });
 
+describe("decodeState — ci (current insurer code) validation", () => {
+  it("preserves a known insurer code", () => {
+    expect(decodeState(new URLSearchParams("ci=8")).currentInsurerCode).toBe("8");
+  });
+
+  it("drops an unknown insurer code to null (stale/mistyped shared link)", () => {
+    expect(decodeState(new URLSearchParams("ci=not-a-code")).currentInsurerCode).toBeNull();
+  });
+});
+
 describe("encodeState / decodeState — currentMonthlyPremium round-trip", () => {
   it("encodes currentMonthlyPremium as the cp param", () => {
     const params = encodeState(BASE_STATE);
