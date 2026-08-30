@@ -94,12 +94,12 @@ describe("GET /api/admin/stats", () => {
 
   it("anchors every range filter and the trend bucketing to Europe/Zurich", async () => {
     process.env.POSTGRES_URL = "postgres://test";
-    const fakeSql = vi.fn(() => Promise.resolve([]));
+    const fakeSql = vi.fn((_strings: TemplateStringsArray) => Promise.resolve([]));
     vi.mocked(db.getSql).mockReturnValue(fakeSql as unknown as ReturnType<typeof db.getSql>);
 
     await GET(makeRequest("from=2026-07-12&to=2026-08-11"));
 
-    const queryTexts = (fakeSql.mock.calls as [TemplateStringsArray][]).map(([strings]) => strings.join("?"));
+    const queryTexts = fakeSql.mock.calls.map(([strings]) => strings.join("?"));
     expect(queryTexts.length).toBe(11); // total + trend + 9 breakdowns
     for (const text of queryTexts) {
       expect(text).toContain("AT TIME ZONE 'Europe/Zurich'");
