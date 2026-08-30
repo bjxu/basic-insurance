@@ -6,6 +6,7 @@
 import { buildTrendPath, TREND_CHART_VIEWBOX } from "@/lib/trendPath";
 import { MONTHS_DE } from "@/lib/adminRanges";
 import type { Granularity } from "@/lib/adminStats";
+import { zurichParts } from "@/lib/zurichTime";
 
 type Point = { bucket: string; n: number };
 
@@ -23,12 +24,13 @@ const GRANULARITY_LABEL: Record<Granularity, string> = {
 function formatBucketLabel(iso: string, granularity: Granularity): string {
   const d = new Date(iso);
   if (granularity === "hour") {
-    return d.toLocaleTimeString("de-CH", { hour: "2-digit", minute: "2-digit", timeZone: "UTC" });
+    return d.toLocaleTimeString("de-CH", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Zurich" });
   }
+  const zp = zurichParts(d);
   if (granularity === "month") {
-    return `${MONTHS_DE[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+    return `${MONTHS_DE[zp.month - 1]} ${zp.year}`;
   }
-  return `${d.getUTCDate()} ${MONTHS_DE[d.getUTCMonth()]}`;
+  return `${zp.day} ${MONTHS_DE[zp.month - 1]}`;
 }
 
 // Evenly-spaced label indices, capped at `maxLabels`, so a long trend doesn't
