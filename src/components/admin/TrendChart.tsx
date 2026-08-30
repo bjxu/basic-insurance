@@ -21,6 +21,9 @@ const GRANULARITY_LABEL: Record<Granularity, string> = {
 // (adminRanges.ts's MONTHS_DE) rather than a second, differently-abbreviated
 // set from the locale data — and to match mockups/admin.html's compact,
 // unpunctuated "12 Jul" style.
+// On the two Europe/Zurich DST-transition days a year, adjacent hourly
+// labels can look identical (spring-forward) or one label can cover two
+// real hours (fall-back) — see zurichTime.ts's DST edge convention.
 function formatBucketLabel(iso: string, granularity: Granularity): string {
   const d = new Date(iso);
   if (granularity === "hour") {

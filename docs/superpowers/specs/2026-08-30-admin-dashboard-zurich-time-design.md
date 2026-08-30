@@ -97,6 +97,19 @@ the DB session's timezone setting (currently UTC by Neon default, but this
 removes the dependency on that default entirely). All 11 queries in the route
 get this same substitution.
 
+(Corrected during final review: the cast above is `${from}::timestamp AT TIME
+ZONE 'Europe/Zurich'` / `${to}::timestamp AT TIME ZONE 'Europe/Zurich'`, not
+`::date`. Postgres has two `AT TIME ZONE` overloads — `timestamp AT TIME ZONE
+zone → timestamptz` (naive local wall-clock in, correct UTC instant out) and
+`timestamptz AT TIME ZONE zone → timestamp` (the reverse). Casting to `::date`
+first makes Postgres implicitly promote through `timestamptz` using the DB
+session's own TimeZone setting before applying `AT TIME ZONE`, which resolves
+to the wrong-direction overload — verified against this project's live Neon
+database: `'2026-07-12'::date AT TIME ZONE 'Europe/Zurich'` = `2026-07-12
+02:00:00` (wrong) vs. `'2026-07-12'::timestamp AT TIME ZONE 'Europe/Zurich'` =
+`2026-07-11 22:00:00+00` (correct). `::timestamp` is the cast that must be
+used everywhere in this section and in `route.ts`.)
+
 The trend query's bucketing also moves to Zurich, using the standard
 "bucket-in-a-zone" idiom:
 

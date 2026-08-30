@@ -534,6 +534,8 @@ In `src/app/api/admin/stats/route.ts`, replace the `try` block's query array (th
 
 (Only the `WHERE`/bucket fragments change — column lists, aliases, `GROUP BY`/`ORDER BY`/`LIMIT` clauses, and the `NOT NULL` filters are untouched.)
 
+(Corrected during final review: every `${from}::date AT TIME ZONE 'Europe/Zurich'` / `${to}::date AT TIME ZONE 'Europe/Zurich'` above must be `${from}::timestamp AT TIME ZONE 'Europe/Zurich'` / `${to}::timestamp AT TIME ZONE 'Europe/Zurich'`. Postgres resolves `::date AT TIME ZONE` and `::timestamp AT TIME ZONE` to different overloads — casting to `::date` first implicitly promotes through `timestamptz` using the DB session's own TimeZone setting before `AT TIME ZONE` applies, landing on the wrong-direction overload. Verified against this project's live Neon database: `'2026-07-12'::date AT TIME ZONE 'Europe/Zurich'` = `2026-07-12 02:00:00` (wrong) vs. `'2026-07-12'::timestamp AT TIME ZONE 'Europe/Zurich'` = `2026-07-11 22:00:00+00` (correct, matches Zurich midnight of 2026-07-12). The `date_trunc(...) AT TIME ZONE 'Europe/Zurich' AS bucket` expression in query 2 is unaffected — it operates on the `ts` column, a real `timestamptz`, not on `from`/`to`.)
+
 - [ ] **Step 4: Run the tests to verify they pass**
 
 Run: `npx vitest run src/app/api/admin/stats/route.test.ts`

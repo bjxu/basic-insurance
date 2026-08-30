@@ -103,6 +103,9 @@ describe("GET /api/admin/stats", () => {
     expect(queryTexts.length).toBe(11); // total + trend + 9 breakdowns
     for (const text of queryTexts) {
       expect(text).toContain("AT TIME ZONE 'Europe/Zurich'");
+      expect(text).toContain(
+        "ts >= (?::timestamp AT TIME ZONE 'Europe/Zurich') AND ts < (?::timestamp AT TIME ZONE 'Europe/Zurich')",
+      );
     }
     expect(queryTexts.some((t) => t.includes("date_trunc"))).toBe(true);
   });

@@ -52,7 +52,7 @@ export function zurichParts(instant: Date): ZurichParts {
 // Europe/Zurich's UTC offset, in milliseconds, at the given instant.
 function zurichOffsetMs(instant: Date): number {
   const local = zurichParts(instant);
-  const asUTC = Date.UTC(local.year, local.month - 1, local.day, local.hour, local.minute, local.second);
+  const asUTC = Date.UTC(local.year, local.month - 1, local.day, local.hour, local.minute, local.second, instant.getMilliseconds());
   return asUTC - instant.getTime();
 }
 
