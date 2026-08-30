@@ -37,6 +37,18 @@ describe("presetRange", () => {
     const mar1 = new Date(Date.UTC(2028, 2, 1)); // 1 Mar 2028 (leap year)
     expect(presetRange("30d", mar1)).toEqual({ from: "2028-02-01", to: "2028-03-02" });
   });
+
+  it("today: uses the Zurich calendar day, not the UTC one, near midnight in summer (CEST)", () => {
+    // 2026-08-10T23:00Z is already 2026-08-11 01:00 CEST in Zurich.
+    const lateUTC = new Date(Date.UTC(2026, 7, 10, 23, 0));
+    expect(presetRange("today", lateUTC)).toEqual({ from: "2026-08-11", to: "2026-08-12" });
+  });
+
+  it("today: uses the Zurich calendar day, not the UTC one, near midnight in winter (CET)", () => {
+    // 2026-01-10T23:30Z is already 2026-01-11 00:30 CET in Zurich.
+    const lateUTC = new Date(Date.UTC(2026, 0, 10, 23, 30));
+    expect(presetRange("today", lateUTC)).toEqual({ from: "2026-01-11", to: "2026-01-12" });
+  });
 });
 
 describe("PRESETS", () => {
