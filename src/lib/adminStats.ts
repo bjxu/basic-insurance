@@ -1,6 +1,8 @@
 // src/lib/adminStats.ts
 // Pure helpers for the admin stats API (architecture.md §13.2, REQ-22).
 
+import { zurichWallToUTC } from "./zurichTime";
+
 export type Granularity = "hour" | "day" | "month";
 
 // Range-length -> trend-chart granularity, per the table in architecture.md §13.2.
@@ -13,24 +15,30 @@ export function selectGranularity(fromISO: string, toISO: string): Granularity {
   return "month";
 }
 
-// The stats route's trend query does `GROUP BY date_trunc(...)`, which only
-// emits rows for buckets that actually have data — empty buckets are simply
-// absent, not present with n=0. buildTrendPath (src/lib/trendPath.ts) then
-// spreads whatever rows it receives evenly across the chart's fixed width, so
-// sparse data misrepresents time (e.g. two points on the 1st and the 30th
-// render as a straight line, indistinguishable from steady daily activity).
+// The stats route's trend query does `GROUP BY date_trunc(...)` bucketed in
+// Europe/Zurich (see route.ts), which only emits rows for buckets that
+// actually have data — empty buckets are simply absent, not present with
+// n=0. buildTrendPath (src/lib/trendPath.ts) then spreads whatever rows it
+// receives evenly across the chart's fixed width, so sparse data
+// misrepresents time (e.g. two points on the 1st and the 30th render as a
+// straight line, indistinguishable from steady daily activity).
 //
-// This fills every expected bucket boundary between `from` (inclusive) and
-// `to` (exclusive) at the given granularity, defaulting missing buckets to
-// n: 0, so TrendChart always receives a complete, evenly-spaced series.
+// This fills every expected Zurich-wall-clock bucket boundary between
+// `from` (inclusive) and `to` (exclusive, both Zurich calendar dates) at
+// the given granularity, defaulting missing buckets to n: 0, so TrendChart
+// always receives a complete, evenly-spaced series. Bucket boundaries are
+// computed via zurichWallToUTC so they line up exactly with the SQL's own
+// `date_trunc(..., ts AT TIME ZONE 'Europe/Zurich') AT TIME ZONE
+// 'Europe/Zurich'` bucketing, DST included.
 export function fillTrendGaps(
   rows: { bucket: string; n: number }[],
   granularity: Granularity,
   from: string,
   to: string,
 ): { bucket: string; n: number }[] {
-  const fromDate = new Date(`${from}T00:00:00Z`);
-  const toDate = new Date(`${to}T00:00:00Z`);
+  const [fromY, fromM, fromD] = from.split("-").map(Number);
+  const [toY, toM, toD] = to.split("-").map(Number);
+  const toDate = zurichWallToUTC(toY, toM, toD);
 
   const countsByBucket = new Map<string, number>();
   for (const row of rows) {
@@ -40,17 +48,44 @@ export function fillTrendGaps(
   const buckets: { bucket: string; n: number }[] = [];
 
   if (granularity === "month") {
-    let cursor = new Date(Date.UTC(fromDate.getUTCFullYear(), fromDate.getUTCMonth(), 1));
-    while (cursor < toDate) {
-      const iso = cursor.toISOString();
+    let year = fromY;
+    let month = fromM; // 1-12
+    let real = zurichWallToUTC(year, month, 1);
+    while (real < toDate) {
+      const iso = real.toISOString();
       buckets.push({ bucket: iso, n: countsByBucket.get(iso) ?? 0 });
-      cursor = new Date(Date.UTC(cursor.getUTCFullYear(), cursor.getUTCMonth() + 1, 1));
+      month += 1;
+      if (month > 12) {
+        month = 1;
+        year += 1;
+      }
+      real = zurichWallToUTC(year, month, 1);
     }
-  } else {
-    const stepMs = granularity === "hour" ? 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
-    for (let ms = fromDate.getTime(); ms < toDate.getTime(); ms += stepMs) {
-      const iso = new Date(ms).toISOString();
-      buckets.push({ bucket: iso, n: countsByBucket.get(iso) ?? 0 });
+    return buckets;
+  }
+
+  // day / hour: step a plain UTC-labelled scratch Date purely as calendar
+  // arithmetic (leap years and month lengths handled by native Date), then
+  // convert each label to its real UTC instant via zurichWallToUTC. The
+  // scratch Date's fields are never used as a real instant themselves.
+  const cursor =
+    granularity === "hour"
+      ? new Date(Date.UTC(fromY, fromM - 1, fromD, 0))
+      : new Date(Date.UTC(fromY, fromM - 1, fromD));
+
+  for (;;) {
+    const y = cursor.getUTCFullYear();
+    const m = cursor.getUTCMonth() + 1;
+    const d = cursor.getUTCDate();
+    const h = granularity === "hour" ? cursor.getUTCHours() : 0;
+    const real = zurichWallToUTC(y, m, d, h);
+    if (!(real < toDate)) break;
+    const iso = real.toISOString();
+    buckets.push({ bucket: iso, n: countsByBucket.get(iso) ?? 0 });
+    if (granularity === "hour") {
+      cursor.setUTCHours(cursor.getUTCHours() + 1);
+    } else {
+      cursor.setUTCDate(cursor.getUTCDate() + 1);
     }
   }
 
