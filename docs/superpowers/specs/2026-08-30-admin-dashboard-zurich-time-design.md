@@ -67,7 +67,13 @@ than an accident of the two-pass algorithm:
   does not exist): snaps forward, matching native `Date`'s own overflow
   behavior for out-of-range fields.
 - **Fall back** (ambiguous wall-clock hour, e.g. 2026-10-25 02:00–03:00 occurs
-  twice): resolves to its **first** occurrence (the earlier UTC offset).
+  twice): resolves to its **second** occurrence (the post-transition, CET
+  offset) — the natural fixed point of the same two-pass correction used for
+  every other instant, not a specially-cased branch. (Corrected during
+  planning from an initially-stated "first occurrence": forcing the other
+  tie-break would need extra branching for a ~1-hour/year edge case with no
+  functional stakes, so the plan keeps the simpler, already-DST-correct
+  algorithm and documents what it actually does.)
 
 This affects at most ~2 hours a year, visible only at hourly granularity on
 those two specific dashboard days.
@@ -162,8 +168,14 @@ values feeding them.
   23:30 UTC in summer = 01:30 CEST the next day) lands on the correct Zurich
   calendar day for `today`.
 - `adminStats.test.ts`: existing `fillTrendGaps`/`selectGranularity` cases
-  re-verified against Zurich boundaries, plus a new hourly-range case
-  crossing 2026-10-25 (23 or 25 buckets, not silently wrong).
+  re-verified against Zurich boundaries, plus a new hourly-range case over
+  2026-03-29 (the spring-forward day): the hour-label loop still produces 24
+  entries, but two of them (the nonexistent local 02:00 and the following
+  03:00) land on the same UTC instant — asserted explicitly, so the
+  duplicate is a documented fact, not a silent bug. (The fall-back day's
+  ambiguous-hour tie-break is exercised directly in `zurichTime.test.ts`
+  instead, where it's a one-function unit check rather than a full
+  `fillTrendGaps` trace.)
 - `route.test.ts`: unaffected structurally.
 
 ## Docs
