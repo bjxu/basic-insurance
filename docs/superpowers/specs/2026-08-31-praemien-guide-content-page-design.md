@@ -97,7 +97,20 @@ New pure module `src/lib/praemienGuide.ts`:
 ```ts
 export type CantonAverage = { kanton: string; averagePremium: number };
 
-export function averagePremiumByCanton(rows: PremiumRow[]): CantonAverage[]
+// Pure — no I/O. rows are the raw (pre-levy) PremiumRow[] for `year`;
+// levyPerMonthByYear is metadata.json's environmentalLevyPerMonth.
+export function averagePremiumByCanton(
+  rows: PremiumRow[],
+  year: number,
+  levyPerMonthByYear: Record<string, number>,
+): CantonAverage[]
+
+// I/O — reads public/data/premiums-{year}.json off disk.
+export function readPremiumRows(year: number): Promise<PremiumRow[]>
+
+// I/O — lists public/data/, returns the max year found among
+// premiums-{year}.json files.
+export function getPremiumDataYear(): Promise<number>
 ```
 
 - Canton is derived from `praemienregionId.split("-")[0]` — confirmed exact:
@@ -111,14 +124,36 @@ export function averagePremiumByCanton(rows: PremiumRow[]): CantonAverage[]
 - `cheapestPerInsurer` (already in `src/lib/lookup.ts`) is applied *before*
   averaging, per canton, so an insurer with many overlapping product rows
   in the same canton doesn't skew that canton's average.
+- Each row's `monthlyPremium` has `applyEnvironmentalLevy` (already in
+  `src/lib/environmentalLevy.ts`) applied *before* averaging, via the
+  `year`/`levyPerMonthByYear` parameters — the same adjustment
+  `InsuranceComparator.tsx` applies before displaying any price. Skipping
+  this would show pre-levy tariff numbers nobody actually pays, and would
+  visibly disagree with the comparator tool's own results for the same
+  inputs. The caller passes `metadata.json`'s `environmentalLevyPerMonth`
+  (already imported the same way `InsuranceComparator.tsx` does).
 - Result: one row per canton (up to 26), each `{ kanton, averagePremium }`,
   sorted by `kanton` ascending — a plain, predictable table, not a ranked
   "cheapest canton" list (that framing invites the kind of stale/misleading
   claim a hand-maintained page risks — the whole point of computing this
   from real data is to avoid it).
-- Called from `PraemienGuideContent` (or the page component) against
-  whatever `PremiumRow[]` the app already loads for the comparator — no new
-  data-loading path, just a new aggregation over data already in memory.
+
+**Corrected during planning — there is no existing server-side data load.**
+The comparator only ever loads `PremiumRow[]` client-side, lazily per year,
+via `fetch("/data/premiums-{year}.json")` in `InsuranceComparator.tsx`.
+Since this page must be server-rendered with the table already in the HTML
+(that's the entire SEO point), it needs its own server-side loader — a new
+small function, `readPremiumRows(year)` (in `src/lib/praemienGuide.ts`),
+reading `public/data/premiums-{year}.json` directly off disk with
+`node:fs/promises` (`readFile(join(process.cwd(), "public", "data",
+"premiums-" + year + ".json"), "utf-8")` then `JSON.parse`), mirroring how
+`scripts/ingest.ts` already writes to that same path
+(`PUBLIC_DATA_DIR = join(process.cwd(), "public", "data")`). This runs at
+request/build time in a Server Component — never shipped to the client, so
+it doesn't touch the existing client-side fetch path at all.
+
+`getPremiumDataYear()` (below) is what tells this loader *which* year's
+file to read — it doesn't hard-code a year.
 
 ## Metadata
 
@@ -127,23 +162,33 @@ export function averagePremiumByCanton(rows: PremiumRow[]): CantonAverage[]
   pattern) in `src/messages/de.json`, interpolating the current premium
   data year rather than hard-coding it.
 - The "current premium data year" comes from a small helper,
-  `getPremiumDataYear()` (in `src/lib/praemienGuide.ts` or wherever the
-  loaded `PremiumRow[]` already lives) — `Math.max` over the loaded rows'
-  `year` field. This guarantees the title/H1 and the table can never drift
-  apart (e.g. title says 2027 while the table is still showing 2026 rows).
+  `getPremiumDataYear()` (in `src/lib/praemienGuide.ts`) — lists
+  `public/data/` (`node:fs/promises` `readdir`), matches filenames against
+  `premiums-(\d+)\.json`, and returns the max year found. This determines
+  which file `readPremiumRows(year)` reads, so the title/H1 and the table
+  can never drift apart (e.g. title says 2027 while the table is still
+  showing 2026 rows) — both are driven by the same source of truth, and
+  neither hard-codes a year.
 - `sitemap.ts` gains one new entry for `/de/praemien` — German only, not
   looped across `routing.locales` like the other `INDEXABLE_PATHS` — with a
   `priority` comparable to `how-it-works`'s 0.6.
 
 ## Testing
 
-- `src/lib/praemienGuide.test.ts` — table-driven tests against small
-  synthetic `PremiumRow[]` fixtures: correct per-canton grouping from
-  `praemienregionId` prefixes, correct reference-profile filtering (rows
-  outside the fixed profile excluded), `cheapestPerInsurer`-before-average
-  ordering (an insurer with two rows in the same canton at different prices
-  only contributes its cheaper one), correct averaging arithmetic, and
-  `getPremiumDataYear()`'s max-year computation.
+- `src/lib/praemienGuide.test.ts` — `averagePremiumByCanton` (pure, no I/O)
+  table-driven against small synthetic `PremiumRow[]` fixtures: correct
+  per-canton grouping from `praemienregionId` prefixes, correct
+  reference-profile filtering (rows outside the fixed profile excluded),
+  `cheapestPerInsurer`-before-average ordering (an insurer with two rows in
+  the same canton at different prices only contributes its cheaper one),
+  correct averaging arithmetic, and that the levy is actually subtracted
+  before averaging (a fixture with a known `levyPerMonthByYear` entry
+  produces the levy-adjusted, not raw, average). `readPremiumRows` and
+  `getPremiumDataYear` are I/O and get a couple of focused tests against
+  fixture files in a temp directory (or against the real `public/data/`
+  contents, whichever the implementer finds cleaner given how the rest of
+  the ingest pipeline's tests are already structured) — not exhaustively
+  unit-tested the way the pure function is.
 - `sitemap.test.ts` extended to cover the new `/de/praemien` entry
   (present, German-only, not duplicated across other locales).
 - No test for the prose content itself — consistent with `how-it-works`/
