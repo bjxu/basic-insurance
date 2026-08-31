@@ -92,6 +92,24 @@ describe("GET /api/admin/stats", () => {
     });
   });
 
+  it("anchors every range filter and the trend bucketing to Europe/Zurich", async () => {
+    process.env.POSTGRES_URL = "postgres://test";
+    const fakeSql = vi.fn(() => Promise.resolve([]));
+    vi.mocked(db.getSql).mockReturnValue(fakeSql as unknown as ReturnType<typeof db.getSql>);
+
+    await GET(makeRequest("from=2026-07-12&to=2026-08-11"));
+
+    const queryTexts = (fakeSql.mock.calls as unknown as [TemplateStringsArray][]).map(([strings]) => strings.join("?"));
+    expect(queryTexts.length).toBe(11); // total + trend + 9 breakdowns
+    for (const text of queryTexts) {
+      expect(text).toContain("AT TIME ZONE 'Europe/Zurich'");
+      expect(text).toContain(
+        "ts >= (?::timestamp AT TIME ZONE 'Europe/Zurich') AND ts < (?::timestamp AT TIME ZONE 'Europe/Zurich')",
+      );
+    }
+    expect(queryTexts.some((t) => t.includes("date_trunc"))).toBe(true);
+  });
+
   it("returns 500 with an error body when the DB queries fail (e.g. inquiry_log not migrated yet)", async () => {
     process.env.POSTGRES_URL = "postgres://test";
     const fakeSql = vi.fn(() => Promise.reject(new Error("relation \"inquiry_log\" does not exist")));

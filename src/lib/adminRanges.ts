@@ -7,6 +7,8 @@
 // no conversion; only formatRangeLabel (and the RangePicker's date input,
 // Task 11) convert to/from the inclusive, human-facing end date.
 
+import { zurichParts } from "./zurichTime";
+
 export type PresetKey = "today" | "7d" | "30d" | "month" | "3m" | "year";
 
 export const PRESETS: { key: PresetKey; label: string }[] = [
@@ -31,7 +33,8 @@ function addDays(d: Date, n: number): Date {
 // `today` is injected (never read from `new Date()` internally) so callers —
 // and tests — control "now" precisely instead of depending on wall-clock time.
 export function presetRange(key: PresetKey, today: Date): { from: string; to: string } {
-  const todayMidnight = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+  const zp = zurichParts(today);
+  const todayMidnight = new Date(Date.UTC(zp.year, zp.month - 1, zp.day));
   const to = toISODate(addDays(todayMidnight, 1)); // exclusive: tomorrow
 
   switch (key) {

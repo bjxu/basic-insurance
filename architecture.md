@@ -413,9 +413,13 @@ No user table, no JWT library — one env variable, one cookie.
 
 `GET /api/admin/stats?from=<ISO date>&to=<ISO date>` (guarded by middleware).
 
-Both `from` and `to` are required ISO-8601 date strings (`YYYY-MM-DD`). The route
-validates them server-side and returns 400 on invalid input. All queries are
-parameterised — no string interpolation.
+Both `from` and `to` are required ISO-8601 date strings (`YYYY-MM-DD`),
+interpreted as **Europe/Zurich calendar dates** (Bern/Zurich local time, not
+UTC) — every query wraps them as `$1::timestamp AT TIME ZONE 'Europe/Zurich'` /
+`$2::timestamp AT TIME ZONE 'Europe/Zurich'` so the range boundary lands on the
+correct real instant regardless of the DB session's own timezone setting.
+The route validates them server-side and returns 400 on invalid input. All
+queries are parameterised — no string interpolation.
 
 The trend chart granularity is chosen server-side based on the range length and
 returned as a `granularity` field (`'hour' | 'day' | 'month'`) so the client doesn't
@@ -431,24 +435,25 @@ need to re-derive it:
 -- 1. Total in range
 SELECT COUNT(*) AS total
 FROM inquiry_log
-WHERE ts >= $1 AND ts < $2;
+WHERE ts >= ($1::timestamp AT TIME ZONE 'Europe/Zurich') AND ts < ($2::timestamp AT TIME ZONE 'Europe/Zurich');
 
--- 2. Trend series (granularity substituted server-side as date_trunc argument)
-SELECT date_trunc($3, ts) AS bucket, COUNT(*) AS n
+-- 2. Trend series (granularity substituted server-side as date_trunc argument;
+--    bucketed in Europe/Zurich, matching the range filter above)
+SELECT date_trunc($3, ts AT TIME ZONE 'Europe/Zurich') AT TIME ZONE 'Europe/Zurich' AS bucket, COUNT(*) AS n
 FROM inquiry_log
-WHERE ts >= $1 AND ts < $2
+WHERE ts >= ($1::timestamp AT TIME ZONE 'Europe/Zurich') AND ts < ($2::timestamp AT TIME ZONE 'Europe/Zurich')
 GROUP BY 1 ORDER BY 1;
 
 -- 3. Top 10 regions
 SELECT region_id, COUNT(*) AS n
 FROM inquiry_log
-WHERE ts >= $1 AND ts < $2
+WHERE ts >= ($1::timestamp AT TIME ZONE 'Europe/Zurich') AND ts < ($2::timestamp AT TIME ZONE 'Europe/Zurich')
 GROUP BY 1 ORDER BY 2 DESC LIMIT 10;
 
 -- 4. Age band breakdown
 SELECT altersklasse, COUNT(*) AS n
 FROM inquiry_log
-WHERE ts >= $1 AND ts < $2
+WHERE ts >= ($1::timestamp AT TIME ZONE 'Europe/Zurich') AND ts < ($2::timestamp AT TIME ZONE 'Europe/Zurich')
 GROUP BY 1 ORDER BY 2 DESC;
 
 -- 4b. Age group breakdown (finer; NULL age_group = pre-feature rows, excluded)
@@ -456,37 +461,37 @@ GROUP BY 1 ORDER BY 2 DESC;
 -- fixed AGE_GROUPS sequence.
 SELECT age_group AS "ageGroup", COUNT(*) AS n
 FROM inquiry_log
-WHERE ts >= $1 AND ts < $2 AND age_group IS NOT NULL
+WHERE ts >= ($1::timestamp AT TIME ZONE 'Europe/Zurich') AND ts < ($2::timestamp AT TIME ZONE 'Europe/Zurich') AND age_group IS NOT NULL
 GROUP BY 1;
 
 -- 5. Franchise breakdown
 SELECT franchise, COUNT(*) AS n
 FROM inquiry_log
-WHERE ts >= $1 AND ts < $2
+WHERE ts >= ($1::timestamp AT TIME ZONE 'Europe/Zurich') AND ts < ($2::timestamp AT TIME ZONE 'Europe/Zurich')
 GROUP BY 1 ORDER BY 1;
 
 -- 6. Model set breakdown (unnested)
 SELECT unnest(models) AS model, COUNT(*) AS n
 FROM inquiry_log
-WHERE ts >= $1 AND ts < $2
+WHERE ts >= ($1::timestamp AT TIME ZONE 'Europe/Zurich') AND ts < ($2::timestamp AT TIME ZONE 'Europe/Zurich')
 GROUP BY 1 ORDER BY 2 DESC;
 
 -- 7. Accident coverage
 SELECT accident, COUNT(*) AS n
 FROM inquiry_log
-WHERE ts >= $1 AND ts < $2
+WHERE ts >= ($1::timestamp AT TIME ZONE 'Europe/Zurich') AND ts < ($2::timestamp AT TIME ZONE 'Europe/Zurich')
 GROUP BY 1;
 
 -- 8. Language mix (COALESCE NULL -> 'unbekannt' so pre-feature rows still surface)
 SELECT COALESCE(locale, 'unbekannt') AS locale, COUNT(*) AS n
 FROM inquiry_log
-WHERE ts >= $1 AND ts < $2
+WHERE ts >= ($1::timestamp AT TIME ZONE 'Europe/Zurich') AND ts < ($2::timestamp AT TIME ZONE 'Europe/Zurich')
 GROUP BY 1 ORDER BY 2 DESC;
 
 -- 9. Current insurer, top 10 (only inquiries where the current plan was provided)
 SELECT current_insurer, COUNT(*) AS n
 FROM inquiry_log
-WHERE ts >= $1 AND ts < $2 AND current_insurer IS NOT NULL
+WHERE ts >= ($1::timestamp AT TIME ZONE 'Europe/Zurich') AND ts < ($2::timestamp AT TIME ZONE 'Europe/Zurich') AND current_insurer IS NOT NULL
 GROUP BY 1 ORDER BY 2 DESC LIMIT 10;
 
 -- 10. Current premium band (only inquiries where the current plan was provided)
@@ -495,7 +500,7 @@ GROUP BY 1 ORDER BY 2 DESC LIMIT 10;
 -- push `<250` to the end.
 SELECT current_premium_band AS band, COUNT(*) AS n
 FROM inquiry_log
-WHERE ts >= $1 AND ts < $2 AND current_premium_band IS NOT NULL
+WHERE ts >= ($1::timestamp AT TIME ZONE 'Europe/Zurich') AND ts < ($2::timestamp AT TIME ZONE 'Europe/Zurich') AND current_premium_band IS NOT NULL
 GROUP BY 1;
 ```
 
