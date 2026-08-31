@@ -171,10 +171,14 @@ the page needs beyond the premium rows themselves.
 
 ## Metadata
 
-- New `meta.praemienGuideTitle` / `meta.praemienGuideDescription` (and
-  `og`/`twitter` variants, matching the existing `meta.howItWorksTitle`
-  pattern) in `src/messages/de.json`, interpolating the current premium
-  data year rather than hard-coding it.
+- New `meta.praemienGuideTitle` / `meta.praemienGuideDescription` in
+  `src/messages/de.json`, interpolating the current premium data year.
+  Matching the *actual* `how-it-works` pattern exactly (re-verified against
+  its code, correcting an earlier overstatement in this spec): just these
+  two keys, reused as-is for `title`, `openGraph.title`/`description`, and
+  `twitter.title`/`description` alike — `how-it-works` has no separate
+  `howItWorksOgTitle`/`howItWorksTwitterTitle` keys, and this page follows
+  the same two-key shape rather than inventing more.
 - The "current premium data year" is `Math.max(...metadata.availableYears)`
   (see the "year comes from `metadata.json`" note above) — computed once in
   the page component and used for both the title/H1 interpolation and
