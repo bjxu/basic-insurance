@@ -54,9 +54,16 @@ locale; this page is German-only):
   For any locale other than `de`, the page calls `notFound()` — the route
   exists, but only the German version is real content.
 - `src/components/help/PraemienGuideContent.tsx` — the actual content
-  component, mirroring `HowItWorksContent`'s role. Takes no `full`/summary
-  variant (unlike `HowItWorksContent`, which is also embedded inline
-  elsewhere) — this content only ever appears on its own page.
+  component, mirroring `HowItWorksContent`'s role: `"use client"`, reads
+  copy via `useTranslations` (Next still server-renders a client
+  component's first paint, so this doesn't cost crawlability — same as
+  `HowItWorksContent` today). Takes no `full`/summary variant (unlike
+  `HowItWorksContent`, which is also embedded inline elsewhere) — this
+  content only ever appears on its own page. Unlike `HowItWorksContent`, it
+  does take one prop: `cantonAverages: CantonAverage[]` — the page
+  component (a Server Component) does the `readPremiumRows` +
+  `averagePremiumByCanton` work and passes the small, already-computed
+  result down; the fs/aggregation code itself never runs client-side.
 - Copy lives in `src/messages/de.json` under a new `praemienGuide` message
   namespace (section intros, FAQ question/answer pairs, deadline text).
   The exact German prose is drafted during implementation, not spelled out
@@ -107,10 +114,6 @@ export function averagePremiumByCanton(
 
 // I/O — reads public/data/premiums-{year}.json off disk.
 export function readPremiumRows(year: number): Promise<PremiumRow[]>
-
-// I/O — lists public/data/, returns the max year found among
-// premiums-{year}.json files.
-export function getPremiumDataYear(): Promise<number>
 ```
 
 - Canton is derived from `praemienregionId.split("-")[0]` — confirmed exact:
@@ -152,8 +155,19 @@ reading `public/data/premiums-{year}.json` directly off disk with
 request/build time in a Server Component — never shipped to the client, so
 it doesn't touch the existing client-side fetch path at all.
 
-`getPremiumDataYear()` (below) is what tells this loader *which* year's
-file to read — it doesn't hard-code a year.
+**The year comes from `metadata.json`, not a directory scan.**
+`src/data/metadata.json`'s `availableYears` is already the app's
+established source of truth for "which premium year is current" — after
+each yearly ingest run, `scripts/ingest.ts` rewrites it to `[year]` (the
+year just ingested), and existing code already reads it this same way
+(`scripts/crawl/crawlDescriptions.ts`: `Math.max(...metadata.availableYears)`).
+The page component imports `metadata.json` directly (same pattern
+`InsuranceComparator.tsx` already uses) and computes
+`Math.max(...metadata.availableYears)` inline — no new function, no
+directory listing, and it automatically tracks whatever year the ingest
+pipeline last wrote. `metadata.json` also already holds
+`environmentalLevyPerMonth` (§ above), so one import supplies both values
+the page needs beyond the premium rows themselves.
 
 ## Metadata
 
@@ -161,14 +175,11 @@ file to read — it doesn't hard-code a year.
   `og`/`twitter` variants, matching the existing `meta.howItWorksTitle`
   pattern) in `src/messages/de.json`, interpolating the current premium
   data year rather than hard-coding it.
-- The "current premium data year" comes from a small helper,
-  `getPremiumDataYear()` (in `src/lib/praemienGuide.ts`) — lists
-  `public/data/` (`node:fs/promises` `readdir`), matches filenames against
-  `premiums-(\d+)\.json`, and returns the max year found. This determines
-  which file `readPremiumRows(year)` reads, so the title/H1 and the table
-  can never drift apart (e.g. title says 2027 while the table is still
-  showing 2026 rows) — both are driven by the same source of truth, and
-  neither hard-codes a year.
+- The "current premium data year" is `Math.max(...metadata.availableYears)`
+  (see the "year comes from `metadata.json`" note above) — computed once in
+  the page component and used for both the title/H1 interpolation and
+  `readPremiumRows(year)`, so the two can never drift apart (e.g. title
+  says 2027 while the table is still showing 2026 rows).
 - `sitemap.ts` gains one new entry for `/de/praemien` — German only, not
   looped across `routing.locales` like the other `INDEXABLE_PATHS` — with a
   `priority` comparable to `how-it-works`'s 0.6.
@@ -183,11 +194,10 @@ file to read — it doesn't hard-code a year.
   the same canton at different prices only contributes its cheaper one),
   correct averaging arithmetic, and that the levy is actually subtracted
   before averaging (a fixture with a known `levyPerMonthByYear` entry
-  produces the levy-adjusted, not raw, average). `readPremiumRows` and
-  `getPremiumDataYear` are I/O and get a couple of focused tests against
-  fixture files in a temp directory (or against the real `public/data/`
-  contents, whichever the implementer finds cleaner given how the rest of
-  the ingest pipeline's tests are already structured) — not exhaustively
+  produces the levy-adjusted, not raw, average). `readPremiumRows` is I/O
+  and gets a couple of focused tests reading the real `public/data/
+  premiums-{year}.json` (a fixture already exists on disk for the current
+  year — no need to invent a temp-directory fixture) — not exhaustively
   unit-tested the way the pure function is.
 - `sitemap.test.ts` extended to cover the new `/de/praemien` entry
   (present, German-only, not duplicated across other locales).
