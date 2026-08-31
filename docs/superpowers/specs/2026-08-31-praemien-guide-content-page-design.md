@@ -70,6 +70,19 @@ locale; this page is German-only):
   here — this spec fixes the section list and each section's purpose,
   not its wording.
 
+**Found during planning — the other 5 locale files need the same keys
+too, even though this page never renders for them.**
+`src/messages/messages.test.ts` already enforces that every locale file
+has exactly the same key paths and placeholder names as `de.json`. Since
+the page `notFound()`s for every non-German locale, the *content* of those
+5 files' `praemienGuide.*`/`meta.praemienGuide*` entries is genuinely
+unreachable — but the keys still have to exist, with the same
+placeholders, or the existing test fails. The implementation copies the
+German strings verbatim into all 6 locale files for this namespace (not
+real translations — this is not the French/Italian work the "German only
+for now" scope decision deferred, just satisfying an existing repo
+invariant for otherwise-dead content).
+
 ### Sections, in order
 
 1. **H1/intro** — "Krankenkassenprämien {currentYear}: Was Sie wissen
