@@ -1,9 +1,11 @@
 // src/lib/praemienGuide.ts
 // Canton-level average premium aggregation for the /de/praemien SEO guide
 // (docs/superpowers/specs/2026-08-31-praemien-guide-content-page-design.md).
+//
+// Pure, browser-safe: PraemienGuideContent.tsx ("use client") imports
+// CANTON_NAMES_DE and the CantonAverage type from here, so this module must
+// stay free of Node built-ins. The disk read lives in ./praemienGuideData.
 
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import type { PremiumRow } from "./types";
 import { cheapestPerInsurer } from "./lookup";
 import { applyEnvironmentalLevy } from "./environmentalLevy";
@@ -88,14 +90,4 @@ export function averagePremiumByCanton(
   }
 
   return result.sort((a, b) => a.kanton.localeCompare(b.kanton));
-}
-
-/** Reads public/data/premiums-{year}.json off disk. I/O — server-side only
- *  (mirrors how scripts/ingest.ts writes to the same path via
- *  PUBLIC_DATA_DIR = join(process.cwd(), "public", "data")). Never call this
- *  from a "use client" component. */
-export async function readPremiumRows(year: number): Promise<PremiumRow[]> {
-  const filePath = join(process.cwd(), "public", "data", `premiums-${year}.json`);
-  const json = await readFile(filePath, "utf-8");
-  return JSON.parse(json) as PremiumRow[];
 }

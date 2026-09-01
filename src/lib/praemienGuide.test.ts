@@ -1,6 +1,7 @@
 // src/lib/praemienGuide.test.ts
 import { describe, it, expect } from "vitest";
-import { averagePremiumByCanton, readPremiumRows, CANTON_NAMES_DE } from "./praemienGuide";
+import { averagePremiumByCanton, CANTON_NAMES_DE } from "./praemienGuide";
+import { readPremiumRows } from "./praemienGuideData";
 import type { PremiumRow } from "./types";
 
 function row(overrides: Partial<PremiumRow>): PremiumRow {
