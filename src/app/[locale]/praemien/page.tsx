@@ -14,6 +14,7 @@ import { BackToComparisonLink } from "@/components/help/BackToComparisonLink";
 import { averagePremiumByCanton } from "@/lib/praemienGuide";
 import { readPremiumRows } from "@/lib/praemienGuideData";
 import metadata from "@/data/metadata.json";
+import projection from "@/data/praemienProjection.json";
 
 export async function generateMetadata({
   params,
@@ -73,7 +74,15 @@ export default async function PraemienGuidePage({
         <BackToComparisonLink />
       </Suspense>
       <div className="mt-4">
-        <PraemienGuideContent year={year} cantonAverages={cantonAverages} />
+        <PraemienGuideContent
+          year={year}
+          cantonAverages={cantonAverages}
+          projection={{
+            comparis: projection.comparis.increase,
+            bag: projection.bag.increase,
+            asOf: projection.asOf,
+          }}
+        />
       </div>
       <div className="mt-6">
         <Suspense fallback={backFallback}>

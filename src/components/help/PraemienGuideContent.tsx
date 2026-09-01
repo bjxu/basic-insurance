@@ -19,19 +19,34 @@ const FAQ_ITEMS = [
   { q: "q5", a: "a5" },
 ] as const;
 
+export type PraemienProjection = {
+  comparis: string;
+  bag: string;
+  asOf: string;
+};
+
 export function PraemienGuideContent({
   year,
   cantonAverages,
+  projection,
 }: {
   year: number;
   cantonAverages: CantonAverage[];
+  projection: PraemienProjection;
 }) {
   const t = useTranslations("praemienGuide");
 
   return (
     <div className="text-on-surface">
       <h1 className="text-title-large">{t("h1", { year })}</h1>
-      <p className="mt-2 text-body-medium text-on-surface-variant">{t("intro")}</p>
+      <p className="mt-2 text-body-medium text-on-surface-variant">
+        {t("intro")}{" "}
+        {t("projected", {
+          comparis: projection.comparis,
+          bag: projection.bag,
+          asOf: projection.asOf,
+        })}
+      </p>
 
       <section id="wie-berechnet" className="mt-5 border-t border-outline-variant pt-4">
         <h2 className="text-label-large text-on-surface">{t("howSet.heading")}</h2>

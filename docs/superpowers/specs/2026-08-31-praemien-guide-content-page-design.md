@@ -87,7 +87,13 @@ invariant for otherwise-dead content).
 
 1. **H1/intro** — "Krankenkassenprämien {currentYear}: Was Sie wissen
    müssen." States when BAG announces rates (late September) and what
-   typically drives year-over-year change.
+   typically drives year-over-year change. The intro closes with a sentence
+   giving both published forecasts for the next year's average increase
+   (Comparis and the BAG estimate), each with a "Stand: {month}" marker.
+   Those figures are hand-maintained editorial data with source URLs, kept
+   in `src/data/praemienProjection.json` — a standalone file the BAG ingest
+   pipeline never rewrites (unlike `metadata.json`). Update or remove when
+   the definitive rates are published.
 2. **How premiums are set** — canton/region, age group (Kind/Jung/
    Erwachsen), franchise, model (Standard/Hausarzt/Telmed/HMO), accident
    coverage — written for a reader who has never used the comparator,
