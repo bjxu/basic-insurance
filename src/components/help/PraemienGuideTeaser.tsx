@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import metadata from "@/data/metadata.json";
+import projection from "@/data/praemienProjection.json";
 
 // Standalone teaser above the comparator card (InsuranceComparator), linking to
 // the /de/praemien SEO guide. Rendered on every locale: the guide is
@@ -16,7 +17,14 @@ export function PraemienGuideTeaser() {
   return (
     <div className="mb-4 rounded-lg border border-outline-variant bg-surface p-4 shadow-sm">
       <h2 className="text-title-medium text-on-surface">{t("h1", { year })}</h2>
-      <p className="mt-1 text-body-small text-on-surface-variant">{t("teaserIntro")}</p>
+      <p className="mt-1 text-body-small text-on-surface-variant">
+        {t("intro")}{" "}
+        {t("projected", {
+          comparis: projection.comparis.increase,
+          bag: projection.bag.increase,
+          asOf: projection.asOf,
+        })}
+      </p>
       <Link
         href="/praemien"
         locale="de"
