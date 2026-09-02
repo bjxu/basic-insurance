@@ -8,8 +8,8 @@
     "twitterDescription": "Vergleiche Krankenkassenprämien für die Grundversicherung – offizielle BAG-Daten.",
     "howItWorksTitle": "So funktioniert die Schweizer Grundversicherung – Krankenkassenvergleich",
     "howItWorksDescription": "Neu in der Schweiz? Wie die obligatorische Grundversicherung funktioniert: Anmeldefristen, Kassenwechsel, Franchise und Versicherungsmodelle — einfach erklärt.",
-    "praemienGuideTitle": "Krankenkassenprämien {year}: Vergleich & Kantonsübersicht",
-    "praemienGuideDescription": "Was die Krankenkassenprämien {year} kosten, wie sie berechnet werden und was sich ändert — mit Durchschnittsprämien nach Kanton und den wichtigsten Fristen."
+    "praemienGuideTitle": "Krankenkassenprämien {year} & {nextYear}: Vergleich nach Kanton",
+    "praemienGuideDescription": "Krankenkassenprämien {year} im Vergleich – Durchschnittsprämie nach Kanton, wie sie berechnet werden und der Prämien-Ausblick auf {nextYear}."
   },
   "inputs": {
     "title": "Prämienvergleich",

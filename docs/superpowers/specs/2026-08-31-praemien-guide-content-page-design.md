@@ -199,18 +199,31 @@ the page needs beyond the premium rows themselves.
 ## Metadata
 
 - New `meta.praemienGuideTitle` / `meta.praemienGuideDescription` in
-  `src/messages/de.json`, interpolating the current premium data year.
-  Matching the *actual* `how-it-works` pattern exactly (re-verified against
-  its code, correcting an earlier overstatement in this spec): just these
-  two keys, reused as-is for `title`, `openGraph.title`/`description`, and
-  `twitter.title`/`description` alike — `how-it-works` has no separate
-  `howItWorksOgTitle`/`howItWorksTwitterTitle` keys, and this page follows
-  the same two-key shape rather than inventing more.
+  `src/messages/de.json`, reused as-is for `title`, `openGraph.title`/
+  `description`, and `twitter.title`/`description` alike (the same two-key
+  shape `how-it-works` uses). Both interpolate `{year}` (the current
+  premium data year) **and** `{nextYear}` — SEO re-eval found that in the
+  months before BAG publishes, search intent is "prämien {nextYear}" while
+  the data year still lags one behind, so the title/description lead with
+  the range ("Krankenkassenprämien {year} & {nextYear}: …") and mention the
+  outlook. `{nextYear}` is `year + 1`, derived in `generateMetadata` — not
+  a second source of truth.
+- The `<h1>` still interpolates only `{year}` (evergreen "was Sie wissen
+  müssen" framing; the intro paragraph carries the forecast). The canton
+  table's own "Basis: BAG-Daten {year}" note keeps the data year honest
+  regardless of what the title leads with.
 - The "current premium data year" is `Math.max(...metadata.availableYears)`
-  (see the "year comes from `metadata.json`" note above) — computed once in
-  the page component and used for both the title/H1 interpolation and
-  `readPremiumRows(year)`, so the two can never drift apart (e.g. title
-  says 2027 while the table is still showing 2026 rows).
+  — computed once in the page component and used for both the H1
+  interpolation and `readPremiumRows(year)`, so those can never drift.
+- `alternates`: `canonical` plus a self-referential `languages` map
+  (`{ de, "x-default" }` both → `/de/praemien`), mirroring
+  `how-it-works`'s alternates shape for a page that has only a German
+  version.
+- **`FAQPage` JSON-LD** — a `<script type="application/ld+json">` in the
+  page body, built from the same `praemienGuide.faq.q*/a*` message keys the
+  FAQ section renders, so the two can't diverge. (`Article` JSON-LD is
+  still deferred — it wants a publisher/author identity the app doesn't
+  have a constant for yet.)
 - `sitemap.ts` gains one new entry for `/de/praemien` — German only, not
   looped across `routing.locales` like the other `INDEXABLE_PATHS` — with a
   `priority` comparable to `how-it-works`'s 0.6.
@@ -239,7 +252,8 @@ the page needs beyond the premium rows themselves.
 
 ## Out of scope (explicitly deferred)
 
-- JSON-LD/`FAQPage` structured data — separate spec, next.
+- `Article`/`WebPage` JSON-LD — needs a publisher/author identity the app
+  has no constant for. (`FAQPage` JSON-LD *is* now shipped — see Metadata.)
 - French (`primes {year}`) and Italian (`premi {year}`) versions — different
   keyword research and copy, not a translation pass of this page.
 - Any "data last updated" banner beyond the one-line note described above.

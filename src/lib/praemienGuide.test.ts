@@ -1,8 +1,9 @@
 // src/lib/praemienGuide.test.ts
 import { describe, it, expect } from "vitest";
-import { averagePremiumByCanton, CANTON_NAMES_DE } from "./praemienGuide";
+import { averagePremiumByCanton, buildFaqJsonLd, CANTON_NAMES_DE, FAQ_KEYS } from "./praemienGuide";
 import { readPremiumRows } from "./praemienGuideData";
 import type { PremiumRow } from "./types";
+import de from "../messages/de.json";
 
 function row(overrides: Partial<PremiumRow>): PremiumRow {
   return {
@@ -96,5 +97,27 @@ describe("readPremiumRows", () => {
 
   it("rejects for a year with no data file", async () => {
     await expect(readPremiumRows(1999)).rejects.toThrow();
+  });
+});
+
+describe("buildFaqJsonLd", () => {
+  it("emits a FAQPage with one Question per FAQ key, resolved through t", () => {
+    const ld = buildFaqJsonLd((key) => `T:${key}`);
+    expect(ld["@type"]).toBe("FAQPage");
+    expect(ld.mainEntity).toHaveLength(FAQ_KEYS.length);
+    expect(ld.mainEntity[4]).toEqual({
+      "@type": "Question",
+      name: "T:faq.q5",
+      acceptedAnswer: { "@type": "Answer", text: "T:faq.a5" },
+    });
+  });
+
+  it("every FAQ key resolves to real German copy in de.json (no fallback echo)", () => {
+    const faq = de.praemienGuide.faq as Record<string, string>;
+    const ld = buildFaqJsonLd((key) => faq[key.replace("faq.", "")]);
+    for (const entry of ld.mainEntity) {
+      expect(entry.name).toMatch(/\?$/); // questions end with a question mark
+      expect(entry.acceptedAnswer.text.length).toBeGreaterThan(20);
+    }
   });
 });

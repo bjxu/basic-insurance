@@ -8,8 +8,8 @@
     "twitterDescription": "Compara las primas del seguro básico de salud suizo: datos oficiales de la autoridad sanitaria suiza (OFSP).",
     "howItWorksTitle": "Cómo funciona el seguro básico de salud suizo – Comparación de primas",
     "howItWorksDescription": "¿Nuevo en Suiza? Cómo funciona el seguro básico obligatorio: plazos de inscripción, cambio de aseguradora, la franquicia y los modelos de seguro — explicado de forma sencilla.",
-    "praemienGuideTitle": "Krankenkassenprämien {year}: Vergleich & Kantonsübersicht",
-    "praemienGuideDescription": "Was die Krankenkassenprämien {year} kosten, wie sie berechnet werden und was sich ändert — mit Durchschnittsprämien nach Kanton und den wichtigsten Fristen."
+    "praemienGuideTitle": "Krankenkassenprämien {year} & {nextYear}: Vergleich nach Kanton",
+    "praemienGuideDescription": "Krankenkassenprämien {year} im Vergleich – Durchschnittsprämie nach Kanton, wie sie berechnet werden und der Prämien-Ausblick auf {nextYear}."
   },
   "inputs": {
     "title": "Comparación de primas",

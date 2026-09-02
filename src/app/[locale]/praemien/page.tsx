@@ -11,7 +11,7 @@ import { getSiteUrl } from "@/lib/site-url";
 import { Link } from "@/i18n/navigation";
 import { PraemienGuideContent } from "@/components/help/PraemienGuideContent";
 import { BackToComparisonLink } from "@/components/help/BackToComparisonLink";
-import { averagePremiumByCanton } from "@/lib/praemienGuide";
+import { averagePremiumByCanton, buildFaqJsonLd } from "@/lib/praemienGuide";
 import { readPremiumRows } from "@/lib/praemienGuideData";
 import metadata from "@/data/metadata.json";
 import projection from "@/data/praemienProjection.json";
@@ -27,20 +27,30 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "meta" });
   const baseUrl = getSiteUrl();
   const year = Math.max(...metadata.availableYears);
+  // The year users search for ("prämien {nextYear}") leads the title/description;
+  // the canton table's own note keeps the data year honest. Derived, not a
+  // second source of truth — stays one ahead of the ingested data.
+  const vars = { year, nextYear: year + 1 };
+  const url = `${baseUrl}/de/praemien`;
 
   return {
-    title: t("praemienGuideTitle", { year }),
-    description: t("praemienGuideDescription", { year }),
-    alternates: { canonical: `${baseUrl}/de/praemien` },
+    title: t("praemienGuideTitle", vars),
+    description: t("praemienGuideDescription", vars),
+    alternates: {
+      canonical: url,
+      // German-only page: the one URL is both the `de` version and the
+      // fallback. Mirrors how-it-works/page.tsx's alternates shape.
+      languages: { de: url, "x-default": url },
+    },
     openGraph: {
-      title: t("praemienGuideTitle", { year }),
-      description: t("praemienGuideDescription", { year }),
+      title: t("praemienGuideTitle", vars),
+      description: t("praemienGuideDescription", vars),
       type: "article",
     },
     twitter: {
       card: "summary",
-      title: t("praemienGuideTitle", { year }),
-      description: t("praemienGuideDescription", { year }),
+      title: t("praemienGuideTitle", vars),
+      description: t("praemienGuideDescription", vars),
     },
   };
 }
@@ -68,8 +78,17 @@ export default async function PraemienGuidePage({
     </Link>
   );
 
+  // FAQPage structured data from the same q/a pairs the page renders
+  // (praemienGuide.faq.*), so the FAQ is machine-readable for search engines.
+  const tg = await getTranslations({ locale, namespace: "praemienGuide" });
+  const faqLd = buildFaqJsonLd((key) => tg(key));
+
   return (
     <main className="mx-auto my-8 max-w-[720px] px-4">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+      />
       <Suspense fallback={backFallback}>
         <BackToComparisonLink />
       </Suspense>

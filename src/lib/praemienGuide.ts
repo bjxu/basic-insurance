@@ -44,6 +44,26 @@ export const CANTON_NAMES_DE: Record<string, string> = {
   ZH: "Zürich",
 };
 
+// The five FAQ entries the page renders (praemienGuide.faq.q1..q5 /
+// a1..a5). One list, consumed by both PraemienGuideContent's <dl> and the
+// FAQPage JSON-LD, so the rendered FAQ and the structured data can't drift.
+export const FAQ_KEYS = ["q1", "q2", "q3", "q4", "q5"] as const;
+
+/** FAQPage schema.org JSON-LD for the guide, resolved through `t` (a
+ *  next-intl translator scoped to the `praemienGuide` namespace, or any
+ *  `key -> string` lookup). Pure — no next-intl import here. */
+export function buildFaqJsonLd(t: (key: string) => string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: FAQ_KEYS.map((q, i) => ({
+      "@type": "Question",
+      name: t(`faq.${q}`),
+      acceptedAnswer: { "@type": "Answer", text: t(`faq.a${i + 1}`) },
+    })),
+  };
+}
+
 // Fixed reference profile for the guide's canton table — stated here (not
 // buried inline) and echoed in the page's own copy (praemienGuide.table.note)
 // so the numbers are self-explanatory.

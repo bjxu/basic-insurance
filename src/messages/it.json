@@ -8,8 +8,8 @@
     "twitterDescription": "Confronta i premi dell'assicurazione di base svizzera – dati ufficiali dell'UFSP.",
     "howItWorksTitle": "Come funziona l'assicurazione di base svizzera – Confronto dei premi",
     "howItWorksDescription": "Nuovo in Svizzera? Come funziona l'assicurazione di base obbligatoria: termini di affiliazione, cambio di cassa, franchigia e modelli assicurativi — spiegato in modo semplice.",
-    "praemienGuideTitle": "Krankenkassenprämien {year}: Vergleich & Kantonsübersicht",
-    "praemienGuideDescription": "Was die Krankenkassenprämien {year} kosten, wie sie berechnet werden und was sich ändert — mit Durchschnittsprämien nach Kanton und den wichtigsten Fristen."
+    "praemienGuideTitle": "Krankenkassenprämien {year} & {nextYear}: Vergleich nach Kanton",
+    "praemienGuideDescription": "Krankenkassenprämien {year} im Vergleich – Durchschnittsprämie nach Kanton, wie sie berechnet werden und der Prämien-Ausblick auf {nextYear}."
   },
   "inputs": {
     "title": "Confronto dei premi",
