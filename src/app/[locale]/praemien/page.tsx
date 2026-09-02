@@ -1,12 +1,11 @@
 // src/app/[locale]/praemien/page.tsx
-// German-only SEO content page (docs/superpowers/specs/2026-08-31-praemien-
-// guide-content-page-design.md). Follows how-it-works/page.tsx's structure;
-// notFound()s for every other locale rather than rendering empty content.
+// SEO content page on every locale (docs/superpowers/specs/2026-09-02-
+// praemien-guide-i18n-design.md). Mirrors how-it-works/page.tsx.
 
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { routing } from "@/i18n/routing";
 import { getSiteUrl } from "@/lib/site-url";
 import { Link } from "@/i18n/navigation";
 import { PraemienGuideContent } from "@/components/help/PraemienGuideContent";
@@ -22,7 +21,6 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  if (locale !== "de") return {};
 
   const t = await getTranslations({ locale, namespace: "meta" });
   const baseUrl = getSiteUrl();
@@ -32,16 +30,17 @@ export async function generateMetadata({
   // description additionally name-checks {nextYear} for the forecast hook —
   // derived, not a second source of truth.
   const vars = { year, nextYear: year + 1 };
-  const url = `${baseUrl}/de/praemien`;
 
   return {
     title: t("praemienGuideTitle", vars),
     description: t("praemienGuideDescription", vars),
     alternates: {
-      canonical: url,
-      // German-only page: the one URL is both the `de` version and the
-      // fallback. Mirrors how-it-works/page.tsx's alternates shape.
-      languages: { de: url, "x-default": url },
+      languages: {
+        ...Object.fromEntries(
+          routing.locales.map((l) => [l, `${baseUrl}/${l}/praemien`]),
+        ),
+        "x-default": `${baseUrl}/${routing.defaultLocale}/praemien`,
+      },
     },
     openGraph: {
       title: t("praemienGuideTitle", vars),
@@ -62,7 +61,6 @@ export default async function PraemienGuidePage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  if (locale !== "de") notFound();
   setRequestLocale(locale);
 
   const year = Math.max(...metadata.availableYears);
