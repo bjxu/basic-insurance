@@ -10,13 +10,21 @@ import projection from "@/data/praemienProjection.json";
 // German-only content, so the copy here is German too (the praemienGuide
 // namespace), matching the page it links to. `locale="de"` on the Link keeps
 // the target at /de/praemien even from /fr, /it, /en.
+//
+// SEO: `lang="de"` scopes this German block for crawlers on the non-German
+// homepages (the surrounding page is `lang="fr"` etc.). The title is a plain
+// styled <p>, not a heading — it's a promo blurb that sits above the page's
+// own <h1>, so making it <h2> would break the heading outline.
 export function PraemienGuideTeaser() {
   const t = useTranslations("praemienGuide");
   const year = Math.max(...metadata.availableYears);
 
   return (
-    <div className="mb-4 rounded-lg border border-outline-variant bg-surface p-4 shadow-sm">
-      <h2 className="text-title-medium text-on-surface">{t("h1", { year })}</h2>
+    <div
+      lang="de"
+      className="mb-4 rounded-lg border border-outline-variant bg-surface p-4 shadow-sm"
+    >
+      <p className="text-title-medium text-on-surface">{t("h1", { year })}</p>
       <p className="mt-1 text-body-small text-on-surface-variant">
         {t("intro")}{" "}
         {t("projected", {
