@@ -159,6 +159,8 @@
     "h1": "Krankenkassenprämien {year}: Was Sie wissen müssen",
     "intro": "Das Bundesamt für Gesundheit (BAG) veröffentlicht die neuen Prämien jeweils Ende September. Wie stark sie steigen oder sinken, hängt von den Gesundheitskosten des Vorjahres, dem Kanton und der gewählten Kasse ab — es gibt keine einheitliche Schweizer Prämie.",
     "projected": "Für 2027 rechnet Comparis mit einem durchschnittlichen Prämienanstieg von {comparis}, das Bundesamt für Gesundheit (BAG) mit {bag} (Stand: {asOf}).",
+    "teaserIntro": "Wie die Prämien berechnet werden, die wichtigsten Wechselfristen und die Durchschnittsprämie nach Kanton – kompakt erklärt.",
+    "teaserCta": "Mehr Details →",
     "howSet": {
       "heading": "Wie sich die Prämie zusammensetzt",
       "intro": "Jede Krankenkasse berechnet ihre Prämien nach denselben gesetzlich vorgegebenen Faktoren:",

@@ -53,6 +53,14 @@ locale; this page is German-only):
   (`BackToComparisonLink` at top and bottom, same as `how-it-works`).
   For any locale other than `de`, the page calls `notFound()` — the route
   exists, but only the German version is real content.
+- `src/components/help/PraemienGuideTeaser.tsx` — a small standalone block
+  rendered by `InsuranceComparator` directly above the comparator card, on
+  every locale: the guide's heading, a one-line summary, and a "Mehr
+  Details →" link. `locale="de"` on the link keeps the target at
+  `/de/praemien` from every locale (the guide is German-only content, so
+  the teaser copy is German too — same `praemienGuide` namespace). This is
+  the guide's in-app entry point; it does not replace the newcomer banner
+  (REQ-29), which still opens the how-it-works drawer.
 - `src/components/help/PraemienGuideContent.tsx` — the actual content
   component, mirroring `HowItWorksContent`'s role: `"use client"`, reads
   copy via `useTranslations` (Next still server-renders a client

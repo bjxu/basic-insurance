@@ -14,6 +14,7 @@ import { EmptyState } from "./results/EmptyState";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { NewcomerBanner } from "./help/NewcomerBanner";
 import { HowItWorksDrawer } from "./help/HowItWorksDrawer";
+import { PraemienGuideTeaser } from "./help/PraemienGuideTeaser";
 import { getAltersklasse, getFranchiseTiers } from "@/lib/ageband";
 import { getAgeGroup } from "@/lib/ageGroup";
 import { resolveGemeinden, needsDisambiguation } from "@/lib/location";
@@ -290,6 +291,7 @@ export function InsuranceComparator() {
 
   return (
     <main className="max-w-[860px] mx-auto my-8 px-4">
+      <PraemienGuideTeaser />
       <div className="bg-surface border border-outline-variant rounded-lg shadow-sm p-6">
         <NewcomerBanner onOpenGuide={openGuide} />
         <div className="flex items-start justify-between gap-3 mb-1">
