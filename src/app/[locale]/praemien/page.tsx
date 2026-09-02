@@ -27,9 +27,10 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "meta" });
   const baseUrl = getSiteUrl();
   const year = Math.max(...metadata.availableYears);
-  // The year users search for ("prämien {nextYear}") leads the title/description;
-  // the canton table's own note keeps the data year honest. Derived, not a
-  // second source of truth — stays one ahead of the ingested data.
+  // Title identity is the data year (matches the canton table), and flips to
+  // the new year automatically once that year's BAG file is ingested. The
+  // description additionally name-checks {nextYear} for the forecast hook —
+  // derived, not a second source of truth.
   const vars = { year, nextYear: year + 1 };
   const url = `${baseUrl}/de/praemien`;
 

@@ -8,7 +8,7 @@
     "twitterDescription": "Comparez les primes de l'assurance de base suisse – données officielles de l'OFSP.",
     "howItWorksTitle": "Comment fonctionne l'assurance de base suisse – Comparaison des primes",
     "howItWorksDescription": "Nouveau en Suisse ? Comment fonctionne l'assurance de base obligatoire : délais d'affiliation, changement de caisse, franchise et modèles d'assurance — expliqué simplement.",
-    "praemienGuideTitle": "Krankenkassenprämien {year} & {nextYear}: Vergleich nach Kanton",
+    "praemienGuideTitle": "Krankenkassenprämien {year}: Vergleich nach Kanton",
     "praemienGuideDescription": "Krankenkassenprämien {year} im Vergleich – Durchschnittsprämie nach Kanton, wie sie berechnet werden und der Prämien-Ausblick auf {nextYear}."
   },
   "inputs": {

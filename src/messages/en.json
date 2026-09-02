@@ -8,7 +8,7 @@
     "twitterDescription": "Compare Swiss basic health insurance premiums – official FOPH data.",
     "howItWorksTitle": "How Swiss basic health insurance works – Premium comparison",
     "howItWorksDescription": "New to Switzerland? How mandatory basic insurance works: sign-up deadlines, switching insurers, the deductible, and insurance models — explained simply.",
-    "praemienGuideTitle": "Krankenkassenprämien {year} & {nextYear}: Vergleich nach Kanton",
+    "praemienGuideTitle": "Krankenkassenprämien {year}: Vergleich nach Kanton",
     "praemienGuideDescription": "Krankenkassenprämien {year} im Vergleich – Durchschnittsprämie nach Kanton, wie sie berechnet werden und der Prämien-Ausblick auf {nextYear}."
   },
   "inputs": {

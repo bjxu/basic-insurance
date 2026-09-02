@@ -201,17 +201,20 @@ the page needs beyond the premium rows themselves.
 - New `meta.praemienGuideTitle` / `meta.praemienGuideDescription` in
   `src/messages/de.json`, reused as-is for `title`, `openGraph.title`/
   `description`, and `twitter.title`/`description` alike (the same two-key
-  shape `how-it-works` uses). Both interpolate `{year}` (the current
-  premium data year) **and** `{nextYear}` — SEO re-eval found that in the
-  months before BAG publishes, search intent is "prämien {nextYear}" while
-  the data year still lags one behind, so the title/description lead with
-  the range ("Krankenkassenprämien {year} & {nextYear}: …") and mention the
-  outlook. `{nextYear}` is `year + 1`, derived in `generateMetadata` — not
-  a second source of truth.
-- The `<h1>` still interpolates only `{year}` (evergreen "was Sie wissen
-  müssen" framing; the intro paragraph carries the forecast). The canton
-  table's own "Basis: BAG-Daten {year}" note keeps the data year honest
-  regardless of what the title leads with.
+  shape `how-it-works` uses).
+- The **title** interpolates only `{year}` (the current premium data year):
+  its identity matches the canton table, and it flips to the new year
+  automatically the moment that year's BAG file is ingested — which is
+  exactly when "prämien {newYear}" search volume peaks for switching
+  season. Leading the title with `{nextYear}` instead was considered and
+  rejected: it would be a mild content mismatch in the pre-publication
+  window and, worse, permanently one year ahead of reality in the steady
+  state.
+- The **description** additionally interpolates `{nextYear}` (`year + 1`,
+  derived in `generateMetadata`) to name-check the forecast in the SERP
+  snippet, where the length budget is looser.
+- The `<h1>` interpolates only `{year}` (evergreen "was Sie wissen müssen"
+  framing; the intro paragraph carries the forecast).
 - The "current premium data year" is `Math.max(...metadata.availableYears)`
   — computed once in the page component and used for both the H1
   interpolation and `readPremiumRows(year)`, so those can never drift.
