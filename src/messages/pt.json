@@ -7,7 +7,9 @@
     "twitterTitle": "Comparação de seguros de saúde – Seguro básico Suíça",
     "twitterDescription": "Compare os prémios do seguro básico de saúde suíço – dados oficiais da autoridade suíça de saúde (OFSP).",
     "howItWorksTitle": "Como funciona o seguro básico de saúde suíço – Comparação de prémios",
-    "howItWorksDescription": "Novo na Suíça? Como funciona o seguro básico obrigatório: prazos de inscrição, mudança de seguradora, a franquia e os modelos de seguro — explicado de forma simples."
+    "howItWorksDescription": "Novo na Suíça? Como funciona o seguro básico obrigatório: prazos de inscrição, mudança de seguradora, a franquia e os modelos de seguro — explicado de forma simples.",
+    "praemienGuideTitle": "Krankenkassenprämien {year}: Vergleich nach Kanton",
+    "praemienGuideDescription": "Krankenkassenprämien {year} im Vergleich – Durchschnittsprämie nach Kanton, wie sie berechnet werden und der Prämien-Ausblick auf {nextYear}."
   },
   "inputs": {
     "title": "Comparação de prémios",
@@ -152,5 +154,43 @@
   },
   "languageSwitcher": {
     "menuLabel": "Escolher idioma"
+  },
+  "praemienGuide": {
+    "h1": "Krankenkassenprämien {year}: Was Sie wissen müssen",
+    "intro": "Das Bundesamt für Gesundheit (BAG) veröffentlicht die neuen Prämien jeweils Ende September. Wie stark sie steigen oder sinken, hängt von den Gesundheitskosten des Vorjahres, dem Kanton und der gewählten Kasse ab — es gibt keine einheitliche Schweizer Prämie.",
+    "projected": "Für 2027 rechnet Comparis mit einem durchschnittlichen Prämienanstieg von {comparis}, das Bundesamt für Gesundheit (BAG) mit {bag} (Stand: {asOf}).",
+    "teaserCta": "Mehr Details →",
+    "howSet": {
+      "heading": "Wie sich die Prämie zusammensetzt",
+      "intro": "Jede Krankenkasse berechnet ihre Prämien nach denselben gesetzlich vorgegebenen Faktoren:",
+      "region": "Wohnkanton und Prämienregion — je nach Gesundheitskosten in der Region.",
+      "age": "Altersklasse — Kinder (0–18), junge Erwachsene (19–25) und Erwachsene (ab 26) zahlen unterschiedliche Prämien.",
+      "franchise": "Franchise — eine höhere Franchise (bis CHF 2500) senkt die monatliche Prämie, du trägst dafür mehr Kosten selbst.",
+      "model": "Versicherungsmodell — Standard, Hausarzt, Telmed oder HMO; eine eingeschränkte Wahl der Leistungserbringer senkt die Prämie.",
+      "accident": "Unfalldeckung — wer über den Arbeitgeber bereits gegen Unfall versichert ist, kann sie aus der Krankenkasse ausschliessen."
+    },
+    "table": {
+      "heading": "Durchschnittsprämie {year} nach Kanton",
+      "note": "Monatliche Durchschnittsprämie für Erwachsene, Franchise CHF 300, Standardmodell, mit Unfalldeckung — Basis: offizielle BAG-Daten {year}, abzüglich der Prämienverbilligung durch die CO₂-/VOC-Lenkungsabgabe.",
+      "cantonHeader": "Kanton",
+      "premiumHeader": "Ø Prämie/Monat"
+    },
+    "deadlines": {
+      "heading": "Wichtige Fristen",
+      "text": "Du kannst die Krankenkasse einmal pro Jahr wechseln. Die Kündigung muss bis zum 30. November bei der bisherigen Kasse eintreffen, der Wechsel gilt ab dem 1. Januar."
+    },
+    "faq": {
+      "heading": "Häufige Fragen",
+      "q1": "Wann muss ich die Krankenkasse wechseln?",
+      "a1": "Die Kündigung muss bis spätestens 30. November bei deiner aktuellen Kasse eintreffen. Der Wechsel zur neuen Kasse gilt dann ab dem 1. Januar des Folgejahres.",
+      "q2": "Steigen die Prämien jedes Jahr?",
+      "a2": "Nicht zwingend, aber meistens. Die Prämien folgen den tatsächlichen Gesundheitskosten — in den meisten Jahren steigen sie, die Höhe unterscheidet sich aber stark nach Kanton und Kasse.",
+      "q3": "Was ist die Franchise?",
+      "a3": "Die Franchise ist der jährliche Betrag, den du selbst für Behandlungskosten bezahlst, bevor die Krankenkasse übernimmt. Sie liegt zwischen CHF 300 und CHF 2500 — eine höhere Franchise senkt die monatliche Prämie.",
+      "q4": "Was bedeutet Standardmodell?",
+      "a4": "Im Standardmodell kannst du frei jeden zugelassenen Arzt oder jede zugelassene Ärztin wählen. Alternative Modelle (Hausarzt, Telmed, HMO) schränken die Wahl ein und sind dafür günstiger.",
+      "q5": "Kann jede Krankenkasse meine Aufnahme ablehnen?",
+      "a5": "Nein. In der Grundversicherung muss dich jede Krankenkasse aufnehmen — es gibt keine Gesundheitsfragen und keine Ablehnung."
+    }
   }
 }

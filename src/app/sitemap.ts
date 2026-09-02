@@ -11,7 +11,7 @@ const INDEXABLE_PATHS = ["", "/how-it-works"] as const;
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = getSiteUrl();
 
-  return routing.locales.flatMap((locale) =>
+  const localizedEntries = routing.locales.flatMap((locale) =>
     INDEXABLE_PATHS.map((path) => ({
       url: `${baseUrl}/${locale}${path}`,
       lastModified: new Date(),
@@ -24,4 +24,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       },
     })),
   );
+
+  // German-only content (docs/superpowers/specs/2026-08-31-praemien-guide-
+  // content-page-design.md) — no other-locale version exists yet, so no
+  // hreflang alternates map (there's nothing to alternate to).
+  const praemienEntry: MetadataRoute.Sitemap[number] = {
+    url: `${baseUrl}/de/praemien`,
+    lastModified: new Date(),
+    changeFrequency: "yearly",
+    priority: 0.6,
+  };
+
+  return [...localizedEntries, praemienEntry];
 }
