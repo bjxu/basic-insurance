@@ -1,10 +1,15 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { CANTON_NAMES_DE, type CantonAverage } from "@/lib/praemienGuide";
+import { useTranslations, useLocale } from "next-intl";
+import {
+  formatProjection,
+  type CantonAverage,
+  type RawProjection,
+} from "@/lib/praemienGuide";
+import { CANTON_NAMES, type CantonCode } from "@/lib/cantonNames";
 
 // Mirrors HowItWorksContent's role (src/components/help/HowItWorksContent.tsx)
-// for the /de/praemien page. "use client" for useTranslations — Next still
+// for the /praemien page. "use client" for useTranslations — Next still
 // server-renders a client component's first paint, so this doesn't cost
 // crawlability. Unlike HowItWorksContent, this only ever appears on its own
 // page (no full/summary variant) and takes the pre-computed canton table as
@@ -19,12 +24,6 @@ const FAQ_ITEMS = [
   { q: "q5", a: "a5" },
 ] as const;
 
-export type PraemienProjection = {
-  comparis: string;
-  bag: string;
-  asOf: string;
-};
-
 export function PraemienGuideContent({
   year,
   cantonAverages,
@@ -32,20 +31,19 @@ export function PraemienGuideContent({
 }: {
   year: number;
   cantonAverages: CantonAverage[];
-  projection: PraemienProjection;
+  projection: RawProjection;
 }) {
   const t = useTranslations("praemienGuide");
+  const locale = useLocale();
+  const cantonNames =
+    CANTON_NAMES[locale as keyof typeof CANTON_NAMES] ?? CANTON_NAMES.de;
 
   return (
     <div className="text-on-surface">
       <h1 className="text-title-large">{t("h1", { year })}</h1>
       <p className="mt-2 text-body-medium text-on-surface-variant">
         {t("intro")}{" "}
-        {t("projected", {
-          comparis: projection.comparis,
-          bag: projection.bag,
-          asOf: projection.asOf,
-        })}
+        {t("projected", formatProjection(projection, locale))}
       </p>
 
       <section id="wie-berechnet" className="mt-5 border-t border-outline-variant pt-4">
@@ -73,7 +71,11 @@ export function PraemienGuideContent({
           <tbody>
             {cantonAverages.map(({ kanton, averagePremium }) => (
               <tr key={kanton} className="border-t border-outline-variant">
-                <td className="py-1 pr-2">{CANTON_NAMES_DE[kanton] ?? kanton}</td>
+                <td className="py-1 pr-2">
+                  {cantonNames[kanton as CantonCode] ??
+                    CANTON_NAMES.de[kanton as CantonCode] ??
+                    kanton}
+                </td>
                 <td className="py-1 text-right">CHF {averagePremium.toFixed(2)}</td>
               </tr>
             ))}

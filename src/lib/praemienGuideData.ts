@@ -1,5 +1,5 @@
 // src/lib/praemienGuideData.ts
-// Server-only disk read for the /de/praemien guide. Split out of
+// Server-only disk read for the /praemien guide. Split out of
 // praemienGuide.ts so that module stays browser-safe for the "use client"
 // content component (node:fs/promises cannot be bundled for the client).
 

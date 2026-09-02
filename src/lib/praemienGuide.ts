@@ -1,48 +1,17 @@
 // src/lib/praemienGuide.ts
-// Canton-level average premium aggregation for the /de/praemien SEO guide
+// Canton-level average premium aggregation for the /praemien SEO guide
 // (docs/superpowers/specs/2026-08-31-praemien-guide-content-page-design.md).
 //
-// Pure, browser-safe: PraemienGuideContent.tsx ("use client") imports
-// CANTON_NAMES_DE and the CantonAverage type from here, so this module must
-// stay free of Node built-ins. The disk read lives in ./praemienGuideData.
+// Pure, browser-safe: PraemienGuideContent.tsx ("use client") imports the
+// CantonAverage type from here, so this module must stay free of Node
+// built-ins. The disk read lives in ./praemienGuideData; canton display
+// names live in ./cantonNames.
 
 import type { PremiumRow } from "./types";
 import { cheapestPerInsurer } from "./lookup";
 import { applyEnvironmentalLevy } from "./environmentalLevy";
 
 export type CantonAverage = { kanton: string; averagePremium: number };
-
-// German canton display names, keyed by the 2-letter code already used
-// throughout the app's data (praemienregionId's "<KANTON>-<region>" prefix;
-// scripts/ingest/parsePremiums.ts's VALID_CANTONS). All 26 cantons.
-export const CANTON_NAMES_DE: Record<string, string> = {
-  AG: "Aargau",
-  AI: "Appenzell Innerrhoden",
-  AR: "Appenzell Ausserrhoden",
-  BE: "Bern",
-  BL: "Basel-Landschaft",
-  BS: "Basel-Stadt",
-  FR: "Freiburg",
-  GE: "Genf",
-  GL: "Glarus",
-  GR: "Graubünden",
-  JU: "Jura",
-  LU: "Luzern",
-  NE: "Neuenburg",
-  NW: "Nidwalden",
-  OW: "Obwalden",
-  SG: "St. Gallen",
-  SH: "Schaffhausen",
-  SO: "Solothurn",
-  SZ: "Schwyz",
-  TG: "Thurgau",
-  TI: "Tessin",
-  UR: "Uri",
-  VD: "Waadt",
-  VS: "Wallis",
-  ZG: "Zug",
-  ZH: "Zürich",
-};
 
 // The five FAQ entries the page renders (praemienGuide.faq.q1..q5 /
 // a1..a5). One list, consumed by both PraemienGuideContent's <dl> and the
@@ -110,4 +79,32 @@ export function averagePremiumByCanton(
   }
 
   return result.sort((a, b) => a.kanton.localeCompare(b.kanton));
+}
+
+export type RawProjection = {
+  year: number;
+  asOf: string; // ISO year-month, e.g. "2026-05"
+  comparis: { increase: number };
+  bag: { low: number; high: number };
+};
+
+/** Locale-formatted projection figures for the `praemienGuide.projected`
+ *  message. Pure — safe to call from a client component. `locale` is an app
+ *  locale code ("de", "fr", …), deliberately not "de-CH": German/French/
+ *  Italian/Spanish/Portuguese then render a decimal comma (matching how the
+ *  forecasts are published), English a decimal point. */
+export function formatProjection(projection: RawProjection, locale: string) {
+  const nf = new Intl.NumberFormat(locale);
+  const asOf = new Intl.DateTimeFormat(locale, {
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${projection.asOf}-01T00:00:00Z`));
+  return {
+    projYear: String(projection.year),
+    comparis: nf.format(projection.comparis.increase),
+    bagLow: nf.format(projection.bag.low),
+    bagHigh: nf.format(projection.bag.high),
+    asOf,
+  };
 }

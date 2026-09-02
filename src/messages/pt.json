@@ -8,8 +8,8 @@
     "twitterDescription": "Compare os prémios do seguro básico de saúde suíço – dados oficiais da autoridade suíça de saúde (OFSP).",
     "howItWorksTitle": "Como funciona o seguro básico de saúde suíço – Comparação de prémios",
     "howItWorksDescription": "Novo na Suíça? Como funciona o seguro básico obrigatório: prazos de inscrição, mudança de seguradora, a franquia e os modelos de seguro — explicado de forma simples.",
-    "praemienGuideTitle": "Krankenkassenprämien {year}: Vergleich nach Kanton",
-    "praemienGuideDescription": "Krankenkassenprämien {year} im Vergleich – Durchschnittsprämie nach Kanton, wie sie berechnet werden und der Prämien-Ausblick auf {nextYear}."
+    "praemienGuideTitle": "Prémios do seguro de saúde {year}: comparação por cantão",
+    "praemienGuideDescription": "Os prémios do seguro de saúde suíço {year} comparados: prémio médio por cantão, como são calculados e as perspetivas para {nextYear}."
   },
   "inputs": {
     "title": "Comparação de prémios",
@@ -156,41 +156,41 @@
     "menuLabel": "Escolher idioma"
   },
   "praemienGuide": {
-    "h1": "Krankenkassenprämien {year}: Was Sie wissen müssen",
-    "intro": "Das Bundesamt für Gesundheit (BAG) veröffentlicht die neuen Prämien jeweils Ende September. Wie stark sie steigen oder sinken, hängt von den Gesundheitskosten des Vorjahres, dem Kanton und der gewählten Kasse ab — es gibt keine einheitliche Schweizer Prämie.",
-    "projected": "Für 2027 rechnet Comparis mit einem durchschnittlichen Prämienanstieg von {comparis}, das Bundesamt für Gesundheit (BAG) mit {bag} (Stand: {asOf}).",
-    "teaserCta": "Mehr Details →",
+    "h1": "Prémios do seguro de saúde {year}: o que precisa de saber",
+    "intro": "O Serviço Federal da Saúde Pública (OFSP) publica os novos prémios no final de setembro de cada ano. O quanto sobem ou descem depende dos custos de saúde do ano anterior, do cantão e da seguradora escolhida — não existe um prémio suíço único.",
+    "projected": "Para {projYear}, a Comparis prevê um aumento médio dos prémios de {comparis} %, e o OFSP de {bagLow}–{bagHigh} % (dados de {asOf}).",
+    "teaserCta": "Mais detalhes →",
     "howSet": {
-      "heading": "Wie sich die Prämie zusammensetzt",
-      "intro": "Jede Krankenkasse berechnet ihre Prämien nach denselben gesetzlich vorgegebenen Faktoren:",
-      "region": "Wohnkanton und Prämienregion — je nach Gesundheitskosten in der Region.",
-      "age": "Altersklasse — Kinder (0–18), junge Erwachsene (19–25) und Erwachsene (ab 26) zahlen unterschiedliche Prämien.",
-      "franchise": "Franchise — eine höhere Franchise (bis CHF 2500) senkt die monatliche Prämie, du trägst dafür mehr Kosten selbst.",
-      "model": "Versicherungsmodell — Standard, Hausarzt, Telmed oder HMO; eine eingeschränkte Wahl der Leistungserbringer senkt die Prämie.",
-      "accident": "Unfalldeckung — wer über den Arbeitgeber bereits gegen Unfall versichert ist, kann sie aus der Krankenkasse ausschliessen."
+      "heading": "Como se compõe o prémio",
+      "intro": "Todas as seguradoras calculam os seus prémios segundo os mesmos fatores definidos por lei:",
+      "region": "Cantão de residência e região de prémios — consoante os custos de saúde na região.",
+      "age": "Escalão etário — as crianças (0–18 anos), os jovens adultos (19–25 anos) e os adultos (a partir dos 26 anos) pagam prémios diferentes.",
+      "franchise": "Franquia — uma franquia mais elevada (até CHF 2500) reduz o prémio mensal, mas assume uma parte maior dos custos.",
+      "model": "Modelo de seguro — padrão, médico de família, Telmed ou HMO; uma escolha limitada de prestadores reduz o prémio.",
+      "accident": "Cobertura de acidentes — quem já está coberto contra acidentes através do empregador pode excluí-la do seguro de saúde."
     },
     "table": {
-      "heading": "Durchschnittsprämie {year} nach Kanton",
-      "note": "Monatliche Durchschnittsprämie für Erwachsene, Franchise CHF 300, Standardmodell, mit Unfalldeckung — Basis: offizielle BAG-Daten {year}, abzüglich der Prämienverbilligung durch die CO₂-/VOC-Lenkungsabgabe.",
-      "cantonHeader": "Kanton",
-      "premiumHeader": "Ø Prämie/Monat"
+      "heading": "Prémio médio {year} por cantão",
+      "note": "Prémio mensal médio para adultos, franquia de CHF 300, modelo padrão, com cobertura de acidentes — base: dados oficiais do OFSP {year}, deduzida a redução do prémio pela taxa de incentivo sobre o CO₂/COV.",
+      "cantonHeader": "Cantão",
+      "premiumHeader": "Prémio médio/mês"
     },
     "deadlines": {
-      "heading": "Wichtige Fristen",
-      "text": "Du kannst die Krankenkasse einmal pro Jahr wechseln. Die Kündigung muss bis zum 30. November bei der bisherigen Kasse eintreffen, der Wechsel gilt ab dem 1. Januar."
+      "heading": "Prazos importantes",
+      "text": "Pode mudar de seguradora uma vez por ano. A rescisão tem de chegar à seguradora atual até 30 de novembro; a mudança produz efeitos a 1 de janeiro."
     },
     "faq": {
-      "heading": "Häufige Fragen",
-      "q1": "Wann muss ich die Krankenkasse wechseln?",
-      "a1": "Die Kündigung muss bis spätestens 30. November bei deiner aktuellen Kasse eintreffen. Der Wechsel zur neuen Kasse gilt dann ab dem 1. Januar des Folgejahres.",
-      "q2": "Steigen die Prämien jedes Jahr?",
-      "a2": "Nicht zwingend, aber meistens. Die Prämien folgen den tatsächlichen Gesundheitskosten — in den meisten Jahren steigen sie, die Höhe unterscheidet sich aber stark nach Kanton und Kasse.",
-      "q3": "Was ist die Franchise?",
-      "a3": "Die Franchise ist der jährliche Betrag, den du selbst für Behandlungskosten bezahlst, bevor die Krankenkasse übernimmt. Sie liegt zwischen CHF 300 und CHF 2500 — eine höhere Franchise senkt die monatliche Prämie.",
-      "q4": "Was bedeutet Standardmodell?",
-      "a4": "Im Standardmodell kannst du frei jeden zugelassenen Arzt oder jede zugelassene Ärztin wählen. Alternative Modelle (Hausarzt, Telmed, HMO) schränken die Wahl ein und sind dafür günstiger.",
-      "q5": "Kann jede Krankenkasse meine Aufnahme ablehnen?",
-      "a5": "Nein. In der Grundversicherung muss dich jede Krankenkasse aufnehmen — es gibt keine Gesundheitsfragen und keine Ablehnung."
+      "heading": "Perguntas frequentes",
+      "q1": "Quando tenho de mudar de seguradora?",
+      "a1": "A rescisão tem de chegar à sua seguradora atual até 30 de novembro, o mais tardar. A mudança para a nova seguradora produz então efeitos a 1 de janeiro do ano seguinte.",
+      "q2": "Os prémios sobem todos os anos?",
+      "a2": "Não necessariamente, mas na maioria das vezes sim. Os prémios acompanham os custos reais de saúde — na maioria dos anos sobem, mas o valor varia muito consoante o cantão e a seguradora.",
+      "q3": "O que é a franquia?",
+      "a3": "A franquia é o montante anual que paga do seu bolso pelos custos de tratamento antes de a seguradora comparticipar. Situa-se entre CHF 300 e CHF 2500 — uma franquia mais elevada reduz o prémio mensal.",
+      "q4": "O que significa o modelo padrão?",
+      "a4": "No modelo padrão pode escolher livremente qualquer médico autorizado. Os modelos alternativos (médico de família, Telmed, HMO) limitam essa escolha e, em troca, são mais baratos.",
+      "q5": "Uma seguradora pode recusar a minha adesão?",
+      "a5": "Não. No seguro básico, todas as seguradoras têm de o aceitar — não há perguntas de saúde nem recusas."
     }
   }
 }

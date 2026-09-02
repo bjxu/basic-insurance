@@ -1,13 +1,14 @@
 {
-  "_comment": "Hand-maintained editorial figures for the /de/praemien guide (docs/superpowers/specs/2026-08-31-praemien-guide-content-page-design.md). Two published forecasts for the next premium year's average increase. Not from the BAG ingest pipeline — the ingest script never touches this file. Update when the definitive BAG premiums are published (end of September) or when a newer forecast supersedes these.",
+  "_comment": "Hand-maintained editorial figures for the Prämien guide (docs/superpowers/specs/2026-08-31-praemien-guide-content-page-design.md). Two published forecasts for the next premium year's average increase, stored as plain numbers (percent) and an ISO year-month so each locale formats and phrases them itself. Not from the BAG ingest pipeline — the ingest script never touches this file. Update when the definitive BAG premiums are published (end of September) or when a newer forecast supersedes these.",
   "year": 2027,
-  "asOf": "Mai 2026",
+  "asOf": "2026-05",
   "comparis": {
-    "increase": "3,7 %",
+    "increase": 3.7,
     "source": "https://www.comparis.ch/publikationen/mitteilungen/2026/05/krankenkassenpraemien-steigen-2027-um-3-7prozent"
   },
   "bag": {
-    "increase": "4,5 bis 5 %",
+    "low": 4.5,
+    "high": 5,
     "source": "https://www.20min.ch/story/bag-krankenkassenpraemien-steigen-wieder-um-vier-prozent-oder-mehr-103570875"
   }
 }
