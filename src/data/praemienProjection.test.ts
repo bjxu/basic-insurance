@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import projection from "./praemienProjection.json";
 
-// Hand-maintained editorial figures for the /de/praemien guide. This guards
+// Hand-maintained editorial figures for the /praemien guide. This guards
 // the shape the page (src/app/[locale]/praemien/page.tsx) and content
 // component depend on, and — per requirement.md Core Principle #3 — that
 // every published figure carries a source URL back to where it was announced.

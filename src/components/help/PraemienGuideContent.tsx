@@ -9,7 +9,7 @@ import {
 import { CANTON_NAMES, type CantonCode } from "@/lib/cantonNames";
 
 // Mirrors HowItWorksContent's role (src/components/help/HowItWorksContent.tsx)
-// for the /de/praemien page. "use client" for useTranslations — Next still
+// for the /praemien page. "use client" for useTranslations — Next still
 // server-renders a client component's first paint, so this doesn't cost
 // crawlability. Unlike HowItWorksContent, this only ever appears on its own
 // page (no full/summary variant) and takes the pre-computed canton table as

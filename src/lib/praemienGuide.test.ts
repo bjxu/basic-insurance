@@ -126,6 +126,32 @@ describe("formatProjection", () => {
       asOf: "May 2026",
     });
   });
+
+  // The other four locales all publish forecasts with a decimal comma; only
+  // the month string is locale-specific. Values below are the real Intl output.
+  it.each([
+    ["fr", "mai 2026"],
+    ["it", "maggio 2026"],
+    ["es", "mayo de 2026"],
+    ["pt", "maio de 2026"],
+  ])("formats figures for %s (decimal comma, locale-native month)", (locale, asOf) => {
+    expect(formatProjection(raw, locale)).toEqual({
+      projYear: "2027",
+      comparis: "3,7",
+      bagLow: "4,5",
+      bagHigh: "5",
+      asOf,
+    });
+  });
+
+  it("returns exactly the values de.json's `projected` message asks for", () => {
+    const placeholders = [
+      ...new Set(
+        [...de.praemienGuide.projected.matchAll(/\{(\w+)\}/g)].map((m) => m[1]),
+      ),
+    ].sort();
+    expect(Object.keys(formatProjection(raw, "de")).sort()).toEqual(placeholders);
+  });
 });
 
 describe("readPremiumRows", () => {

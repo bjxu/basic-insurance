@@ -1,5 +1,5 @@
 // src/lib/praemienGuide.ts
-// Canton-level average premium aggregation for the /de/praemien SEO guide
+// Canton-level average premium aggregation for the /praemien SEO guide
 // (docs/superpowers/specs/2026-08-31-praemien-guide-content-page-design.md).
 //
 // Pure, browser-safe: PraemienGuideContent.tsx ("use client") imports the
