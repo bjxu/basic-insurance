@@ -8,8 +8,8 @@
     "twitterDescription": "Compare Swiss basic health insurance premiums – official FOPH data.",
     "howItWorksTitle": "How Swiss basic health insurance works – Premium comparison",
     "howItWorksDescription": "New to Switzerland? How mandatory basic insurance works: sign-up deadlines, switching insurers, the deductible, and insurance models — explained simply.",
-    "praemienGuideTitle": "Krankenkassenprämien {year}: Vergleich nach Kanton",
-    "praemienGuideDescription": "Krankenkassenprämien {year} im Vergleich – Durchschnittsprämie nach Kanton, wie sie berechnet werden und der Prämien-Ausblick auf {nextYear}."
+    "praemienGuideTitle": "Swiss health insurance premiums {year}: comparison by canton",
+    "praemienGuideDescription": "Swiss health insurance premiums {year} compared – average premium by canton, how they are calculated and the outlook for {nextYear}."
   },
   "inputs": {
     "title": "Premium Comparison",
@@ -156,41 +156,41 @@
     "menuLabel": "Choose language"
   },
   "praemienGuide": {
-    "h1": "Krankenkassenprämien {year}: Was Sie wissen müssen",
-    "intro": "Das Bundesamt für Gesundheit (BAG) veröffentlicht die neuen Prämien jeweils Ende September. Wie stark sie steigen oder sinken, hängt von den Gesundheitskosten des Vorjahres, dem Kanton und der gewählten Kasse ab — es gibt keine einheitliche Schweizer Prämie.",
-    "projected": "Für {projYear} rechnet Comparis mit einem durchschnittlichen Prämienanstieg von {comparis} %, das Bundesamt für Gesundheit (BAG) mit {bagLow} bis {bagHigh} % (Stand: {asOf}).",
-    "teaserCta": "Mehr Details →",
+    "h1": "Swiss health insurance premiums {year}: what you need to know",
+    "intro": "The Federal Office of Public Health (FOPH) publishes the new premiums at the end of September each year. How much they rise or fall depends on the previous year's healthcare costs, the canton and the insurer you choose — there is no single Swiss premium.",
+    "projected": "For {projYear}, Comparis expects an average premium increase of {comparis}%, and the FOPH {bagLow}–{bagHigh}% (as of {asOf}).",
+    "teaserCta": "More details →",
     "howSet": {
-      "heading": "Wie sich die Prämie zusammensetzt",
-      "intro": "Jede Krankenkasse berechnet ihre Prämien nach denselben gesetzlich vorgegebenen Faktoren:",
-      "region": "Wohnkanton und Prämienregion — je nach Gesundheitskosten in der Region.",
-      "age": "Altersklasse — Kinder (0–18), junge Erwachsene (19–25) und Erwachsene (ab 26) zahlen unterschiedliche Prämien.",
-      "franchise": "Franchise — eine höhere Franchise (bis CHF 2500) senkt die monatliche Prämie, du trägst dafür mehr Kosten selbst.",
-      "model": "Versicherungsmodell — Standard, Hausarzt, Telmed oder HMO; eine eingeschränkte Wahl der Leistungserbringer senkt die Prämie.",
-      "accident": "Unfalldeckung — wer über den Arbeitgeber bereits gegen Unfall versichert ist, kann sie aus der Krankenkasse ausschliessen."
+      "heading": "How the premium is made up",
+      "intro": "Every insurer calculates its premiums using the same factors set by law:",
+      "region": "Canton of residence and premium region — depending on healthcare costs in the region.",
+      "age": "Age group — children (0–18), young adults (19–25) and adults (26+) pay different premiums.",
+      "franchise": "Deductible — a higher deductible (up to CHF 2500) lowers the monthly premium, but you cover more of the costs yourself.",
+      "model": "Insurance model — standard, family doctor, Telmed or HMO; a restricted choice of providers lowers the premium.",
+      "accident": "Accident coverage — if you are already covered against accidents through your employer, you can exclude it from your health insurance."
     },
     "table": {
-      "heading": "Durchschnittsprämie {year} nach Kanton",
-      "note": "Monatliche Durchschnittsprämie für Erwachsene, Franchise CHF 300, Standardmodell, mit Unfalldeckung — Basis: offizielle BAG-Daten {year}, abzüglich der Prämienverbilligung durch die CO₂-/VOC-Lenkungsabgabe.",
-      "cantonHeader": "Kanton",
-      "premiumHeader": "Ø Prämie/Monat"
+      "heading": "Average premium {year} by canton",
+      "note": "Average monthly premium for adults, CHF 300 deductible, standard model, with accident coverage — based on official FOPH data {year}, less the premium reduction from the CO₂/VOC incentive tax.",
+      "cantonHeader": "Canton",
+      "premiumHeader": "Avg. premium/month"
     },
     "deadlines": {
-      "heading": "Wichtige Fristen",
-      "text": "Du kannst die Krankenkasse einmal pro Jahr wechseln. Die Kündigung muss bis zum 30. November bei der bisherigen Kasse eintreffen, der Wechsel gilt ab dem 1. Januar."
+      "heading": "Key deadlines",
+      "text": "You can switch insurers once a year. Your cancellation must reach your current insurer by 30 November; the switch takes effect on 1 January."
     },
     "faq": {
-      "heading": "Häufige Fragen",
-      "q1": "Wann muss ich die Krankenkasse wechseln?",
-      "a1": "Die Kündigung muss bis spätestens 30. November bei deiner aktuellen Kasse eintreffen. Der Wechsel zur neuen Kasse gilt dann ab dem 1. Januar des Folgejahres.",
-      "q2": "Steigen die Prämien jedes Jahr?",
-      "a2": "Nicht zwingend, aber meistens. Die Prämien folgen den tatsächlichen Gesundheitskosten — in den meisten Jahren steigen sie, die Höhe unterscheidet sich aber stark nach Kanton und Kasse.",
-      "q3": "Was ist die Franchise?",
-      "a3": "Die Franchise ist der jährliche Betrag, den du selbst für Behandlungskosten bezahlst, bevor die Krankenkasse übernimmt. Sie liegt zwischen CHF 300 und CHF 2500 — eine höhere Franchise senkt die monatliche Prämie.",
-      "q4": "Was bedeutet Standardmodell?",
-      "a4": "Im Standardmodell kannst du frei jeden zugelassenen Arzt oder jede zugelassene Ärztin wählen. Alternative Modelle (Hausarzt, Telmed, HMO) schränken die Wahl ein und sind dafür günstiger.",
-      "q5": "Kann jede Krankenkasse meine Aufnahme ablehnen?",
-      "a5": "Nein. In der Grundversicherung muss dich jede Krankenkasse aufnehmen — es gibt keine Gesundheitsfragen und keine Ablehnung."
+      "heading": "Frequently asked questions",
+      "q1": "When do I have to switch insurers?",
+      "a1": "Your cancellation must reach your current insurer by 30 November at the latest. The switch to the new insurer then takes effect on 1 January of the following year.",
+      "q2": "Do premiums go up every year?",
+      "a2": "Not necessarily, but usually. Premiums follow actual healthcare costs — in most years they rise, but the amount varies widely by canton and insurer.",
+      "q3": "What is the deductible?",
+      "a3": "The deductible is the annual amount you pay yourself for treatment costs before your insurer starts to pay. It ranges from CHF 300 to CHF 2500 — a higher deductible lowers the monthly premium.",
+      "q4": "What does the standard model mean?",
+      "a4": "In the standard model you can freely choose any licensed doctor. Alternative models (family doctor, Telmed, HMO) restrict that choice and are cheaper in return.",
+      "q5": "Can an insurer turn down my application?",
+      "a5": "No. In basic insurance every insurer must accept you — there are no health questions and no rejection."
     }
   }
 }

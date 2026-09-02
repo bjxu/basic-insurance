@@ -8,8 +8,8 @@
     "twitterDescription": "Comparez les primes de l'assurance de base suisse – données officielles de l'OFSP.",
     "howItWorksTitle": "Comment fonctionne l'assurance de base suisse – Comparaison des primes",
     "howItWorksDescription": "Nouveau en Suisse ? Comment fonctionne l'assurance de base obligatoire : délais d'affiliation, changement de caisse, franchise et modèles d'assurance — expliqué simplement.",
-    "praemienGuideTitle": "Krankenkassenprämien {year}: Vergleich nach Kanton",
-    "praemienGuideDescription": "Krankenkassenprämien {year} im Vergleich – Durchschnittsprämie nach Kanton, wie sie berechnet werden und der Prämien-Ausblick auf {nextYear}."
+    "praemienGuideTitle": "Primes d'assurance-maladie {year} : comparaison par canton",
+    "praemienGuideDescription": "Les primes d'assurance-maladie {year} comparées – prime moyenne par canton, comment elles sont calculées et les perspectives pour {nextYear}."
   },
   "inputs": {
     "title": "Comparaison des primes",
@@ -156,41 +156,41 @@
     "menuLabel": "Choisir la langue"
   },
   "praemienGuide": {
-    "h1": "Krankenkassenprämien {year}: Was Sie wissen müssen",
-    "intro": "Das Bundesamt für Gesundheit (BAG) veröffentlicht die neuen Prämien jeweils Ende September. Wie stark sie steigen oder sinken, hängt von den Gesundheitskosten des Vorjahres, dem Kanton und der gewählten Kasse ab — es gibt keine einheitliche Schweizer Prämie.",
-    "projected": "Für {projYear} rechnet Comparis mit einem durchschnittlichen Prämienanstieg von {comparis} %, das Bundesamt für Gesundheit (BAG) mit {bagLow} bis {bagHigh} % (Stand: {asOf}).",
-    "teaserCta": "Mehr Details →",
+    "h1": "Primes d'assurance-maladie {year} : ce qu'il faut savoir",
+    "intro": "L'Office fédéral de la santé publique (OFSP) publie les nouvelles primes chaque année fin septembre. L'ampleur de leur hausse ou de leur baisse dépend des coûts de la santé de l'année précédente, du canton et de la caisse choisie — il n'existe pas de prime suisse unique.",
+    "projected": "Pour {projYear}, Comparis prévoit une hausse moyenne des primes de {comparis} %, l'OFSP de {bagLow} à {bagHigh} % (état : {asOf}).",
+    "teaserCta": "Plus de détails →",
     "howSet": {
-      "heading": "Wie sich die Prämie zusammensetzt",
-      "intro": "Jede Krankenkasse berechnet ihre Prämien nach denselben gesetzlich vorgegebenen Faktoren:",
-      "region": "Wohnkanton und Prämienregion — je nach Gesundheitskosten in der Region.",
-      "age": "Altersklasse — Kinder (0–18), junge Erwachsene (19–25) und Erwachsene (ab 26) zahlen unterschiedliche Prämien.",
-      "franchise": "Franchise — eine höhere Franchise (bis CHF 2500) senkt die monatliche Prämie, du trägst dafür mehr Kosten selbst.",
-      "model": "Versicherungsmodell — Standard, Hausarzt, Telmed oder HMO; eine eingeschränkte Wahl der Leistungserbringer senkt die Prämie.",
-      "accident": "Unfalldeckung — wer über den Arbeitgeber bereits gegen Unfall versichert ist, kann sie aus der Krankenkasse ausschliessen."
+      "heading": "Comment la prime est composée",
+      "intro": "Chaque caisse-maladie calcule ses primes selon les mêmes facteurs fixés par la loi :",
+      "region": "Canton de domicile et région de primes — selon les coûts de la santé dans la région.",
+      "age": "Classe d'âge — les enfants (0–18 ans), les jeunes adultes (19–25 ans) et les adultes (dès 26 ans) paient des primes différentes.",
+      "franchise": "Franchise — une franchise plus élevée (jusqu'à CHF 2500) réduit la prime mensuelle, mais vous prenez en charge une plus grande part des coûts.",
+      "model": "Modèle d'assurance — standard, médecin de famille, Telmed ou HMO ; un choix restreint des fournisseurs de prestations réduit la prime.",
+      "accident": "Couverture accidents — si vous êtes déjà assuré contre les accidents par votre employeur, vous pouvez l'exclure de l'assurance-maladie."
     },
     "table": {
-      "heading": "Durchschnittsprämie {year} nach Kanton",
-      "note": "Monatliche Durchschnittsprämie für Erwachsene, Franchise CHF 300, Standardmodell, mit Unfalldeckung — Basis: offizielle BAG-Daten {year}, abzüglich der Prämienverbilligung durch die CO₂-/VOC-Lenkungsabgabe.",
-      "cantonHeader": "Kanton",
-      "premiumHeader": "Ø Prämie/Monat"
+      "heading": "Prime moyenne {year} par canton",
+      "note": "Prime mensuelle moyenne pour les adultes, franchise CHF 300, modèle standard, avec couverture accidents — base : données officielles de l'OFSP {year}, déduction faite de la réduction de prime liée à la taxe d'incitation CO₂/COV.",
+      "cantonHeader": "Canton",
+      "premiumHeader": "Prime moy./mois"
     },
     "deadlines": {
-      "heading": "Wichtige Fristen",
-      "text": "Du kannst die Krankenkasse einmal pro Jahr wechseln. Die Kündigung muss bis zum 30. November bei der bisherigen Kasse eintreffen, der Wechsel gilt ab dem 1. Januar."
+      "heading": "Délais importants",
+      "text": "Vous pouvez changer de caisse-maladie une fois par an. La résiliation doit parvenir à votre caisse actuelle jusqu'au 30 novembre ; le changement prend effet au 1er janvier."
     },
     "faq": {
-      "heading": "Häufige Fragen",
-      "q1": "Wann muss ich die Krankenkasse wechseln?",
-      "a1": "Die Kündigung muss bis spätestens 30. November bei deiner aktuellen Kasse eintreffen. Der Wechsel zur neuen Kasse gilt dann ab dem 1. Januar des Folgejahres.",
-      "q2": "Steigen die Prämien jedes Jahr?",
-      "a2": "Nicht zwingend, aber meistens. Die Prämien folgen den tatsächlichen Gesundheitskosten — in den meisten Jahren steigen sie, die Höhe unterscheidet sich aber stark nach Kanton und Kasse.",
-      "q3": "Was ist die Franchise?",
-      "a3": "Die Franchise ist der jährliche Betrag, den du selbst für Behandlungskosten bezahlst, bevor die Krankenkasse übernimmt. Sie liegt zwischen CHF 300 und CHF 2500 — eine höhere Franchise senkt die monatliche Prämie.",
-      "q4": "Was bedeutet Standardmodell?",
-      "a4": "Im Standardmodell kannst du frei jeden zugelassenen Arzt oder jede zugelassene Ärztin wählen. Alternative Modelle (Hausarzt, Telmed, HMO) schränken die Wahl ein und sind dafür günstiger.",
-      "q5": "Kann jede Krankenkasse meine Aufnahme ablehnen?",
-      "a5": "Nein. In der Grundversicherung muss dich jede Krankenkasse aufnehmen — es gibt keine Gesundheitsfragen und keine Ablehnung."
+      "heading": "Questions fréquentes",
+      "q1": "Quand dois-je changer de caisse-maladie ?",
+      "a1": "La résiliation doit parvenir à votre caisse actuelle au plus tard le 30 novembre. Le changement vers la nouvelle caisse prend alors effet au 1er janvier de l'année suivante.",
+      "q2": "Les primes augmentent-elles chaque année ?",
+      "a2": "Pas nécessairement, mais le plus souvent. Les primes suivent les coûts réels de la santé — la plupart des années, elles augmentent, mais l'ampleur varie fortement selon le canton et la caisse.",
+      "q3": "Qu'est-ce que la franchise ?",
+      "a3": "La franchise est le montant annuel que vous payez vous-même pour les frais de traitement avant que la caisse-maladie ne prenne le relais. Elle se situe entre CHF 300 et CHF 2500 — une franchise plus élevée réduit la prime mensuelle.",
+      "q4": "Que signifie le modèle standard ?",
+      "a4": "Dans le modèle standard, vous choisissez librement tout médecin agréé. Les modèles alternatifs (médecin de famille, Telmed, HMO) restreignent ce choix et sont donc meilleur marché.",
+      "q5": "Une caisse-maladie peut-elle refuser mon adhésion ?",
+      "a5": "Non. Dans l'assurance de base, chaque caisse-maladie doit vous accepter — il n'y a pas de questions de santé ni de refus."
     }
   }
 }
