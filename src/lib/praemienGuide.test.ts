@@ -1,6 +1,8 @@
 // src/lib/praemienGuide.test.ts
 import { describe, it, expect } from "vitest";
-import { averagePremiumByCanton, buildFaqJsonLd, CANTON_NAMES_DE, FAQ_KEYS } from "./praemienGuide";
+import { averagePremiumByCanton, buildFaqJsonLd, FAQ_KEYS } from "./praemienGuide";
+import { CANTON_NAMES, CANTON_CODES } from "./cantonNames";
+import { routing } from "@/i18n/routing";
 import { readPremiumRows } from "./praemienGuideData";
 import type { PremiumRow } from "./types";
 import de from "../messages/de.json";
@@ -75,15 +77,25 @@ describe("averagePremiumByCanton", () => {
   });
 });
 
-describe("CANTON_NAMES_DE", () => {
-  it("has all 26 cantons", () => {
-    expect(Object.keys(CANTON_NAMES_DE)).toHaveLength(26);
+describe("CANTON_NAMES", () => {
+  it("has an entry for every app locale", () => {
+    expect(Object.keys(CANTON_NAMES).sort()).toEqual([...routing.locales].sort());
   });
 
-  it("maps each code to its German name (spot check)", () => {
-    expect(CANTON_NAMES_DE.ZH).toBe("Zürich");
-    expect(CANTON_NAMES_DE.GE).toBe("Genf");
-    expect(CANTON_NAMES_DE.TI).toBe("Tessin");
+  it("names all 26 cantons in every locale", () => {
+    for (const locale of routing.locales) {
+      expect(Object.keys(CANTON_NAMES[locale]).sort()).toEqual(
+        [...CANTON_CODES].sort(),
+      );
+    }
+  });
+
+  it("uses localized canton names (spot check)", () => {
+    expect(CANTON_NAMES.de.ZH).toBe("Zürich");
+    expect(CANTON_NAMES.de.GE).toBe("Genf");
+    expect(CANTON_NAMES.fr.GE).toBe("Genève");
+    expect(CANTON_NAMES.it.GE).toBe("Ginevra");
+    expect(CANTON_NAMES.en.GE).toBe("Geneva");
   });
 });
 

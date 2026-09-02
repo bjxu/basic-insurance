@@ -1,7 +1,8 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { CANTON_NAMES_DE, type CantonAverage } from "@/lib/praemienGuide";
+import { useTranslations, useLocale } from "next-intl";
+import type { CantonAverage } from "@/lib/praemienGuide";
+import { CANTON_NAMES, type CantonCode } from "@/lib/cantonNames";
 
 // Mirrors HowItWorksContent's role (src/components/help/HowItWorksContent.tsx)
 // for the /de/praemien page. "use client" for useTranslations — Next still
@@ -35,6 +36,9 @@ export function PraemienGuideContent({
   projection: PraemienProjection;
 }) {
   const t = useTranslations("praemienGuide");
+  const locale = useLocale();
+  const cantonNames =
+    CANTON_NAMES[locale as keyof typeof CANTON_NAMES] ?? CANTON_NAMES.de;
 
   return (
     <div className="text-on-surface">
@@ -73,7 +77,11 @@ export function PraemienGuideContent({
           <tbody>
             {cantonAverages.map(({ kanton, averagePremium }) => (
               <tr key={kanton} className="border-t border-outline-variant">
-                <td className="py-1 pr-2">{CANTON_NAMES_DE[kanton] ?? kanton}</td>
+                <td className="py-1 pr-2">
+                  {cantonNames[kanton as CantonCode] ??
+                    CANTON_NAMES.de[kanton as CantonCode] ??
+                    kanton}
+                </td>
                 <td className="py-1 text-right">CHF {averagePremium.toFixed(2)}</td>
               </tr>
             ))}
