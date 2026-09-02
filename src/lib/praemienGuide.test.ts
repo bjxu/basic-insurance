@@ -1,6 +1,6 @@
 // src/lib/praemienGuide.test.ts
 import { describe, it, expect } from "vitest";
-import { averagePremiumByCanton, buildFaqJsonLd, FAQ_KEYS } from "./praemienGuide";
+import { averagePremiumByCanton, buildFaqJsonLd, FAQ_KEYS, formatProjection } from "./praemienGuide";
 import { CANTON_NAMES, CANTON_CODES } from "./cantonNames";
 import { routing } from "@/i18n/routing";
 import { readPremiumRows } from "./praemienGuideData";
@@ -96,6 +96,35 @@ describe("CANTON_NAMES", () => {
     expect(CANTON_NAMES.fr.GE).toBe("Genève");
     expect(CANTON_NAMES.it.GE).toBe("Ginevra");
     expect(CANTON_NAMES.en.GE).toBe("Geneva");
+  });
+});
+
+describe("formatProjection", () => {
+  const raw = {
+    year: 2027,
+    asOf: "2026-05",
+    comparis: { increase: 3.7 },
+    bag: { low: 4.5, high: 5 },
+  };
+
+  it("formats figures for German (decimal comma, German month)", () => {
+    expect(formatProjection(raw, "de")).toEqual({
+      projYear: "2027",
+      comparis: "3,7",
+      bagLow: "4,5",
+      bagHigh: "5",
+      asOf: "Mai 2026",
+    });
+  });
+
+  it("formats figures for English (decimal point, English month)", () => {
+    expect(formatProjection(raw, "en")).toEqual({
+      projYear: "2027",
+      comparis: "3.7",
+      bagLow: "4.5",
+      bagHigh: "5",
+      asOf: "May 2026",
+    });
   });
 });
 

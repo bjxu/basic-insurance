@@ -1,7 +1,8 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { formatProjection } from "@/lib/praemienGuide";
 import metadata from "@/data/metadata.json";
 import projection from "@/data/praemienProjection.json";
 
@@ -17,6 +18,7 @@ import projection from "@/data/praemienProjection.json";
 // own <h1>, so making it <h2> would break the heading outline.
 export function PraemienGuideTeaser() {
   const t = useTranslations("praemienGuide");
+  const locale = useLocale();
   const year = Math.max(...metadata.availableYears);
 
   return (
@@ -27,11 +29,7 @@ export function PraemienGuideTeaser() {
       <p className="text-title-medium text-on-surface">{t("h1", { year })}</p>
       <p className="mt-1 text-body-small text-on-surface-variant">
         {t("intro")}{" "}
-        {t("projected", {
-          comparis: projection.comparis.increase,
-          bag: projection.bag.increase,
-          asOf: projection.asOf,
-        })}
+        {t("projected", formatProjection(projection, locale))}
       </p>
       <Link
         href="/praemien"

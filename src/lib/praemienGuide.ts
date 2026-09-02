@@ -80,3 +80,31 @@ export function averagePremiumByCanton(
 
   return result.sort((a, b) => a.kanton.localeCompare(b.kanton));
 }
+
+export type RawProjection = {
+  year: number;
+  asOf: string; // ISO year-month, e.g. "2026-05"
+  comparis: { increase: number };
+  bag: { low: number; high: number };
+};
+
+/** Locale-formatted projection figures for the `praemienGuide.projected`
+ *  message. Pure — safe to call from a client component. `locale` is an app
+ *  locale code ("de", "fr", …), deliberately not "de-CH": German/French/
+ *  Italian/Spanish/Portuguese then render a decimal comma (matching how the
+ *  forecasts are published), English a decimal point. */
+export function formatProjection(projection: RawProjection, locale: string) {
+  const nf = new Intl.NumberFormat(locale);
+  const asOf = new Intl.DateTimeFormat(locale, {
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${projection.asOf}-01T00:00:00Z`));
+  return {
+    projYear: String(projection.year),
+    comparis: nf.format(projection.comparis.increase),
+    bagLow: nf.format(projection.bag.low),
+    bagHigh: nf.format(projection.bag.high),
+    asOf,
+  };
+}

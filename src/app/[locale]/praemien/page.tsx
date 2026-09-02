@@ -97,11 +97,7 @@ export default async function PraemienGuidePage({
         <PraemienGuideContent
           year={year}
           cantonAverages={cantonAverages}
-          projection={{
-            comparis: projection.comparis.increase,
-            bag: projection.bag.increase,
-            asOf: projection.asOf,
-          }}
+          projection={projection}
         />
       </div>
       <div className="mt-6">

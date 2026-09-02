@@ -1,7 +1,11 @@
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
-import type { CantonAverage } from "@/lib/praemienGuide";
+import {
+  formatProjection,
+  type CantonAverage,
+  type RawProjection,
+} from "@/lib/praemienGuide";
 import { CANTON_NAMES, type CantonCode } from "@/lib/cantonNames";
 
 // Mirrors HowItWorksContent's role (src/components/help/HowItWorksContent.tsx)
@@ -20,12 +24,6 @@ const FAQ_ITEMS = [
   { q: "q5", a: "a5" },
 ] as const;
 
-export type PraemienProjection = {
-  comparis: string;
-  bag: string;
-  asOf: string;
-};
-
 export function PraemienGuideContent({
   year,
   cantonAverages,
@@ -33,7 +31,7 @@ export function PraemienGuideContent({
 }: {
   year: number;
   cantonAverages: CantonAverage[];
-  projection: PraemienProjection;
+  projection: RawProjection;
 }) {
   const t = useTranslations("praemienGuide");
   const locale = useLocale();
@@ -45,11 +43,7 @@ export function PraemienGuideContent({
       <h1 className="text-title-large">{t("h1", { year })}</h1>
       <p className="mt-2 text-body-medium text-on-surface-variant">
         {t("intro")}{" "}
-        {t("projected", {
-          comparis: projection.comparis,
-          bag: projection.bag,
-          asOf: projection.asOf,
-        })}
+        {t("projected", formatProjection(projection, locale))}
       </p>
 
       <section id="wie-berechnet" className="mt-5 border-t border-outline-variant pt-4">
