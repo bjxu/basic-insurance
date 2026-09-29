@@ -18,8 +18,8 @@ describe("buildPrompt", () => {
 
   it("includes example descriptions for the 2027 praxis/flex categories", () => {
     const prompt = buildPrompt({ pageText: "Some page content here.", productName: "AGRIeco", tarifart: "praxis" });
-    expect(prompt).toContain("praxis");
-    expect(prompt).toContain("flex");
+    expect(prompt).toContain("Erstanlaufstelle immer bei der gewählten Praxis oder dem HMO-Zentrum");
+    expect(prompt).toContain("Mehrere Erstanlaufstellen zur Wahl, z. B. Praxis, Telmedizin oder Apotheke");
   });
 });
 
