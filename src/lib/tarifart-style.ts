@@ -5,5 +5,7 @@ export const MODEL_TAG_CLASSES: Record<string, string> = {
   hmo: "bg-warning-container text-on-warning-container",
   telmed: "bg-tertiary-container text-on-tertiary-container",
   hausarzt: "bg-success-container text-on-success-container",
+  praxis: "bg-success-container text-on-success-container", // same family as hausarzt, its 2027 successor
+  flex: "bg-secondary-container text-on-secondary-container",
 };
 export const DEFAULT_MODEL_TAG_CLASSES = "bg-surface-variant text-on-surface-variant";
