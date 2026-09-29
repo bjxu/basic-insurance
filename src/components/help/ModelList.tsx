@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 // The alternative Tarifarts, nested under one "Alternative models" group.
 // `standard` sits above the group. Copy comes from the same `copy.tarifart.*`
 // catalog the result rows use; the group label from `help.terms.models.altGroup`.
-const ALT_MODEL_KEYS = ["hausarzt", "telmed", "hmo"] as const;
+const ALT_MODEL_KEYS = ["hausarzt", "praxis", "telmed", "flex", "hmo"] as const;
 
 function Row({ label, desc }: { label: string; desc: string }) {
   return (

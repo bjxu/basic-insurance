@@ -49,6 +49,8 @@ const MODEL_LABEL: Record<string, string> = {
   standard: "Standard",
   hausarzt: "Hausarzt",
   hmo: "HMO",
+  praxis: "Praxis",
+  flex: "Flex",
   telmed: "Telmed",
   andere: "Andere",
 };
