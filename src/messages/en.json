@@ -144,6 +144,8 @@
       "hausarzt": { "label": "Family doctor", "description": "First point of contact is always your chosen family doctor" },
       "telmed": { "label": "Telmed", "description": "Must call a hotline before every doctor's visit" },
       "hmo": { "label": "HMO", "description": "First point of contact is always the HMO centre" },
+      "praxis": { "label": "Family doctor/HMO", "description": "First point of contact is always your chosen practice or HMO centre" },
+      "flex": { "label": "Flex", "description": "Choice of several first points of contact, e.g. practice, telmed, or pharmacy" },
       "andere": { "label": "Alternative model", "description": "Restricted choice of first point of contact" }
     },
     "altersklasse": {

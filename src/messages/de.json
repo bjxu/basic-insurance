@@ -144,6 +144,8 @@
       "hausarzt": { "label": "Hausarzt", "description": "Erstbehandlung immer beim gewählten Hausarzt" },
       "telmed": { "label": "Telmed", "description": "Anruf bei Hotline erforderlich vor jedem Arztbesuch" },
       "hmo": { "label": "HMO", "description": "Erstanlaufstelle immer beim HMO-Zentrum" },
+      "praxis": { "label": "Hausarzt/HMO", "description": "Erstanlaufstelle immer bei der gewählten Praxis oder dem HMO-Zentrum" },
+      "flex": { "label": "Flex", "description": "Mehrere Erstanlaufstellen zur Wahl, z. B. Praxis, Telmedizin oder Apotheke" },
       "andere": { "label": "Alternativmodell", "description": "Eingeschränkte Wahl des Erstanlaufpunkts" }
     },
     "altersklasse": {
