@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { carryForwardEnvironmentalLevy } from "./metadata";
+import { carryForwardEnvironmentalLevy, mergeAvailableYears } from "./metadata";
 
 function metadataJson(environmentalLevyPerMonth: unknown): string {
   return JSON.stringify({
@@ -66,5 +66,37 @@ describe("carryForwardEnvironmentalLevy", () => {
     expect(result.ok).toBe(false);
     if (result.ok) throw new Error("expected failure");
     expect(result.error).toContain("must be a finite number");
+  });
+});
+
+describe("mergeAvailableYears", () => {
+  function metadataJsonWithYears(availableYears: unknown): string {
+    return JSON.stringify({
+      publicationDate: "2025-09-23",
+      availableYears,
+      memberCountAsOf: 2024,
+      environmentalLevyPerMonth: { "2026": 5.15 },
+    });
+  }
+
+  it("adds a new year alongside the existing ones, sorted ascending", () => {
+    expect(mergeAvailableYears(metadataJsonWithYears([2026]), 2027)).toEqual([2026, 2027]);
+  });
+
+  it("does not duplicate a year that is already present", () => {
+    expect(mergeAvailableYears(metadataJsonWithYears([2026, 2027]), 2027)).toEqual([2026, 2027]);
+  });
+
+  it("sorts ascending when re-ingesting an older year after a newer one is already published", () => {
+    expect(mergeAvailableYears(metadataJsonWithYears([2027]), 2026)).toEqual([2026, 2027]);
+  });
+
+  it("returns just the ingested year when metadata.json does not exist yet", () => {
+    expect(mergeAvailableYears(null, 2026)).toEqual([2026]);
+  });
+
+  it("returns just the ingested year when availableYears is missing or malformed", () => {
+    expect(mergeAvailableYears(metadataJsonWithYears(undefined), 2026)).toEqual([2026]);
+    expect(mergeAvailableYears(metadataJsonWithYears("2026"), 2026)).toEqual([2026]);
   });
 });

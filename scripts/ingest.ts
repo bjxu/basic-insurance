@@ -16,7 +16,7 @@ import { parseMemberCounts } from "./ingest/members";
 import { buildInsurersJson, INSURER_NAMES } from "./ingest/insurers";
 import { downloadRawFiles } from "./ingest/downloadRaw";
 import { validateIngestOutput, verifyWrittenFile } from "./ingest/validateIngest";
-import { carryForwardEnvironmentalLevy } from "./ingest/metadata";
+import { carryForwardEnvironmentalLevy, mergeAvailableYears } from "./ingest/metadata";
 import type { Metadata } from "../src/lib/types";
 
 const DATA_DIR = join(process.cwd(), "src", "data");
@@ -103,7 +103,7 @@ async function main() {
 
   const metadata: Metadata = {
     publicationDate: args.publicationDate,
-    availableYears: [year],
+    availableYears: mergeAvailableYears(existingMetadataJson, year),
     memberCountAsOf,
     environmentalLevyPerMonth: levy.environmentalLevyPerMonth,
   };
