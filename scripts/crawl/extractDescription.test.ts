@@ -15,6 +15,12 @@ describe("buildPrompt", () => {
     const prompt = buildPrompt({ pageText: longText, productName: "P", tarifart: "hmo" });
     expect(prompt.length).toBeLessThan(longText.length);
   });
+
+  it("includes example descriptions for the 2027 praxis/flex categories", () => {
+    const prompt = buildPrompt({ pageText: "Some page content here.", productName: "AGRIeco", tarifart: "praxis" });
+    expect(prompt).toContain("praxis");
+    expect(prompt).toContain("flex");
+  });
 });
 
 describe("parseResponse", () => {
