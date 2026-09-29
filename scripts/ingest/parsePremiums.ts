@@ -18,17 +18,33 @@ export const VALID_CANTONS = new Set([
   "NW", "OW", "SG", "SH", "SO", "SZ", "TG", "TI", "UR", "VD", "VS", "ZG", "ZH",
 ]);
 
+// BAG changed its raw code encoding between the 2026 and 2027 premium files (hyphenated
+// prefixes -> underscore-delimited codes) — both are recognized here rather than one
+// replacing the other, since a future fix might require re-parsing 2026's raw CSV (still
+// committed under data/raw/ via git history). If a future year's ingest throws
+// "unrecognized code", check whether BAG changed the encoding again before assuming a bug.
 export const ALTERSKLASSE_MAP: Record<string, Altersklasse> = {
   "AKL-KIN": "kind",
   "AKL-JUG": "jung",
   "AKL-ERW": "erwachsen",
+  "AKA_01_KIN": "kind",
+  "AKA_02_JUG": "jung",
+  "AKA_03_ERW": "erwachsen",
 };
 
+// 2027 merged Hausarzt+HMO into one "PRAXIS" category and split the old "TAR-DIV" bucket
+// into "TEL_DIG" (unchanged in substance: phone/digital first contact) and a genuinely new
+// "FLEX" category (choice of several first-contact options) — see
+// docs/superpowers/specs/2026-09-29-bag-2027-schema-migration-design.md.
 export const TARIFART_MAP: Record<string, Tarifart> = {
   "TAR-BASE": "standard",
   "TAR-HAM": "hausarzt",
   "TAR-HMO": "hmo",
   "TAR-DIV": "telmed",
+  "BASE": "standard",
+  "PRAXIS": "praxis",
+  "FLEX": "flex",
+  "TEL_DIG": "telmed",
 };
 
 export type ParsePremiumsResult = {
@@ -55,7 +71,7 @@ export function parsePremiumRows(
     // Sibling/multi-child discount sub-tiers (K3/K4/K5) — out of scope for a
     // single-person comparison (requirement.md §2). Only K1, the base child rate
     // (always present), is kept. Non-child rows have no Altersuntergruppe.
-    if (r.Altersklasse === "AKL-KIN" && r.Altersuntergruppe !== "K1") continue;
+    if ((r.Altersklasse === "AKL-KIN" || r.Altersklasse === "AKA_01_KIN") && r.Altersuntergruppe !== "K1") continue;
 
     if (!VALID_CANTONS.has(r.Kanton)) {
       skippedCantons.set(r.Kanton, (skippedCantons.get(r.Kanton) ?? 0) + 1);
@@ -102,19 +118,24 @@ export function parsePremiumRows(
 }
 
 export function parseFranchise(code: string): number {
-  const match = /^FRA-(\d+)$/.exec(code);
-  if (!match) throw new Error(`parseFranchise: unrecognized Franchise code "${code}"`);
-  return Number(match[1]);
+  const old = /^FRA-(\d+)$/.exec(code);
+  if (old) return Number(old[1]);
+  // 2027 format: FRA_<stufe>_<E|J|K altersgruppe-letter>_<amount, zero-padded>
+  const neu = /^FRA_\d+_[EJK]_(\d+)$/.exec(code);
+  if (neu) return Number(neu[1]);
+  throw new Error(`parseFranchise: unrecognized Franchise code "${code}"`);
 }
 
 export function parseRegionNumber(code: string): string {
-  const match = /^PR-REG CH(\d+)$/.exec(code);
-  if (!match) throw new Error(`parseRegionNumber: unrecognized Region code "${code}"`);
-  return match[1];
+  const old = /^PR-REG CH(\d+)$/.exec(code);
+  if (old) return old[1];
+  const neu = /^PR_REG_(\d+)$/.exec(code);
+  if (neu) return neu[1];
+  throw new Error(`parseRegionNumber: unrecognized Region code "${code}"`);
 }
 
 export function parseUnfalldeckung(code: string): boolean {
-  if (code === "MIT-UNF") return true;
-  if (code === "OHN-UNF") return false;
+  if (code === "MIT-UNF" || code === "MIT_UNF") return true;
+  if (code === "OHN-UNF" || code === "OHN_UNF") return false;
   throw new Error(`parseUnfalldeckung: unrecognized Unfalleinschluss "${code}"`);
 }
