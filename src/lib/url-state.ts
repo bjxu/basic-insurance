@@ -3,6 +3,7 @@
 // degrades gracefully (§5.2).
 
 import type { Tarifart } from "./types";
+import { ALL_TARIFARTS } from "./lookup";
 import insurersData from "@/data/insurers.json";
 
 export type ComparisonState = {
@@ -17,7 +18,7 @@ export type ComparisonState = {
   currentMonthlyPremium: number | null;
 };
 
-const VALID_TARIFARTEN: Tarifart[] = ["standard", "hmo", "hausarzt", "praxis", "flex", "telmed", "andere"];
+const VALID_TARIFARTEN: Tarifart[] = ALL_TARIFARTS;
 const VALID_INSURER_CODES = new Set(insurersData.map((i) => i.insurerCode));
 
 export function encodeState(state: ComparisonState): URLSearchParams {

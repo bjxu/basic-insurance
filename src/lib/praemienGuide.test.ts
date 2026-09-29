@@ -1,6 +1,6 @@
 // src/lib/praemienGuide.test.ts
 import { describe, it, expect } from "vitest";
-import { averagePremiumByCanton, buildFaqJsonLd, FAQ_KEYS, formatProjection } from "./praemienGuide";
+import { averagePremiumByCanton, buildFaqJsonLd, FAQ_KEYS, formatProjection, shouldShowProjection } from "./praemienGuide";
 import { CANTON_NAMES, CANTON_CODES } from "./cantonNames";
 import { routing } from "@/i18n/routing";
 import { readPremiumRows } from "./praemienGuideData";
@@ -151,6 +151,27 @@ describe("formatProjection", () => {
       ),
     ].sort();
     expect(Object.keys(formatProjection(raw, "de")).sort()).toEqual(placeholders);
+  });
+});
+
+describe("shouldShowProjection", () => {
+  const raw = {
+    year: 2027,
+    asOf: "2026-05",
+    comparis: { increase: 3.7 },
+    bag: { low: 4.5, high: 5 },
+  };
+
+  it("returns true when the projection's year is still ahead of the displayed data year", () => {
+    expect(shouldShowProjection(raw, 2026)).toBe(true);
+  });
+
+  it("returns false once the displayed data year reaches the projection's year", () => {
+    expect(shouldShowProjection(raw, 2027)).toBe(false);
+  });
+
+  it("returns false once the displayed data year has passed the projection's year", () => {
+    expect(shouldShowProjection(raw, 2028)).toBe(false);
   });
 });
 

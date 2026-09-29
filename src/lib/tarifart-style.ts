@@ -1,6 +1,9 @@
 // Model-tag badge color per Tarifart, matching mockups/main.html's .model-tag.hmo/.telmed/.haus
 // (hausarzt maps to the mockup's "haus" class — same success-container treatment). Shared
 // between PlanRow's summary badge and ProductList's per-product detail rows.
+// `praxis` and `flex` have no mockup counterpart — added for BAG's 2027 reclassification
+// (`praxis` reuses `hausarzt`'s success-container color since it's its 2027 successor; `flex`
+// uses `secondary-container`, a previously unused token).
 export const MODEL_TAG_CLASSES: Record<string, string> = {
   hmo: "bg-warning-container text-on-warning-container",
   telmed: "bg-tertiary-container text-on-tertiary-container",

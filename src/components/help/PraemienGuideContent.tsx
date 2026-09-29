@@ -3,6 +3,7 @@
 import { useTranslations, useLocale } from "next-intl";
 import {
   formatProjection,
+  shouldShowProjection,
   type CantonAverage,
   type RawProjection,
 } from "@/lib/praemienGuide";
@@ -42,8 +43,10 @@ export function PraemienGuideContent({
     <div className="text-on-surface">
       <h1 className="text-title-large">{t("h1", { year })}</h1>
       <p className="mt-2 text-body-medium text-on-surface-variant">
-        {t("intro")}{" "}
-        {t("projected", formatProjection(projection, locale))}
+        {t("intro")}
+        {shouldShowProjection(projection, year) && (
+          <> {t("projected", formatProjection(projection, locale))}</>
+        )}
       </p>
 
       <section id="wie-berechnet" className="mt-5 border-t border-outline-variant pt-4">

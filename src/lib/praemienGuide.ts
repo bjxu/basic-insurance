@@ -88,6 +88,14 @@ export type RawProjection = {
   bag: { low: number; high: number };
 };
 
+/** Whether the projection paragraph should render at all. Once `year` (the actual,
+ *  definitive data year the canton table displays) reaches or passes the projection's
+ *  own year, the projection is a superseded forecast of numbers the page now states as
+ *  fact, and showing it would contradict the page's own canton table. */
+export function shouldShowProjection(projection: RawProjection, year: number): boolean {
+  return projection.year > year;
+}
+
 /** Locale-formatted projection figures for the `praemienGuide.projected`
  *  message. Pure — safe to call from a client component. `locale` is an app
  *  locale code ("de", "fr", …), deliberately not "de-CH": German/French/

@@ -31,8 +31,11 @@ export function parseMemberCounts(
   csvText: string,
   insurerNames: Record<string, string>,
 ): ParseMemberCountsResult {
-  // 2026's file is semicolon-delimited; 2027's is comma-delimited. csv-parse auto-detects
-  // which of these two is actually used per call, so both are listed rather than picking one.
+  // 2026's file is semicolon-delimited; 2027's is comma-delimited. csv-parse treats every
+  // listed character as a field separator simultaneously, everywhere in the buffer — not
+  // per-file auto-detection — so this only works because neither year's real file contains
+  // an unquoted comma or semicolon inside a value (both use decimal points for
+  // Durchschnittsbestand).
   const records: Record<string, string>[] = parse(csvText, {
     columns: true,
     bom: true,
