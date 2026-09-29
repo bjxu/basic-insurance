@@ -44,7 +44,7 @@ or switching workflow).
 | Prämienregion | Premium region. Many cantons are split into 1–3 regions with different premium levels; determined by municipality (*Gemeinde*), not just postal code. |
 | Altersklasse (age band) | Premiums differ for children (0–18), young adults (19–25), and adults (26+). |
 | Unfalldeckung (accident coverage) | Can be excluded from the premium if the person is already covered for accidents through an employer (works ≥8h/week). Premium-determining, same as deductible and model. |
-| Tarifart (insurance model) | Standard (free choice of doctor) vs. alternative models (HMO, family-doctor/*Hausarztmodell*, Telmed, and other BAG-classified alternative variants) that restrict first point of contact in exchange for a lower premium. |
+| Tarifart (insurance model) | Standard (free choice of doctor) vs. alternative models (HMO, family-doctor/*Hausarztmodell*, Telmed, and other BAG-classified alternative variants) that restrict first point of contact in exchange for a lower premium. Since 2027, BAG classifies alternative models more coarsely: Hausarzt and HMO merged into one "Praxis" category, plus a new "Flex" category (choice of several first-contact points). 2026 data keeps its original, separate Hausarzt/HMO classification — the app shows both years' authentic categories side by side rather than collapsing one into the other (§11.4). |
 
 ## 4. Core Principles
 
@@ -200,7 +200,7 @@ to each of the two result-filter toggles (alternative models, accident coverage)
 model ⓘ is not repeated on every result row — that opens the short-form explainer (an anchored popover on wide viewports, an inline
 disclosure that expands in place on narrow ones). The models explainer additionally
 lists each BAG Tarifart with its one-line restriction — Standard on top, then Hausarzt /
-Telmed / HMO grouped under an "alternative models" label — reusing the same
+Praxis / Telmed / Flex / HMO grouped under an "alternative models" label — reusing the same
 `copy.tarifart.*` text the result rows carry. Each explainer
 ends with a link that opens the guide drawer scrolled to the matching section. All
 keyboard-operable and screen-reader-labelled per concept (REQ-17).
@@ -382,9 +382,13 @@ parameterized URL to be crawled, shared, and correctly previewed.
    insurer codes. The "Aktuelle Kasse" dropdown should be checked against the full BAG
    insurer list including subsidiaries during implementation, so a user can always find
    their real current insurer in the list.
-4. The alternative-model list in §3 (HMO, Hausarztmodell, Telmed, "other variants") should
-   be driven by BAG's actual Tarifart classification during implementation rather than
-   hardcoded to these three named models, in case the official classification is broader.
+4. ~~The alternative-model list in §3 (HMO, Hausarztmodell, Telmed, "other variants")
+   should be driven by BAG's actual Tarifart classification during implementation rather
+   than hardcoded to these three named models, in case the official classification is
+   broader.~~ — resolved by the 2026-09-29 BAG 2027 schema migration: BAG's own
+   reclassification (Hausarzt+HMO merged into "Praxis", a new "Flex" category added) is
+   exactly the broader-than-anticipated case this note flagged, and the app follows it
+   additively (see `docs/superpowers/specs/2026-09-29-bag-2027-schema-migration-design.md`).
 
 ## 12. Future Considerations (explicitly not v1)
 

@@ -1,9 +1,11 @@
 //
 // Parses BAG's "Versichertenbestand_CH.csv" (per-insurer, per-canton OKP enrollment)
-// into per-insurer national totals. This is a separate BAG file from Praemien_CH.csv:
-// semicolon-delimited (the premium file is comma-delimited) and the Versicherer code is
-// zero-padded (the premium file's is not) — both handled here. Column mapping verified
-// against the live file during planning (2026-08-14) — see
+// into per-insurer national totals. This is a separate BAG file from Praemien_CH.csv, with
+// its own quirks handled here. Both have varied by year rather than being fixed facts:
+// delimiter was semicolon in 2026, comma in 2027 (both recognized below); the Versicherer
+// code was zero-padded in 2026's file ("0008") and unpadded in 2027's ("8") —
+// normalizeInsurerCode handles either via Number() round-tripping. Column mapping
+// verified against the live file during planning (2026-08-14) — see
 // docs/superpowers/plans/2026-08-14-member-count-badge.md Global Constraints.
 //
 // Unlike parsePremiums.ts, every Kanton row is summed regardless of canton validity
@@ -29,11 +31,16 @@ export function parseMemberCounts(
   csvText: string,
   insurerNames: Record<string, string>,
 ): ParseMemberCountsResult {
+  // 2026's file is semicolon-delimited; 2027's is comma-delimited. csv-parse treats every
+  // listed character as a field separator simultaneously, everywhere in the buffer — not
+  // per-file auto-detection — so this only works because neither year's real file contains
+  // an unquoted comma or semicolon inside a value (both use decimal points for
+  // Durchschnittsbestand).
   const records: Record<string, string>[] = parse(csvText, {
     columns: true,
     bom: true,
     trim: true,
-    delimiter: ";",
+    delimiter: [";", ","],
   });
 
   const sums = new Map<string, number>();

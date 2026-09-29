@@ -67,6 +67,54 @@ describe("parsePremiumRows", () => {
     expect(rows[0].monthlyPremium).toBe(120);
   });
 
+  it("maps a standard adult row using 2027's raw code format", () => {
+    const { rows } = parsePremiumRows(
+      csv(
+        "8,ZH,P_OKPCH,2027,2026,PR_REG_1,AKA_03_ERW,MIT_UNF,BASE,BASE,E1,FRASTU_01,FRA_01_E_0300,301.1,1,1,Grundversicherung",
+      ),
+      NAMES,
+    );
+    expect(rows).toEqual([
+      {
+        year: 2027,
+        insurerCode: "8",
+        insurerName: "CSS",
+        praemienregionId: "ZH-1",
+        altersklasse: "erwachsen",
+        franchise: 300,
+        unfalldeckung: true,
+        tarifart: "standard",
+        tarifCode: "BASE",
+        productName: "Grundversicherung",
+        monthlyPremium: 301.1,
+      },
+    ]);
+  });
+
+  it("maps all four 2027 Tariftyp codes to the right Tarifart, distinct from their 2026 counterparts", () => {
+    const { rows } = parsePremiumRows(
+      csv(
+        "8,ZH,P_OKPCH,2027,2026,PR_REG_1,AKA_03_ERW,OHN_UNF,X,PRAXIS,E1,FRASTU_01,FRA_01_E_0300,200,0,0,Praxis",
+        "8,ZH,P_OKPCH,2027,2026,PR_REG_1,AKA_03_ERW,OHN_UNF,X,FLEX,E1,FRASTU_01,FRA_01_E_0300,190,0,0,Flex",
+        "8,ZH,P_OKPCH,2027,2026,PR_REG_1,AKA_03_ERW,OHN_UNF,X,TEL_DIG,E1,FRASTU_01,FRA_01_E_0300,180,0,0,Telmed",
+      ),
+      NAMES,
+    );
+    expect(rows.map((r) => r.tarifart)).toEqual(["praxis", "flex", "telmed"]);
+  });
+
+  it("keeps only the K1 (base) child rate using 2027's sibling-discount code", () => {
+    const { rows } = parsePremiumRows(
+      csv(
+        "8,ZH,P_OKPCH,2027,2026,PR_REG_1,AKA_01_KIN,MIT_UNF,BASE,BASE,K1,FRASTU_01,FRA_01_K_0000,120,0,1,Grundversicherung",
+        "8,ZH,P_OKPCH,2027,2026,PR_REG_1,AKA_01_KIN,MIT_UNF,BASE,BASE,K3,FRASTU_01,FRA_01_K_0000,60,0,1,Grundversicherung",
+      ),
+      NAMES,
+    );
+    expect(rows).toHaveLength(1);
+    expect(rows[0].monthlyPremium).toBe(120);
+  });
+
   it("drops rows for cantons with no Gemeinde/PLZ mapping (e.g. ZE, ZR) and reports them", () => {
     const { rows, skippedCantons } = parsePremiumRows(
       csv(
@@ -133,32 +181,45 @@ describe("exported parsing helpers (reused by validateIngest.ts)", () => {
     expect(VALID_CANTONS.has("ZE")).toBe(false);
   });
 
-  it("ALTERSKLASSE_MAP maps all three real BAG codes", () => {
+  it("ALTERSKLASSE_MAP maps both 2026 and 2027 BAG codes", () => {
     expect(ALTERSKLASSE_MAP["AKL-KIN"]).toBe("kind");
     expect(ALTERSKLASSE_MAP["AKL-JUG"]).toBe("jung");
     expect(ALTERSKLASSE_MAP["AKL-ERW"]).toBe("erwachsen");
+    expect(ALTERSKLASSE_MAP["AKA_01_KIN"]).toBe("kind");
+    expect(ALTERSKLASSE_MAP["AKA_02_JUG"]).toBe("jung");
+    expect(ALTERSKLASSE_MAP["AKA_03_ERW"]).toBe("erwachsen");
   });
 
-  it("TARIFART_MAP maps all four real BAG Tariftyp codes", () => {
+  it("TARIFART_MAP maps both 2026 and 2027 BAG Tariftyp codes", () => {
     expect(TARIFART_MAP["TAR-BASE"]).toBe("standard");
     expect(TARIFART_MAP["TAR-HAM"]).toBe("hausarzt");
     expect(TARIFART_MAP["TAR-HMO"]).toBe("hmo");
     expect(TARIFART_MAP["TAR-DIV"]).toBe("telmed");
+    expect(TARIFART_MAP["BASE"]).toBe("standard");
+    expect(TARIFART_MAP["PRAXIS"]).toBe("praxis");
+    expect(TARIFART_MAP["FLEX"]).toBe("flex");
+    expect(TARIFART_MAP["TEL_DIG"]).toBe("telmed");
   });
 
-  it("parseFranchise extracts the numeric value from a FRA-<n> code", () => {
+  it("parseFranchise extracts the numeric value from either year's Franchise code", () => {
     expect(parseFranchise("FRA-300")).toBe(300);
+    expect(parseFranchise("FRA_01_E_0300")).toBe(300);
+    expect(parseFranchise("FRA_04_K_0300")).toBe(300);
+    expect(parseFranchise("FRA_01_J_0300")).toBe(300);
     expect(() => parseFranchise("XYZ")).toThrow(/Franchise/);
   });
 
-  it("parseRegionNumber extracts the numeric value from a PR-REG CH<n> code", () => {
+  it("parseRegionNumber extracts the numeric value from either year's Region code", () => {
     expect(parseRegionNumber("PR-REG CH1")).toBe("1");
+    expect(parseRegionNumber("PR_REG_1")).toBe("1");
     expect(() => parseRegionNumber("XYZ")).toThrow(/Region/);
   });
 
-  it("parseUnfalldeckung maps MIT-UNF/OHN-UNF to true/false", () => {
+  it("parseUnfalldeckung maps either year's Unfalleinschluss codes to true/false", () => {
     expect(parseUnfalldeckung("MIT-UNF")).toBe(true);
     expect(parseUnfalldeckung("OHN-UNF")).toBe(false);
+    expect(parseUnfalldeckung("MIT_UNF")).toBe(true);
+    expect(parseUnfalldeckung("OHN_UNF")).toBe(false);
     expect(() => parseUnfalldeckung("XYZ")).toThrow(/Unfalleinschluss/);
   });
 });

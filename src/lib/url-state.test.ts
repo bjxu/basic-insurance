@@ -77,3 +77,21 @@ describe("encodeState / decodeState — currentMonthlyPremium round-trip", () =>
     expect(decodeState(new URLSearchParams("cp=350")).currentMonthlyPremium).toBe(350);
   });
 });
+
+describe("decodeState — models backward/forward compatibility across BAG's 2027 reclassification", () => {
+  it("still decodes a legacy shared link using 2026's hausarzt/hmo codes", () => {
+    expect(decodeState(new URLSearchParams("models=standard,hausarzt,hmo")).models).toEqual([
+      "standard",
+      "hausarzt",
+      "hmo",
+    ]);
+  });
+
+  it("decodes a 2027 shared link using the new praxis/flex codes", () => {
+    expect(decodeState(new URLSearchParams("models=standard,praxis,flex")).models).toEqual([
+      "standard",
+      "praxis",
+      "flex",
+    ]);
+  });
+});

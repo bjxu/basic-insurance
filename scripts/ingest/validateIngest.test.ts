@@ -48,6 +48,19 @@ describe("validateIngestOutput", () => {
     expect(validateIngestOutput(csvText, rows)).toEqual({ ok: true, errors: [] });
   });
 
+  it("accounts for a dropped sibling-discount row using 2027's raw code format", () => {
+    const csvText = csv(
+      "8,ZH,P_OKPCH,2027,2026,PR_REG_1,AKA_03_ERW,MIT_UNF,BASE,BASE,E1,FRASTU_01,FRA_01_E_0300,301.1,1,1,Grundversicherung",
+      "8,ZH,P_OKPCH,2027,2026,PR_REG_1,AKA_01_KIN,MIT_UNF,BASE,BASE,K1,FRASTU_01,FRA_01_K_0000,120,0,1,Grundversicherung",
+      "8,ZH,P_OKPCH,2027,2026,PR_REG_1,AKA_01_KIN,MIT_UNF,BASE,BASE,K3,FRASTU_01,FRA_01_K_0000,60,0,1,Grundversicherung",
+    );
+    const rows = [
+      row({ year: 2027, tarifart: "standard" }),
+      row({ year: 2027, altersklasse: "kind", franchise: 0, monthlyPremium: 120, tarifart: "standard" }),
+    ];
+    expect(validateIngestOutput(csvText, rows)).toEqual({ ok: true, errors: [] });
+  });
+
   it("fails when a source row is missing from the output", () => {
     const csvText = csv(
       "8,ZH,CH,2026,2025,PR-REG CH1,AKL-ERW,MIT-UNF,BASE,TAR-BASE,,FRAST1,FRA-300,301.1,1,1,Grundversicherung",

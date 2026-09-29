@@ -48,7 +48,14 @@ describe("parseMemberCounts", () => {
   });
 
   it("throws on a non-numeric Durchschnittsbestand value", () => {
-    const text = csv("0008;AG;2024;153225,267");
+    const text = csv("0008;AG;2024;abc");
     expect(() => parseMemberCounts(text, insurerNames)).toThrow(/non-numeric Durchschnittsbestand/);
+  });
+
+  it("parses a comma-delimited file (2027 format) with unpadded insurer codes", () => {
+    const text = "﻿Versicherer,Kanton,Geschäftsjahr,Durchschnittsbestand\n8,AG,2025,147305.265483858\n8,ZH,2025,100.5";
+    const result = parseMemberCounts(text, insurerNames);
+    expect(result.counts).toEqual({ "8": 147406 }); // 147305.265... + 100.5 = 147405.765... -> round
+    expect(result.year).toBe(2025);
   });
 });

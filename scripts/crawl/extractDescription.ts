@@ -27,6 +27,8 @@ export function buildPrompt({ pageText, productName, tarifart }: ExtractArgs): s
     `- hausarzt: "Erstbehandlung immer beim gewählten Hausarzt"`,
     `- telmed: "Anruf bei Hotline erforderlich vor jedem Arztbesuch"`,
     `- hmo: "Erstanlaufstelle immer beim HMO-Zentrum"`,
+    `- praxis: "Erstanlaufstelle immer bei der gewählten Praxis oder dem HMO-Zentrum"`,
+    `- flex: "Mehrere Erstanlaufstellen zur Wahl, z. B. Praxis, Telmedizin oder Apotheke"`,
     ``,
     `Write one sentence per language (de, en, fr, it) — each under ${MAX_DESCRIPTION_LENGTH} characters.`,
     `If the page content below does not give you anything more specific than the`,

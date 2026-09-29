@@ -5,6 +5,7 @@ import fr from "./fr.json";
 import itMessages from "./it.json";
 import pt from "./pt.json";
 import es from "./es.json";
+import { ALL_TARIFARTS } from "@/lib/lookup";
 
 function collectKeys(value: unknown, prefix = ""): string[] {
   if (typeof value !== "object" || value === null) return [prefix];
@@ -36,5 +37,13 @@ describe("message catalogs", () => {
   ])("%s.json has exactly the same keys and placeholders as de.json", (_locale, catalog) => {
     expect(collectKeys(catalog).sort()).toEqual(deKeys);
     expect(collectPlaceholders(catalog)).toEqual(dePlaceholders);
+  });
+
+  it("de.json has label and description copy for every real Tarifart value", () => {
+    for (const tarifart of ALL_TARIFARTS) {
+      const entry = (de.copy.tarifart as Record<string, { label?: string; description?: string }>)[tarifart];
+      expect(entry?.label, `missing copy.tarifart.${tarifart}.label`).toBeTruthy();
+      expect(entry?.description, `missing copy.tarifart.${tarifart}.description`).toBeTruthy();
+    }
   });
 });

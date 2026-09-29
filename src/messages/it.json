@@ -144,6 +144,8 @@
       "hausarzt": { "label": "Medico di famiglia", "description": "Primo punto di contatto sempre presso il medico di famiglia scelto" },
       "telmed": { "label": "Telmed", "description": "Chiamata a una hotline obbligatoria prima di ogni visita medica" },
       "hmo": { "label": "HMO", "description": "Primo punto di contatto sempre presso il centro HMO" },
+      "praxis": { "label": "Medico di famiglia/HMO", "description": "Primo punto di contatto sempre presso lo studio o il centro HMO scelto" },
+      "flex": { "label": "Flex", "description": "Scelta tra più punti di primo contatto, ad es. studio medico, telemedicina o farmacia" },
       "andere": { "label": "Modello alternativo", "description": "Scelta limitata del primo punto di contatto" }
     },
     "altersklasse": {

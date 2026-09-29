@@ -28,16 +28,18 @@ export function filterPlans(rows: PremiumRow[], params: FilterParams): PremiumRo
 const TARIFART_PRIORITY: Record<Tarifart, number> = {
   standard: 0,
   hausarzt: 1,
-  telmed: 2,
-  hmo: 3,
-  andere: 4,
+  praxis: 2,
+  telmed: 3,
+  flex: 4,
+  hmo: 5,
+  andere: 6,
 };
 
-// All five Tarifart values, in the same priority order as TARIFART_PRIORITY above — the
+// All seven Tarifart values, in the same priority order as TARIFART_PRIORITY above — the
 // filter used when the provider-product-detail accordion needs every model type for an
 // insurer, independent of whichever models are currently toggled into the main list
 // (docs/superpowers/specs/2026-08-16-provider-product-detail-design.md).
-export const ALL_TARIFARTS: Tarifart[] = ["standard", "hausarzt", "telmed", "hmo", "andere"];
+export const ALL_TARIFARTS: Tarifart[] = ["standard", "hausarzt", "praxis", "telmed", "flex", "hmo", "andere"];
 
 /** For each insurer, keep only the row with the lowest monthlyPremium. */
 export function cheapestPerInsurer(rows: PremiumRow[]): PremiumRow[] {
