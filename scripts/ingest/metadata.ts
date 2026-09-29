@@ -80,3 +80,29 @@ export function carryForwardEnvironmentalLevy(
 
   return { ok: true, environmentalLevyPerMonth };
 }
+
+/**
+ * Given the raw text of the existing metadata.json (or `null` if the file doesn't exist)
+ * and the year being ingested, returns the full `availableYears` list to write into the
+ * new metadata.json: every previously published year plus the one just ingested, deduped
+ * and sorted ascending.
+ *
+ * ingest.ts rewrites metadata.json from scratch on every run, so without this an ingest of
+ * year N+1 would silently drop year N from the list — even though its premiums-N.json file
+ * is untouched on disk — and the year toggle would lose it (src/components/results/FilterBar.tsx).
+ */
+export function mergeAvailableYears(existingMetadataJson: string | null, year: number): number[] {
+  if (existingMetadataJson === null) return [year];
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(existingMetadataJson);
+  } catch {
+    return [year];
+  }
+
+  const raw = (parsed as { availableYears?: unknown } | null)?.availableYears;
+  const existingYears = Array.isArray(raw) ? raw.filter((y): y is number => typeof y === "number") : [];
+
+  return Array.from(new Set([...existingYears, year])).sort((a, b) => a - b);
+}
