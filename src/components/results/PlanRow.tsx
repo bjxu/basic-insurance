@@ -2,8 +2,8 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import type { PremiumRow } from "@/lib/types";
-import { discountVsStandardPct } from "@/lib/lookup";
-import { formatChf, formatMemberCount, formatMemberCountDetail } from "@/lib/format";
+import { discountVsStandardPct, yearOverYearChangePct } from "@/lib/lookup";
+import { formatChf, formatMemberCount, formatMemberCountDetail, formatYoyPct } from "@/lib/format";
 import { applyEnvironmentalLevy } from "@/lib/environmentalLevy";
 import metadata from "@/data/metadata.json";
 import { MODEL_TAG_CLASSES, DEFAULT_MODEL_TAG_CLASSES } from "@/lib/tarifart-style";
@@ -37,10 +37,7 @@ export function PlanRow({
 }: Props) {
   const t = useTranslations();
   const locale = useLocale();
-  const yoy =
-    previousYearPremium != null && previousYearPremium !== plan.monthlyPremium
-      ? ((plan.monthlyPremium - previousYearPremium) / previousYearPremium) * 100
-      : null;
+  const yoy = yearOverYearChangePct(previousYearPremium, plan.monthlyPremium);
   const discountPct =
     plan.tarifart === "standard" ? null : discountVsStandardPct(standardPremium, plan.monthlyPremium);
 
@@ -91,19 +88,18 @@ export function PlanRow({
           <span>· {t(`copy.tarifart.${plan.tarifart}.description`)}</span>
         </div>
       </div>
-      {yoy != null && (
-        <div
-          className={`text-xs font-semibold px-1.5 py-px rounded ${
-            yoy > 0 ? "bg-error-container text-error" : yoy < 0 ? "bg-success-container text-success" : "text-outline font-normal"
-          }`}
-        >
-          {yoy > 0 ? "+" : ""}
-          {yoy.toFixed(1)}%
-        </div>
-      )}
       <div className="text-right">
         <div className={`text-headline-small ${isCheapest ? "text-primary" : "text-on-surface"}`}>
           {formatChf(applyEnvironmentalLevy(plan.monthlyPremium, plan.year, ENVIRONMENTAL_LEVY_PER_MONTH))}
+          {yoy != null && (
+            <span
+              className={`ml-1 text-xs font-semibold ${
+                yoy > 0 ? "text-error" : yoy < 0 ? "text-success" : "text-outline font-normal"
+              }`}
+            >
+              ({formatYoyPct(yoy)})
+            </span>
+          )}
         </div>
         <div className="text-body-small text-outline">{t("results.perMonth")}</div>
       </div>
