@@ -8,7 +8,7 @@ import { PREMIUM_BANDS } from "@/lib/premiumBand";
 import { AGE_GROUPS } from "@/lib/ageGroup";
 import insurersData from "@/data/insurers.json";
 
-const TARIFARTEN = ["standard", "hmo", "hausarzt", "telmed", "andere"];
+const TARIFARTEN = ["standard", "hmo", "hausarzt", "praxis", "flex", "telmed", "andere"];
 const ALTERSKLASSEN = ["kind", "jung", "erwachsen"];
 const LOCALES: readonly string[] = routing.locales;
 const INSURER_CODES = new Set(insurersData.map((i) => i.insurerCode));

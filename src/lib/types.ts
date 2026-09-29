@@ -4,9 +4,11 @@ export type Altersklasse = "kind" | "jung" | "erwachsen"; // 0–18, 19–25, 26
 
 export type Tarifart =
   | "standard"
-  | "hmo"
-  | "hausarzt"
+  | "hmo" // 2026-only: BAG's real, separate HMO classification that year
+  | "hausarzt" // 2026-only: ditto for Hausarzt
+  | "praxis" // 2027+: BAG's merged Hausarzt+HMO category
   | "telmed"
+  | "flex" // 2027+: BAG's new "multiple first-contact options" category
   | "andere"; // driven by BAG classification, not hardcoded labels
 
 export type PremiumRow = {

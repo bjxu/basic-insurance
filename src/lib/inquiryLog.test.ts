@@ -34,7 +34,7 @@ describe("buildInquiryLogPayload", () => {
 
   it("includes every tarifart when the alternative-models filter is active", () => {
     const payload = buildInquiryLogPayload({ ...BASE_INPUT, altModelsActive: true });
-    expect(payload?.models).toEqual(["standard", "hausarzt", "telmed", "hmo", "andere"]);
+    expect(payload?.models).toEqual(["standard", "hausarzt", "praxis", "telmed", "flex", "hmo", "andere"]);
   });
 
   it("maps unfalldeckung=false to accident=false", () => {
