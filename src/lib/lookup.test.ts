@@ -9,6 +9,8 @@ import {
   groupByInsurer,
   groupProductsByTarifart,
   deriveVariantLabel,
+  yearOverYearChangePct,
+  previousYearPremiumByProduct,
 } from "@/lib/lookup";
 import type { PremiumRow, SelfReportedPlan } from "@/lib/types";
 
@@ -114,6 +116,56 @@ describe("discountVsStandardPct", () => {
   it("returns null when the Standard baseline is zero or negative (defensive)", () => {
     expect(discountVsStandardPct(0, 300)).toBeNull();
     expect(discountVsStandardPct(-10, 300)).toBeNull();
+  });
+});
+
+describe("yearOverYearChangePct", () => {
+  it("computes a positive percentage when the premium increased", () => {
+    expect(yearOverYearChangePct(300, 312)).toBeCloseTo(4);
+  });
+
+  it("computes a negative percentage when the premium decreased", () => {
+    expect(yearOverYearChangePct(300, 297)).toBeCloseTo(-1);
+  });
+
+  it("returns 0 when the premium is unchanged (still shown as ±0%, not omitted)", () => {
+    expect(yearOverYearChangePct(300, 300)).toBe(0);
+  });
+
+  it("returns null when there's no prior-year premium to compare against", () => {
+    expect(yearOverYearChangePct(undefined, 300)).toBeNull();
+  });
+
+  it("returns null when the prior-year premium is zero or negative (defensive)", () => {
+    expect(yearOverYearChangePct(0, 300)).toBeNull();
+    expect(yearOverYearChangePct(-10, 300)).toBeNull();
+  });
+});
+
+describe("previousYearPremiumByProduct", () => {
+  const params = { praemienregionId: "ZH-1", altersklasse: "erwachsen" as const, franchise: 500, unfalldeckung: true };
+  const previousYearRows: PremiumRow[] = [
+    { year: 2026, insurerCode: "A", insurerName: "Assura", praemienregionId: "ZH-1", altersklasse: "erwachsen", franchise: 500, unfalldeckung: true, tarifart: "standard", monthlyPremium: 283.9, tarifCode: "A-STD", productName: "Grundversicherung" },
+    // Reclassified for 2027 (hausarzt -> praxis) but the tarifCode is stable across years —
+    // matching must key on insurerCode+tarifCode, not tarifart, or this pairing breaks (§3).
+    { year: 2026, insurerCode: "B", insurerName: "Sanitas", praemienregionId: "ZH-1", altersklasse: "erwachsen", franchise: 500, unfalldeckung: true, tarifart: "hausarzt", monthlyPremium: 205, tarifCode: "B-HAUS", productName: "Hausarztmodell" },
+    // Different region — must be excluded.
+    { year: 2026, insurerCode: "A", insurerName: "Assura", praemienregionId: "BE-1", altersklasse: "erwachsen", franchise: 500, unfalldeckung: true, tarifart: "standard", monthlyPremium: 100, tarifCode: "A-STD", productName: "Grundversicherung" },
+  ];
+
+  it("maps insurerCode::tarifCode to the prior-year premium at the same region/age band/franchise/accident-coverage", () => {
+    const result = previousYearPremiumByProduct(previousYearRows, params);
+    expect(result.get("A::A-STD")).toBe(283.9);
+    expect(result.get("B::B-HAUS")).toBe(205);
+  });
+
+  it("excludes rows outside the given filter params", () => {
+    const result = previousYearPremiumByProduct(previousYearRows, params);
+    expect(result.size).toBe(2);
+  });
+
+  it("returns an empty map for empty input", () => {
+    expect(previousYearPremiumByProduct([], params).size).toBe(0);
   });
 });
 

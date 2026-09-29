@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatChf, formatMemberCount, formatMemberCountDetail, formatCount } from "@/lib/format";
+import { formatChf, formatMemberCount, formatMemberCountDetail, formatCount, formatYoyPct } from "@/lib/format";
 
 describe("formatChf", () => {
   it("formats with apostrophe thousands separator and two decimals", () => {
@@ -74,5 +74,24 @@ describe("formatCount", () => {
 
   it("rounds non-integer input", () => {
     expect(formatCount(41.6)).toBe("42");
+  });
+});
+
+describe("formatYoyPct", () => {
+  it("prefixes an increase with a plus sign", () => {
+    expect(formatYoyPct(4.2)).toBe("+4.2%");
+  });
+
+  it("prefixes a decrease with a true minus sign (U+2212), not a hyphen", () => {
+    expect(formatYoyPct(-1.1)).toBe("−1.1%");
+  });
+
+  it("renders zero as ±0%, not +0% or -0%", () => {
+    expect(formatYoyPct(0)).toBe("±0%");
+  });
+
+  it("rounds to one decimal place", () => {
+    expect(formatYoyPct(4.249)).toBe("+4.2%");
+    expect(formatYoyPct(4.25)).toBe("+4.3%"); // matches Number.prototype.toFixed rounding
   });
 });

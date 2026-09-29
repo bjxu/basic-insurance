@@ -112,6 +112,40 @@ export function discountVsStandardPct(standardPremium: number | undefined, premi
   return ((standardPremium - premium) / standardPremium) * 100;
 }
 
+/** Year-over-year change of `premium` vs. this same plan's premium the year before, as a
+ *  percentage — shown in brackets next to a next-year premium (§5.3), never next to a
+ *  current-year one (there's nothing earlier in scope to compare it against, §6.3). Returns
+ *  null (bracket omitted) when there's no prior-year premium for this plan to compare
+ *  against, e.g. the plan didn't exist in BAG's prior-year data. */
+export function yearOverYearChangePct(previousYearPremium: number | undefined, premium: number): number | null {
+  if (previousYearPremium == null || previousYearPremium <= 0) return null;
+  return ((premium - previousYearPremium) / previousYearPremium) * 100;
+}
+
+/** Maps each product (`insurerCode::tarifCode`) to its premium in `previousYearRows`, at the
+ *  given region/age-band/franchise/accident-coverage — the year-over-year baseline for
+ *  next-year rows (§5.3). Keyed on tarifCode rather than tarifart so a product that BAG
+ *  reclassified into a different Tarifart between years (§3, the 2027 Hausarzt/HMO → Praxis
+ *  merge) still matches its own prior-year premium. Mirrors `standardPremiumsByInsurer`'s
+ *  "same params, one axis fixed" shape, fixing year instead of model. */
+export function previousYearPremiumByProduct(
+  previousYearRows: PremiumRow[],
+  params: Omit<FilterParams, "models" | "year">,
+): Map<string, number> {
+  const map = new Map<string, number>();
+  for (const row of previousYearRows) {
+    if (
+      row.praemienregionId === params.praemienregionId &&
+      row.altersklasse === params.altersklasse &&
+      row.franchise === params.franchise &&
+      row.unfalldeckung === params.unfalldeckung
+    ) {
+      map.set(`${row.insurerCode}::${row.tarifCode}`, row.monthlyPremium);
+    }
+  }
+  return map;
+}
+
 /** Groups rows by insurerCode, preserving each row's original relative order — used to
  *  look up "all of this insurer's products at the current filter context" for the
  *  provider-product-detail accordion. */

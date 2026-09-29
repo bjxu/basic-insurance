@@ -6,6 +6,7 @@ type Props = {
   currentInsurerCode: string | null;
   standardBaseline: Map<string, number>;
   productsByInsurer: Map<string, PremiumRow[]>;
+  previousYearPremiums: Map<string, number>;
   memberCounts: Record<string, number>;
   memberCountAsOf: number;
 };
@@ -15,6 +16,7 @@ export function PlanList({
   currentInsurerCode,
   standardBaseline,
   productsByInsurer,
+  previousYearPremiums,
   memberCounts,
   memberCountAsOf,
 }: Props) {
@@ -29,6 +31,7 @@ export function PlanList({
           isCurrentPlan={plan.insurerCode === currentInsurerCode}
           standardPremium={standardBaseline.get(plan.insurerCode)}
           products={productsByInsurer.get(plan.insurerCode) ?? [plan]}
+          previousYearPremium={previousYearPremiums.get(`${plan.insurerCode}::${plan.tarifCode}`)}
           memberCount={memberCounts[plan.insurerCode]}
           memberCountAsOf={memberCountAsOf}
         />

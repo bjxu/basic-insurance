@@ -75,3 +75,12 @@ export function formatMemberCountDetail(count: number, asOfYear: number, locale:
 export function formatCount(n: number): string {
   return groupThousands(String(Math.round(n)));
 }
+
+// Year-over-year change, shown in brackets next to a next-year premium (PlanRow, §5.3):
+// "+4.2%" / "−1.1%" / "±0%". A true minus sign (U+2212), not a hyphen, matching the mockup.
+// Zero-ness is checked post-rounding so a sub-0.05% drift (e.g. -0.02) still reads "±0%"
+// instead of the misleading "−0.0%".
+export function formatYoyPct(pct: number): string {
+  if (parseFloat(pct.toFixed(1)) === 0) return "±0%";
+  return `${pct > 0 ? "+" : "−"}${Math.abs(pct).toFixed(1)}%`;
+}

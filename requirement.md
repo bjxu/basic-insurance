@@ -145,10 +145,15 @@ Below the headline, one row per insurer is listed, showing that insurer's **chea
 - Year: current year by default; toggle to next year once published. This toggle also
   drives the headline's year, per §5.2.
 
-Each row shows: insurer name, model badge with its restriction note, monthly premium, and
-— when next year's data is available and the premium differs — that plan's own
-year-over-year change. Alternative-model rows additionally show a **discount badge** next
-to the model badge — see REQ-23.
+Each row shows: insurer name, model badge with its restriction note, and monthly premium.
+The year-over-year change is only ever shown next to a **next-year (2027)** premium,
+comparing it against that same plan's current-year (2026) premium — it never appears next
+to a current-year premium, since 2026 has no earlier year in scope to compare against
+(§6.3). Whenever the year toggle is on next year, the change is shown in brackets
+immediately after the premium (e.g. "CHF 295.95 (+4.2%)" for an increase, "CHF 313.35
+(−1.1%)" for a decrease, "CHF 329.65 (±0%)" when unchanged) rather than as a separate
+badge. Alternative-model rows additionally show a **discount badge** next to the model
+badge — see REQ-23.
 
 The list is not paginated (realistic result-set sizes are on the order of dozens of
 insurers, not hundreds).

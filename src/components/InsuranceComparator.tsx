@@ -24,6 +24,7 @@ import {
   sortPlans,
   computeHeadline,
   standardPremiumsByInsurer,
+  previousYearPremiumByProduct,
   groupByInsurer,
   ALL_TARIFARTS,
 } from "@/lib/lookup";
@@ -139,6 +140,32 @@ export function InsuranceComparator() {
   }, [year, premiumsByYear]);
 
   const ALL_PREMIUMS = premiumsByYear[year] ?? [];
+
+  // The year immediately before the active one, if any — the year-over-year baseline
+  // (§5.3). Only ever set when `year` is a next-year toggle (2026 is the earliest year in
+  // scope, §6.3), so the bracket only ever appears next to a next-year premium.
+  const previousYear = metadata.availableYears[metadata.availableYears.indexOf(year) - 1] as number | undefined;
+
+  // Fetch the prior year's data too, purely to compute the year-over-year change. Unlike
+  // the active year's fetch above, a failure here must not block or error the main view —
+  // the bracket is simply omitted, the same defensive-omission pattern as the discount and
+  // member-count badges (REQ-23/REQ-24).
+  useEffect(() => {
+    if (previousYear == null || premiumsByYear[previousYear]) return;
+    let cancelled = false;
+    fetch(`/data/premiums-${previousYear}.json`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`failed to load premium data for ${previousYear}: HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((rows: PremiumRow[]) => {
+        if (!cancelled) setPremiumsByYear((prev) => ({ ...prev, [previousYear]: rows }));
+      })
+      .catch((err) => console.error(err));
+    return () => {
+      cancelled = true;
+    };
+  }, [previousYear, premiumsByYear]);
 
   // Sync state to URL (REQ-11) — replace, not push, to avoid history spam.
   useEffect(() => {
@@ -273,7 +300,16 @@ export function InsuranceComparator() {
 
     const headline = computeHeadline(current, cheapestForHeadline);
 
-    return { plans: cheapestRows, headline, standardBaseline, productsByInsurer };
+    // Year-over-year baseline for the bracket next to each row's premium (§5.3) — only
+    // populated when `year` is a next-year toggle with prior-year data already loaded;
+    // otherwise empty, so PlanRow's bracket is omitted everywhere (defensive default, same
+    // as an unmatched discount/member-count baseline).
+    const previousYearPremiums =
+      previousYear != null && premiumsByYear[previousYear]
+        ? previousYearPremiumByProduct(premiumsByYear[previousYear], { praemienregionId, altersklasse, franchise, unfalldeckung })
+        : new Map<string, number>();
+
+    return { plans: cheapestRows, headline, standardBaseline, productsByInsurer, previousYearPremiums };
   }, [
     inputsValid,
     praemienregionId,
@@ -282,6 +318,8 @@ export function InsuranceComparator() {
     altModelsActive,
     unfalldeckung,
     year,
+    previousYear,
+    premiumsByYear,
     currentPlan,
     currentPlanProvided,
     ALL_PREMIUMS,
@@ -390,6 +428,7 @@ export function InsuranceComparator() {
               currentInsurerCode={currentPlan.insurerCode ?? null}
               standardBaseline={results.standardBaseline}
               productsByInsurer={results.productsByInsurer}
+              previousYearPremiums={results.previousYearPremiums}
               memberCounts={MEMBER_COUNTS}
               memberCountAsOf={metadata.memberCountAsOf}
             />
