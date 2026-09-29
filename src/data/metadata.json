@@ -1,10 +1,12 @@
 {
-  "publicationDate": "2025-09-23",
+  "publicationDate": "2026-09-29",
   "availableYears": [
-    2026
+    2026,
+    2027
   ],
-  "memberCountAsOf": 2024,
+  "memberCountAsOf": 2025,
   "environmentalLevyPerMonth": {
-    "2026": 5.15
+    "2026": 5.15,
+    "2027": 4.75
   }
 }

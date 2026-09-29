@@ -1301,8 +1301,8 @@
   ],
   "1187": [
     {
-      "bfsNr": 5436,
-      "name": "Saint-Oyens",
+      "bfsNr": 5428,
+      "name": "Gimel",
       "kanton": "VD",
       "praemienregionId": "VD-1"
     }
@@ -1323,8 +1323,8 @@
   ],
   "1189": [
     {
-      "bfsNr": 5437,
-      "name": "Saubraz",
+      "bfsNr": 5428,
+      "name": "Gimel",
       "kanton": "VD",
       "praemienregionId": "VD-1"
     }
@@ -1811,12 +1811,6 @@
   ],
   "1246": [
     {
-      "bfsNr": 6616,
-      "name": "Collonge-Bellerive",
-      "kanton": "GE",
-      "praemienregionId": "GE-0"
-    },
-    {
       "bfsNr": 6619,
       "name": "Corsier (GE)",
       "kanton": "GE",
@@ -1885,12 +1879,6 @@
   ],
   "1255": [
     {
-      "bfsNr": 6641,
-      "name": "Troinex",
-      "kanton": "GE",
-      "praemienregionId": "GE-0"
-    },
-    {
       "bfsNr": 6645,
       "name": "Veyrier",
       "kanton": "GE",
@@ -1898,18 +1886,6 @@
     }
   ],
   "1256": [
-    {
-      "bfsNr": 6628,
-      "name": "Lancy",
-      "kanton": "GE",
-      "praemienregionId": "GE-0"
-    },
-    {
-      "bfsNr": 6633,
-      "name": "Plan-les-Ouates",
-      "kanton": "GE",
-      "praemienregionId": "GE-0"
-    },
     {
       "bfsNr": 6641,
       "name": "Troinex",
@@ -1927,12 +1903,6 @@
     {
       "bfsNr": 6633,
       "name": "Plan-les-Ouates",
-      "kanton": "GE",
-      "praemienregionId": "GE-0"
-    },
-    {
-      "bfsNr": 6641,
-      "name": "Troinex",
       "kanton": "GE",
       "praemienregionId": "GE-0"
     }
@@ -2305,12 +2275,6 @@
   ],
   "1292": [
     {
-      "bfsNr": 6606,
-      "name": "Bellevue",
-      "kanton": "GE",
-      "praemienregionId": "GE-0"
-    },
-    {
       "bfsNr": 6621,
       "name": "Genève",
       "kanton": "GE",
@@ -2327,12 +2291,6 @@
     {
       "bfsNr": 6606,
       "name": "Bellevue",
-      "kanton": "GE",
-      "praemienregionId": "GE-0"
-    },
-    {
-      "bfsNr": 6622,
-      "name": "Genthod",
       "kanton": "GE",
       "praemienregionId": "GE-0"
     }
@@ -2605,64 +2563,64 @@
   ],
   "1341": [
     {
-      "bfsNr": 5872,
-      "name": "Le Chenit",
+      "bfsNr": 5940,
+      "name": "La Vallée de Joux",
       "kanton": "VD",
       "praemienregionId": "VD-2"
     }
   ],
   "1342": [
     {
-      "bfsNr": 5871,
-      "name": "L'Abbaye",
+      "bfsNr": 5940,
+      "name": "La Vallée de Joux",
       "kanton": "VD",
       "praemienregionId": "VD-2"
     }
   ],
   "1343": [
     {
-      "bfsNr": 5873,
-      "name": "Le Lieu",
+      "bfsNr": 5940,
+      "name": "La Vallée de Joux",
       "kanton": "VD",
       "praemienregionId": "VD-2"
     }
   ],
   "1344": [
     {
-      "bfsNr": 5871,
-      "name": "L'Abbaye",
+      "bfsNr": 5940,
+      "name": "La Vallée de Joux",
       "kanton": "VD",
       "praemienregionId": "VD-2"
     }
   ],
   "1345": [
     {
-      "bfsNr": 5873,
-      "name": "Le Lieu",
+      "bfsNr": 5940,
+      "name": "La Vallée de Joux",
       "kanton": "VD",
       "praemienregionId": "VD-2"
     }
   ],
   "1346": [
     {
-      "bfsNr": 5871,
-      "name": "L'Abbaye",
+      "bfsNr": 5940,
+      "name": "La Vallée de Joux",
       "kanton": "VD",
       "praemienregionId": "VD-2"
     }
   ],
   "1347": [
     {
-      "bfsNr": 5872,
-      "name": "Le Chenit",
+      "bfsNr": 5940,
+      "name": "La Vallée de Joux",
       "kanton": "VD",
       "praemienregionId": "VD-2"
     }
   ],
   "1348": [
     {
-      "bfsNr": 5872,
-      "name": "Le Chenit",
+      "bfsNr": 5940,
+      "name": "La Vallée de Joux",
       "kanton": "VD",
       "praemienregionId": "VD-2"
     }
@@ -3119,16 +3077,16 @@
   ],
   "1437": [
     {
-      "bfsNr": 5930,
-      "name": "Suscévaz",
+      "bfsNr": 5941,
+      "name": "Mathod-Suscévaz",
       "kanton": "VD",
       "praemienregionId": "VD-2"
     }
   ],
   "1438": [
     {
-      "bfsNr": 5919,
-      "name": "Mathod",
+      "bfsNr": 5941,
+      "name": "Mathod-Suscévaz",
       "kanton": "VD",
       "praemienregionId": "VD-2"
     }
@@ -3465,8 +3423,8 @@
   ],
   "1521": [
     {
-      "bfsNr": 5669,
-      "name": "Curtilles",
+      "bfsNr": 5675,
+      "name": "Lucens",
       "kanton": "VD",
       "praemienregionId": "VD-2"
     }
@@ -3557,16 +3515,16 @@
   ],
   "1532": [
     {
-      "bfsNr": 2016,
-      "name": "Fétigny",
+      "bfsNr": 2056,
+      "name": "Fétigny-Ménières",
       "kanton": "FR",
       "praemienregionId": "FR-2"
     }
   ],
   "1533": [
     {
-      "bfsNr": 2027,
-      "name": "Ménières",
+      "bfsNr": 2056,
+      "name": "Fétigny-Ménières",
       "kanton": "FR",
       "praemienregionId": "FR-2"
     }
@@ -5393,12 +5351,6 @@
       "name": "Chardonne",
       "kanton": "VD",
       "praemienregionId": "VD-1"
-    },
-    {
-      "bfsNr": 5885,
-      "name": "Jongny",
-      "kanton": "VD",
-      "praemienregionId": "VD-1"
     }
   ],
   "1804": [
@@ -5407,21 +5359,9 @@
       "name": "Corsier-sur-Vevey",
       "kanton": "VD",
       "praemienregionId": "VD-1"
-    },
-    {
-      "bfsNr": 5885,
-      "name": "Jongny",
-      "kanton": "VD",
-      "praemienregionId": "VD-1"
     }
   ],
   "1805": [
-    {
-      "bfsNr": 5884,
-      "name": "Corsier-sur-Vevey",
-      "kanton": "VD",
-      "praemienregionId": "VD-1"
-    },
     {
       "bfsNr": 5885,
       "name": "Jongny",
@@ -5981,6 +5921,12 @@
       "name": "Leytron",
       "kanton": "VS",
       "praemienregionId": "VS-1"
+    },
+    {
+      "bfsNr": 6140,
+      "name": "Saillon",
+      "kanton": "VS",
+      "praemienregionId": "VS-1"
     }
   ],
   "1912": [
@@ -6337,12 +6283,6 @@
   ],
   "1965": [
     {
-      "bfsNr": 6023,
-      "name": "Conthey",
-      "kanton": "VS",
-      "praemienregionId": "VS-1"
-    },
-    {
       "bfsNr": 6265,
       "name": "Savièse",
       "kanton": "VS",
@@ -6625,12 +6565,6 @@
     {
       "bfsNr": 6024,
       "name": "Nendaz",
-      "kanton": "VS",
-      "praemienregionId": "VS-1"
-    },
-    {
-      "bfsNr": 6134,
-      "name": "Isérables",
       "kanton": "VS",
       "praemienregionId": "VS-1"
     }
@@ -10377,12 +10311,6 @@
       "name": "Neuenegg",
       "kanton": "BE",
       "praemienregionId": "BE-2"
-    },
-    {
-      "bfsNr": 2309,
-      "name": "Wünnewil-Flamatt",
-      "kanton": "FR",
-      "praemienregionId": "FR-2"
     }
   ],
   "3177": [
@@ -10657,8 +10585,8 @@
   ],
   "3214": [
     {
-      "bfsNr": 2278,
-      "name": "Ulmiz",
+      "bfsNr": 2262,
+      "name": "Gurmels",
       "kanton": "FR",
       "praemienregionId": "FR-2"
     }
@@ -16423,14 +16351,14 @@
       "praemienregionId": "SO-0"
     },
     {
-      "bfsNr": 2542,
-      "name": "Bellach",
+      "bfsNr": 2534,
+      "name": "Zuchwil",
       "kanton": "SO",
       "praemienregionId": "SO-0"
     },
     {
-      "bfsNr": 2550,
-      "name": "Langendorf",
+      "bfsNr": 2542,
+      "name": "Bellach",
       "kanton": "SO",
       "praemienregionId": "SO-0"
     },
@@ -16795,20 +16723,8 @@
   ],
   "4566": [
     {
-      "bfsNr": 2520,
-      "name": "Halten",
-      "kanton": "SO",
-      "praemienregionId": "SO-0"
-    },
-    {
       "bfsNr": 2525,
       "name": "Kriegstetten",
-      "kanton": "SO",
-      "praemienregionId": "SO-0"
-    },
-    {
-      "bfsNr": 2529,
-      "name": "Oekingen",
       "kanton": "SO",
       "praemienregionId": "SO-0"
     }
@@ -17187,12 +17103,6 @@
     {
       "bfsNr": 2493,
       "name": "Lostorf",
-      "kanton": "SO",
-      "praemienregionId": "SO-0"
-    },
-    {
-      "bfsNr": 2501,
-      "name": "Winznau",
       "kanton": "SO",
       "praemienregionId": "SO-0"
     }
@@ -22849,12 +22759,6 @@
       "name": "Arbedo-Castione",
       "kanton": "TI",
       "praemienregionId": "TI-1"
-    },
-    {
-      "bfsNr": 5010,
-      "name": "Lumino",
-      "kanton": "TI",
-      "praemienregionId": "TI-1"
     }
   ],
   "6533": [
@@ -23289,14 +23193,6 @@
       "praemienregionId": "TI-1"
     }
   ],
-  "6611": [
-    {
-      "bfsNr": 5136,
-      "name": "Onsernone",
-      "kanton": "TI",
-      "praemienregionId": "TI-2"
-    }
-  ],
   "6612": [
     {
       "bfsNr": 5091,
@@ -23350,6 +23246,12 @@
     }
   ],
   "6622": [
+    {
+      "bfsNr": 5091,
+      "name": "Ascona",
+      "kanton": "TI",
+      "praemienregionId": "TI-1"
+    },
     {
       "bfsNr": 5125,
       "name": "Ronco sopra Ascona",
@@ -23548,30 +23450,6 @@
     }
   ],
   "6661": [
-    {
-      "bfsNr": 5136,
-      "name": "Onsernone",
-      "kanton": "TI",
-      "praemienregionId": "TI-2"
-    }
-  ],
-  "6662": [
-    {
-      "bfsNr": 5136,
-      "name": "Onsernone",
-      "kanton": "TI",
-      "praemienregionId": "TI-2"
-    }
-  ],
-  "6663": [
-    {
-      "bfsNr": 5136,
-      "name": "Onsernone",
-      "kanton": "TI",
-      "praemienregionId": "TI-2"
-    }
-  ],
-  "6664": [
     {
       "bfsNr": 5136,
       "name": "Onsernone",
@@ -24425,12 +24303,6 @@
       "name": "Castel San Pietro",
       "kanton": "TI",
       "praemienregionId": "TI-1"
-    },
-    {
-      "bfsNr": 5254,
-      "name": "Mendrisio",
-      "kanton": "TI",
-      "praemienregionId": "TI-1"
     }
   ],
   "6875": [
@@ -24578,6 +24450,12 @@
     }
   ],
   "6925": [
+    {
+      "bfsNr": 5192,
+      "name": "Lugano",
+      "kanton": "TI",
+      "praemienregionId": "TI-1"
+    },
     {
       "bfsNr": 5236,
       "name": "Collina d'Oro",
@@ -24879,12 +24757,6 @@
       "name": "Lugano",
       "kanton": "TI",
       "praemienregionId": "TI-1"
-    },
-    {
-      "bfsNr": 5226,
-      "name": "Capriasca",
-      "kanton": "TI",
-      "praemienregionId": "TI-1"
     }
   ],
   "6960": [
@@ -25095,12 +24967,6 @@
     {
       "bfsNr": 5151,
       "name": "Bioggio",
-      "kanton": "TI",
-      "praemienregionId": "TI-1"
-    },
-    {
-      "bfsNr": 5161,
-      "name": "Cademario",
       "kanton": "TI",
       "praemienregionId": "TI-1"
     },
@@ -31026,6 +30892,12 @@
     }
   ],
   "8725": [
+    {
+      "bfsNr": 3339,
+      "name": "Uznach",
+      "kanton": "SG",
+      "praemienregionId": "SG-2"
+    },
     {
       "bfsNr": 3341,
       "name": "Gommiswald",
