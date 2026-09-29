@@ -68,7 +68,7 @@ export function validateIngestOutput(csvText: string, rows: PremiumRow[]): Valid
   let droppedCantonRows = 0;
 
   for (const r of records) {
-    if (r.Altersklasse === "AKL-KIN" && r.Altersuntergruppe !== "K1") {
+    if ((r.Altersklasse === "AKL-KIN" || r.Altersklasse === "AKA_01_KIN") && r.Altersuntergruppe !== "K1") {
       droppedSiblingRows++;
       continue;
     }
